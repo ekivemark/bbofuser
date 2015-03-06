@@ -1,0 +1,43 @@
+{% load i18n %}
+
+<div class="container-fluid">
+<div class="navbar navbar-default navbar-static">
+  <ul class="nav nav-pills">
+       <li><a class="navbar-brand" href="#" contenteditable="false"><img src="{{ STATIC_URL }}img/layout/blue-button.png" align="top" alt="{{APPLICATION_TITLE }}" height="100" width="100"></a></li>
+        <li><a class="navbar-brand" href="/" contenteditable="false">{{APPLICATION_TITLE }}</a></li>
+
+        <li class="active">
+            <a href="/" class="" contenteditable="false">Home</a>
+        </li>
+  {% if user.is_authenticated %}
+      <li>
+          <a href="/accounts/logout">{% trans "Logout" %}</a>
+      </li>
+      <li>
+          <a href="/developer/app_management">{% trans "My Applications" %}</a>
+      </li>
+  {% else %}
+      <li>
+          <a href="/accounts/login?next=/">{% trans "Login" %}</a>
+      </li>
+      <li>
+          <a href="/accounts/register/">{% trans "Register" %}</a>
+      </li>
+  {% endif %}
+        <li class="divider-vertical"></li>
+
+      <li><a class="btn dropdown-toggle" data-toggle="dropdown" href="#">More...<span class="caret"></span></a>
+        <ul class="dropdown-menu">
+	        <li><a href="/developer/documentation" class="">Documentation</a>
+    	    </li>
+        	<li><a href="/developer/support" class="">Support</a>
+   		    </li>
+        	<li class="divider"></li>
+        	<li><a href="#" class="">Choice..</a>
+        	</li>
+        </ul>
+      </li>
+      </ul>
+</div>
+</div>
+

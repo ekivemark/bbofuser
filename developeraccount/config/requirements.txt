@@ -1,0 +1,9 @@
+Django==1.7.4
+django-bootstrap-form==3.1
+django-bootstrap3==5.1.1
+django-registration==1.0
+django-registration-redux==1.1
+mongoengine==0.8.7
+pymongo==2.8
+python-stdnum==1.0
+wsgiref==0.1.2
