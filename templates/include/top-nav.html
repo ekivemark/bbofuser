@@ -14,6 +14,7 @@
           <a href="/accounts/logout">{% trans "Logout" %}</a>
       </li>
       <li>
+{# TODO: create /developer/app_management #}
           <a href="/developer/app_management">{% trans "My Applications" %}</a>
       </li>
   {% else %}
@@ -26,18 +27,18 @@
   {% endif %}
         <li class="divider-vertical"></li>
 
-      <li><a class="btn dropdown-toggle" data-toggle="dropdown" href="#">More...<span class="caret"></span></a>
-        <ul class="dropdown-menu">
-	        <li><a href="/developer/documentation" class="">Documentation</a>
-    	    </li>
-        	<li><a href="/developer/support" class="">Support</a>
-   		    </li>
+      <li class="dropdown" id="menu1">
+        <a href="#" class="btn dropdown-toggle" data-toggle="dropdown" >More options...<span class="caret"></span></a>
+        <ul class="dropdown-menu" id="menu1" role="menu">
+{# TODO: Create /developer/documentation page  #}
+	        <li><a href="/developer/documentation" class="">Documentation</a></li>
+{# TODO: /developer/support page  #}
+        	<li><a href="/developer/support" class="">Support</a></li>
         	<li class="divider"></li>
-        	<li><a href="#" class="">Choice..</a>
-        	</li>
+        	<li><a href="#" class="">Choice..</a></li>
         </ul>
       </li>
-      </ul>
+  </ul>
 </div>
 </div>
 

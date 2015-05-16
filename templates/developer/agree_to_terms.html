@@ -26,18 +26,36 @@ div.terms strong {color:#000;}
 		<div class="col-md-12 column">
 
 			<div class="jumbotron well">
-				<p>
-					Registering for a Developer Account requires you to agree to the terms of service shown below.
-				</p>
+				<p>Signing up for a Developer Account is a 3 step process:</p>
+                    <ul>
+                        <li>Agree to the terms of service and our Developer Code of Honor</li>
+                        <li>by creating an account name and password.</li>
+                        <li>Confirm your email address</li>
+                    </ul>
+                <p> These first two steps give you access to the BlueButtonOnFHIR test platform. There is no live production data
+                    on the test platform. The data in the test platform can change at any time.</p>
+                <p> To obtain a key that enables you to let Medicare Beneficiaries connect their Medicare information to
+                    your production application requires you to go through two more steps:</p>
+                    <ul>
+                        <li>Verify your identity</li>
+                        <li>Verify that you have the authority to bind the organization you represent to our terms of use.</li>
+                    </ul>
+                <h3>
+					Step 1: Registering for a Developer Account requires you to agree to the terms of service shown below.
+				</h3>
             </div>
             <div class="terms" >
 
-            <!--- Template is in developeraccount/templates/developer --->
-            {% include "developer/terms_of_use.html" %}
+                <!--- Template is in developeraccount/templates/developer --->
+                {% include "developer/terms_of_use.html" %}
 
+             </div>
+            <h3>
+                Step 2: Agree to the Terms of Use by creating your account and clicking the <br/>"I agree to the terms" button.
+            </h3>
 
-            </div>
-			<form class="form-horizontal" role="form">
+{# TODO: create /developer/create_account page to handle form  #}
+			<form class="form-horizontal" role="form" action="#" method="post">
 				<div class="form-group">
 					 <label for="inputEmail3" class="col-sm-2 control-label">Email</label>
 					<div class="col-sm-10">
@@ -64,10 +82,10 @@ div.terms strong {color:#000;}
 
                     <div class="row clearfix">
 				        <div class="col-md-6 column">
-                            <button type="button" class="btn btn-lg btn-block btn-success">I Agree to the terms</button>
+                            <button type="submit" class="btn btn-lg btn-block btn-success">I Agree to the terms</button>
 				        </div>
 				        <div class="col-md-6 column">
-                            <button type="button" class="btn btn-lg btn-block btn-danger">Cancel</button>
+                            <a href="/developer/agree_to_terms"><button type="button" class="btn btn-lg btn-block btn-danger">Cancel</button></a>
 				        </div>
 			        </div>
                 </div>
