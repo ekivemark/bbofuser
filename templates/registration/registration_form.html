@@ -8,7 +8,11 @@
 <form method="post" action="">
     {% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="{% trans 'Submit' %}" />
+
+    <a href="/"><input type="button" class="btn-danger" value="Cancel" /></a>
+
+    <input class="btn-success" type="submit" value="{% trans 'I Agree to the terms - Register Me' %}" />
+
 </form>
 {% endblock %}
 

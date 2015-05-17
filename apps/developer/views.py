@@ -1,5 +1,6 @@
 """
-
+ Developer views
+ (c) 2015 - Mark Scrimshire - @ekivemark
 """
 
 # TODO Activate Account
