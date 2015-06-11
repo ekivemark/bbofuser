@@ -9,8 +9,8 @@ Resource views
  (c) 2015 - Mark Scrimshire - @ekivemark
 """
 
-# TODO: Build RESTAPI here
-# TODO: Integrate REST FRamework
+# TODO: Build REST API here
+# TODO: Integrate REST framework
 
 # Work flow will use django-registration to enable Account sign up
 # After Activation

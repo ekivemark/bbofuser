@@ -8,6 +8,15 @@ from django.views.generic import FormView
 from django.views.generic.base import TemplateView
 from django.contrib import messages
 
+# used by DemoApi
+from django.conf import settings
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+import requests
+import json
+import dicttoxml
+from xml.dom.minidom import parseString
+
 from .forms import ContactForm, FilesForm, ContactFormSet
 
 
@@ -91,4 +100,37 @@ class PaginationView(TemplateView):
 
 class MiscView(TemplateView):
     template_name = 'demo/misc.html'
+
+
+def DemoApi(request):
+
+    # Demo API
+    application_title = settings.APPLICATION_TITLE
+    DEBUG = settings.DEBUG_SETTINGS
+
+    if DEBUG:
+        print application_title, "in demo.views.DemoApi"
+
+    fhir_server_url = "http://localhost:8080/fhir-p/"
+    fhir_server_param = "baseDstu2/Patient/1/$everything?_format=json"
+
+    data = json.dumps({})
+    r = requests.get(fhir_server_url+fhir_server_param, )
+
+
+    #print r.json
+    #print r.content
+
+    result = r.content
+    result_content = json.loads(r.content)
+    #result = result["resource"]
+    result = json.dumps(result_content, indent=4, )
+    xmlresult = dicttoxml.dicttoxml(result_content)
+
+    dom = parseString(xmlresult)
+    #print dom.toprettyxml()
+
+    context = {"APPLICATION_TITLE": application_title,"result": result, "xmlresult": dom.toprettyxml(),
+               "url": fhir_server_url, "params": fhir_server_param }
+    return render_to_response('demo/demoapi.html', RequestContext(request, context))
 

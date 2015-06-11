@@ -134,7 +134,8 @@ DATABASES = {
 # Use MongoDb for documents
 
 #Mongo DB settings
-MONGO_HOST = "127.0.0.1"
+# MONGO_HOST = "127.0.0.1"
+MONGO_HOST = "172.31.13.249"
 MONGO_PORT = 27017
 MONGO_DB_NAME = "BlueButtonRepository"
 MONGO_ALIAS = "default"
