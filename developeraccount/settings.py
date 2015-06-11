@@ -216,7 +216,7 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
 )
 
-
+from registration_defaults.settings import *
 # For Django Registration:
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
 REGISTRATION_AUTO_LOGIN = False # Automatically log the user in.
@@ -229,7 +229,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # to use console open terminal and run:
 # python -m smtpd -n -c DebuggingServer localhost:1025
 # Replacing localhost:1025 with EMAIL_HOST:EMAIL_PORT if different
-
+DEFAULT_FROM_EMAIL = 'accounts@dev.bbonfhir.com'
 
 if DEBUG_SETTINGS:
     print "Email via %s" % EMAIL_BACKEND
