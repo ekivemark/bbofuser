@@ -146,13 +146,13 @@ MONGO_USER = ""
 MONGO_PASSWORD = ""
 
 from mongoengine import connect
-MONGO_CONNECTION = connect(MONGO_DB_NAME,
-                           alias=MONGO_ALIAS,
-                           username=MONGO_USER, password=MONGO_PASSWORD,
-                           host=MONGO_HOST, port=MONGO_PORT,
-                           )
-if DEBUG_SETTINGS:
-    print "MONGO_CONNECTION:",MONGO_CONNECTION
+# MONGO_CONNECTION = connect(MONGO_DB_NAME,
+#                            alias=MONGO_ALIAS,
+#                            username=MONGO_USER, password=MONGO_PASSWORD,
+#                            host=MONGO_HOST, port=MONGO_PORT,
+#                            )
+# if DEBUG_SETTINGS:
+#     print "MONGO_CONNECTION:",MONGO_CONNECTION
 
 
 # Internationalization
