@@ -56,6 +56,7 @@ ADMINS = (
 MANAGERS = ADMINS
 
 APPLICATION_TITLE = "BB+ Developer Accounts"
+APPLICATION_TITLE = parser.get('global', 'application_title')
 
 if DEBUG_SETTINGS:
     print "Application: %s" % APPLICATION_TITLE
