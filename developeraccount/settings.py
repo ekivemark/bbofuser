@@ -261,7 +261,7 @@ else:
 DEFAULT_FROM_EMAIL = parser.get('global', 'default_from_email')
 
 if DEBUG_SETTINGS:
-    print "Email via %s" % EMAIL_BACKEND
+    print "Email via %s: %s" % (EMAIL_BACKEND_TYPE, EMAIL_BACKEND)
     print "Email Host:Port: %s:%s (%s)" % (EMAIL_HOST, EMAIL_PORT, EMAIL_PORT_NO)
 
 # Django 1.6+ implement a new test runner
