@@ -243,10 +243,10 @@ EMAIL_HOST = 'localhost'
 EMAIL_HOST = parser.get('global', 'email_host')
 EMAIL_PORT_NO = 1025
 EMAIL_PORT_NO = parser.get('global', 'email_port')
-if EMAIL_PORT_NO == 465:
+if EMAIL_PORT_NO == '465':
     EMAIL_PORT = 465
 else:
-    EMAIL_PORT = 26
+    EMAIL_PORT = 465
 
 EMAIL_BACKEND_TYPE = parser.get('global', 'email_backend_type')
 if EMAIL_BACKEND_TYPE == 'smtp':
@@ -262,7 +262,7 @@ DEFAULT_FROM_EMAIL = parser.get('global', 'default_from_email')
 
 if DEBUG_SETTINGS:
     print "Email via %s" % EMAIL_BACKEND
-    print "Email Host:Port: %s:%s" % (EMAIL_HOST, EMAIL_PORT)
+    print "Email Host:Port: %s:%s (%s)" % (EMAIL_HOST, EMAIL_PORT, EMAIL_PORT_NO)
 
 # Django 1.6+ implement a new test runner
 # Suppress error 1_6.W001 by adding:
