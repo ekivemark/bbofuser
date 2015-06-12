@@ -248,7 +248,7 @@ if EMAIL_PORT_NO == '465':
 else:
     EMAIL_PORT = 465
 
-EMAIL_HOST_USER= = 'accounts@dev.bbonfhir.com'
+EMAIL_HOST_USER = 'accounts@dev.bbonfhir.com'
 EMAIL_HOST_PASSWORD = 'FH1R0utbound''
 
 EMAIL_USE_TLS = True
