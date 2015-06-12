@@ -252,11 +252,11 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 # Get Local Settings that you want to keep private.
 # Make sure Local_settings.py is excluded from Git
-try:
-    from developeraccount.local_settings import *
-except Exception as e:
-    print "ERROR: local_settings not loaded"
-    pass
+# try:
+#     from developeraccount.local_settings import *
+# except Exception as e:
+#     print "ERROR: local_settings not loaded"
+#     pass
 
 if DEBUG_SETTINGS:
     print "SECRET_KEY:%s" % SECRET_KEY
