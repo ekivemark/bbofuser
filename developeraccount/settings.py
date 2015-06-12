@@ -244,6 +244,7 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 try:
     from local_settings import *
 except Exception as e:
+    print "ERROR: local_settings not loaded"
     pass
 
 if DEBUG_SETTINGS:
