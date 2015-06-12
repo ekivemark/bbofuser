@@ -241,8 +241,11 @@ REGISTRATION_AUTO_LOGIN = parser.get('global', 'registration_auto_login')
 #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'localhost'
 EMAIL_HOST = parser.get('global', 'email_host')
-EMAIL_PORT = 1025
-EMAIL_PORT = parser.get('global', 'email_port')
+EMAIL_PORT_NO = 1025
+EMAIL_PORT_NO = parser.get('global', 'email_port')
+if EMAIL_PORT_NO == '465'
+    EMAIL_PORT = 465
+    
 EMAIL_BACKEND_TYPE = parser.get('global', 'email_backend_type')
 if EMAIL_BACKEND_TYPE == 'smtp':
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
