@@ -231,8 +231,13 @@ TEMPLATE_LOADERS = (
 )
 
 # For Django Registration:
-ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
+
 ACCOUNT_ACTIVATION_DAYS = parser.get('global', 'account_activation_days')
+try:
+    ACCOUNT_ACTIVATION_DAYS = int(ACCOUNT_ACTIVATION_DAYS)
+except:
+    ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
+
 REGISTRATION_AUTO_LOGIN = False # Automatically log the user in.
 REGISTRATION_AUTO_LOGIN = parser.get('global', 'registration_auto_login')
 
@@ -270,6 +275,7 @@ DEFAULT_FROM_EMAIL = parser.get('global', 'default_from_email')
 
 if DEBUG_SETTINGS:
     print "Email via %s: %s" % (EMAIL_BACKEND_TYPE, EMAIL_BACKEND)
+    print "Account Activation Days: %s" % ACCOUNT_ACTIVATION_DAYS
     print "Email Host:Port: %s:%s (%s)" % (EMAIL_HOST, EMAIL_PORT, EMAIL_PORT_NO)
     print "Credentials: [%s]/[%s]" % (EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
 
