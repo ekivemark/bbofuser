@@ -11,6 +11,7 @@
 # TODO: Request Application Credentials
 # TODO: Manage Application Credentials
 # TODO: Delete Application Credentials
+# TODO: accounts/profile Landing Page.
 
 # Work flow will use django-registration to enable Account sign up
 # After Activation

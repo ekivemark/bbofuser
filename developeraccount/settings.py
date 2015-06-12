@@ -267,6 +267,7 @@ if EMAIL_BACKEND_TYPE == 'smtp':
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+LOGIN_REDIRECT_URL = '/'
 
 # to use console open terminal and run:
 # python -m smtpd -n -c DebuggingServer localhost:1025
