@@ -248,7 +248,7 @@ if EMAIL_BACKEND_TYPE == 'smtp':
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    
+
 
 # to use console open terminal and run:
 # python -m smtpd -n -c DebuggingServer localhost:1025
