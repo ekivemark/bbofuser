@@ -14,10 +14,12 @@ parser = RawConfigParser()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import sys
 from platform import python_version
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-parser.readfp(open(path.join(BASE_DIR, 'local.ini')))
+APPLICATION_ROOT = BASE_DIR
+parser.readfp(open(os.path.join(APPLICATION_ROOT, 'local.ini')))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -59,6 +61,7 @@ if DEBUG_SETTINGS:
     print "Running on Python_version: %s" % python_version()
     print ""
     print "BASE_DIR:%s " % BASE_DIR
+    print "APPLICATION_ROOT:%s " % APPLICATION_ROOT
 
 # Application definition
 
