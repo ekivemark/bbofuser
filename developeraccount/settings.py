@@ -252,6 +252,8 @@ EMAIL_HOST_USER = 'accounts@dev.bbonfhir.com'
 EMAIL_HOST_PASSWORD = 'FH1R0utbound'
 
 #EMAIL_USE_TLS = True
+# Port 465 = SSL
+# Port 587 = TLS
 EMAIL_USE_SSL = True
 
 EMAIL_BACKEND_TYPE = parser.get('global', 'email_backend_type')
