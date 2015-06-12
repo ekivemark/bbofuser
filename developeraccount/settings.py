@@ -19,7 +19,8 @@ from platform import python_version
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 APPLICATION_ROOT = BASE_DIR
-parser.readfp(open(os.path.join(APPLICATION_ROOT, 'local.ini')))
+CONFIG_FILE = 'local.ini'
+parser.readfp(open(os.path.join(APPLICATION_ROOT, CONFIG_FILE)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -62,6 +63,7 @@ if DEBUG_SETTINGS:
     print ""
     print "BASE_DIR:%s " % BASE_DIR
     print "APPLICATION_ROOT:%s " % APPLICATION_ROOT
+    print "config file:%s " % APPLICATION_ROOT+'/'+local.ini
 
 # Application definition
 
