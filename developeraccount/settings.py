@@ -240,7 +240,7 @@ REGISTRATION_AUTO_LOGIN = parser.get('global', 'registration_auto_login')
 # Django Registration
 #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'localhost'
-EMAIL_HOST = parser.get('global', 'email_host')
+EMAIL_HOST = parser.get('global', 'email_host').strip()
 EMAIL_PORT_NO = 1025
 EMAIL_PORT_NO = parser.get('global', 'email_port')
 if EMAIL_PORT_NO == '465':
