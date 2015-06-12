@@ -268,7 +268,7 @@ DEFAULT_FROM_EMAIL = parser.get('global', 'default_from_email')
 if DEBUG_SETTINGS:
     print "Email via %s: %s" % (EMAIL_BACKEND_TYPE, EMAIL_BACKEND)
     print "Email Host:Port: %s:%s (%s)" % (EMAIL_HOST, EMAIL_PORT, EMAIL_PORT_NO)
-    print "Credentials: %s / %s" % (EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
+    print "Credentials: [%s]/[%s]" % (EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
 
 # Django 1.6+ implement a new test runner
 # Suppress error 1_6.W001 by adding:
