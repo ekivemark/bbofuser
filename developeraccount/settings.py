@@ -64,7 +64,7 @@ if DEBUG_SETTINGS:
     print ""
     print "BASE_DIR:%s " % BASE_DIR
     print "APPLICATION_ROOT:%s " % APPLICATION_ROOT
-    print "config file:%s " % APPLICATION_ROOT.rstrip()+'/'+CONFIG_FILE
+    print "config file:%s " % (APPLICATION_ROOT.rstrip()+'/'+CONFIG_FILE)
 
 # Application definition
 
