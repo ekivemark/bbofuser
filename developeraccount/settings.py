@@ -58,13 +58,15 @@ MANAGERS = ADMINS
 APPLICATION_TITLE = "BB+ Developer Accounts"
 APPLICATION_TITLE = parser.get('global', 'application_title')
 
+
 if DEBUG_SETTINGS:
     print "Application: %s" % APPLICATION_TITLE
     print "Running on Python_version: %s" % python_version()
     print ""
     print "BASE_DIR:%s " % BASE_DIR
     print "APPLICATION_ROOT:%s " % APPLICATION_ROOT
-    print "config file:%s " % (APPLICATION_ROOT.rstrip()+'/'+CONFIG_FILE)
+    FULL_CONFIG_FILE = APPLICATION_ROOT.strip()+'/'+CONFIG_FILE
+    print "Config File: %s" % FULL_CONFIG_FILE
 
 # Application definition
 
