@@ -243,7 +243,13 @@ EMAIL_HOST = 'localhost'
 EMAIL_HOST = parser.get('global', 'email_host')
 EMAIL_PORT = 1025
 EMAIL_PORT = parser.get('global', 'email_port')
-EMAIL_BACKEND = parser.get('global', 'email_backend')
+EMAIL_BACKEND_TYPE = parser.get('global', 'email_backend_type')
+if EMAIL_BACKEND_TYPE == 'smtp':
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    
+
 # to use console open terminal and run:
 # python -m smtpd -n -c DebuggingServer localhost:1025
 # Replacing localhost:1025 with EMAIL_HOST:EMAIL_PORT if different
