@@ -7,12 +7,17 @@ https://docs.djangoproject.com/en/1.7/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
+from ConfigParser import RawConfigParser
+parser = RawConfigParser()
+# http://stackoverflow.com/questions/4909958/django-local-settings/14545196#14545196
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from platform import python_version
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+parser.readfp(open(path.join(BASE_DIR, 'local.ini')))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -31,13 +36,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # http://www.miniwebtool.com/django-secret-key-generator/
 #
 SECRET_KEY = 'FAKE_VALUE_REAL_VALUE_SET_IN_LOCAL_SETTINGS'
+SECRET_KEY = parser.get('global', 'secret_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = parser.get('global', 'debug')
 
-TEMPLATE_DEBUG = True
+TEMPLATE_DEBUG = parser.get('global', 'template_debug')
 
-DEBUG_SETTINGS = True
+DEBUG_SETTINGS = parser.get('global', 'debug_settings')
 
 ALLOWED_HOSTS = []
 ADMINS = (
@@ -218,17 +224,22 @@ TEMPLATE_LOADERS = (
 
 # For Django Registration:
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
+ACCOUNT_ACTIVATION_DAYS = parser.get('global', 'account_activation_days')
 REGISTRATION_AUTO_LOGIN = False # Automatically log the user in.
+REGISTRATION_AUTO_LOGIN = parser.get('global', 'registration_auto_login')
+
 
 # Django Registration
 #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'localhost'
+EMAIL_HOST = parser.get('global', 'email_host')
 EMAIL_PORT = 1025
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_PORT = parser.get('global', 'email_port')
+EMAIL_BACKEND = parser.get('global', 'email_backend')
 # to use console open terminal and run:
 # python -m smtpd -n -c DebuggingServer localhost:1025
 # Replacing localhost:1025 with EMAIL_HOST:EMAIL_PORT if different
-DEFAULT_FROM_EMAIL = 'accounts@dev.bbonfhir.com'
+DEFAULT_FROM_EMAIL = parser.get('global', 'default_from_email')
 
 if DEBUG_SETTINGS:
     print "Email via %s" % EMAIL_BACKEND
