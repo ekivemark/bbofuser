@@ -243,7 +243,7 @@ EMAIL_HOST = 'localhost'
 EMAIL_HOST = parser.get('global', 'email_host')
 EMAIL_PORT_NO = 1025
 EMAIL_PORT_NO = parser.get('global', 'email_port')
-if EMAIL_PORT_NO == '465':
+if EMAIL_PORT_NO == 465:
     EMAIL_PORT = 465
 else:
     EMAIL_PORT = 26
