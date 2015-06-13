@@ -16,7 +16,12 @@
   </head>
   <body>
         {% include "include/top-nav.html" %}
-     
+
+        <div class="alert alert-danger">
+            <strong>Upcoming Downtime</strong> CMS's BlueButton APIs will be inaccessible Saturday, August 9th from 8AM - 9AM ET.
+            We apologize for the inconvenience. <a href="mailto:support@bbonfhir.com">Contact us</a> with any questions.
+        </div>
+
          <div id="messages">
       {% if messages %}
         {% for message in messages %}
