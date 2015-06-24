@@ -16,11 +16,30 @@ parser = RawConfigParser()
 import os
 import sys
 from platform import python_version
+from util import str2bool, str2int
+
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 APPLICATION_ROOT = BASE_DIR
+
+# Config file should be installed in parent directory
+# format is:
+# [global]
+# domain = dev.bbonfhir.com
+# debug = True
+# template_debug = True
+# debug_settings = True
+# email_host = box905.bluehost.com
+#
+
 CONFIG_FILE = 'local.ini'
+# Read the config file
 parser.readfp(open(os.path.join(APPLICATION_ROOT, CONFIG_FILE)))
+# Then use parser.get(SECTION, VARIABLE) to read in value
+# Value is in string format
+# Use util functions to convert strings to boolean or Integer
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -38,15 +57,16 @@ parser.readfp(open(os.path.join(APPLICATION_ROOT, CONFIG_FILE)))
 # You can generate a new SECRET_KEY using tools such as
 # http://www.miniwebtool.com/django-secret-key-generator/
 #
-SECRET_KEY = 'FAKE_VALUE_REAL_VALUE_SET_IN_LOCAL_SETTINGS'
+
+SECRET_KEY = 'FAKE_VALUE_REAL_VALUE_SET_FROM_..LOCAL.INI'
 SECRET_KEY = parser.get('global', 'secret_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = parser.get('global', 'debug')
+DEBUG = str2bool(parser.get('global', 'debug'))
 
-TEMPLATE_DEBUG = parser.get('global', 'template_debug')
+TEMPLATE_DEBUG = str2bool(parser.get('global', 'template_debug'))
 
-DEBUG_SETTINGS = parser.get('global', 'debug_settings')
+DEBUG_SETTINGS = str2bool(parser.get('global', 'debug_settings'))
 
 ALLOWED_HOSTS = []
 ADMINS = (
@@ -76,12 +96,15 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.i18n",
     "django.core.context_processors.media",
     "django.core.context_processors.static",
+    "django.core.context_processors.request",
     "django.contrib.messages.context_processors.messages",
    )
 
 
 DEFAULT_APPS = (
     'django.contrib.admin',
+    'django.contrib.admindocs',
+    # add django.contrib.auth to support django registration
     'django.contrib.auth',
     # add django.contrib.sites to support django registration
     'django.contrib.sites',
@@ -93,20 +116,25 @@ DEFAULT_APPS = (
 
 THIRD_PARTY_APPS = (
     # Add third party libraries here
-    'mongoengine',
+    # 'mongoengine',
     'bootstrap3',
     'bootstrapform',
+    # this installs django-registration-redux
     'registration',
 )
 
 LOCAL_APPS = (
     # Add custom apps here
-    'apps.developer',
+    'accounts',
 
 )
 
 
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+AUTH_USER_MODEL= "accounts.User"
+USERNAME_FIELD = "email"
+#AUTHENTICATION_BACKENDS = ['accounts.backends.EmailAuthBackend',]
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -149,17 +177,17 @@ DATABASES = {
 
 #Mongo DB settings
 # MONGO_HOST = "127.0.0.1"
-MONGO_HOST = "172.31.13.249"
-MONGO_PORT = 27017
-MONGO_DB_NAME = "BlueButtonRepository"
-MONGO_ALIAS = "default"
-MONGO_MASTER_COLLECTION = "main"
-MONGO_HISTORYDB_NAME = "history"
-MONGO_LIMIT = 100
-MONGO_USER = ""
-MONGO_PASSWORD = ""
-
-from mongoengine import connect
+# MONGO_HOST = "172.31.13.249"
+# MONGO_PORT = 27017
+# MONGO_DB_NAME = "BlueButtonRepository"
+# MONGO_ALIAS = "default"
+# MONGO_MASTER_COLLECTION = "main"
+# MONGO_HISTORYDB_NAME = "history"
+# MONGO_LIMIT = 100
+# MONGO_USER = ""
+# MONGO_PASSWORD = ""
+#
+# from mongoengine import connect
 # MONGO_CONNECTION = connect(MONGO_DB_NAME,
 #                            alias=MONGO_ALIAS,
 #                            username=MONGO_USER, password=MONGO_PASSWORD,
@@ -208,7 +236,8 @@ STATICFILES_FINDERS = (
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-
+SESSION_COOKIE_SECURE = False
+SESSON_ENGINE = 'django.contrib.sessions.backends.db'
 
 STATIC_URL = '/static/'
 
@@ -231,35 +260,35 @@ TEMPLATE_LOADERS = (
 )
 
 # For Django Registration:
-
-ACCOUNT_ACTIVATION_DAYS = parser.get('global', 'account_activation_days')
+# settings are stored in local.ini in parent directory
+ACCOUNT_ACTIVATION_DAYS = str2int(parser.get('global', 'account_activation_days'))
 try:
     ACCOUNT_ACTIVATION_DAYS = int(ACCOUNT_ACTIVATION_DAYS)
 except:
     ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
 
 REGISTRATION_AUTO_LOGIN = False # Automatically log the user in.
-REGISTRATION_AUTO_LOGIN = parser.get('global', 'registration_auto_login')
+REGISTRATION_AUTO_LOGIN = str2bool(parser.get('global', 'registration_auto_login'))
 
+#REGISTRATION_FORM = 'accounts.admin.UserCreationForm'
 
 # Django Registration
 #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'localhost'
 EMAIL_HOST = parser.get('global', 'email_host').strip()
-EMAIL_PORT_NO = 1025
-EMAIL_PORT_NO = parser.get('global', 'email_port')
-if EMAIL_PORT_NO == '465':
-    EMAIL_PORT = 465
-else:
-    EMAIL_PORT = 465
+# EMAIL_PORT = 1025 # local
+EMAIL_PORT = 645 # SSL
+EMAIL_PORT = str2int(parser.get('global', 'email_port'))
 
-EMAIL_HOST_USER = 'accounts@dev.bbonfhir.com'
-EMAIL_HOST_PASSWORD = 'FH1R0utbound'
+
+EMAIL_HOST_USER = parser.get('global','email_host_user')
+EMAIL_HOST_PASSWORD = parser.get('global','email_host_password')
 
 #EMAIL_USE_TLS = True
 # Port 465 = SSL
 # Port 587 = TLS
 EMAIL_USE_SSL = True
+EMAIL_USE_SSL = str2bool(parser.get('global', 'email_use_ssl'))
 
 EMAIL_BACKEND_TYPE = parser.get('global', 'email_backend_type')
 if EMAIL_BACKEND_TYPE == 'smtp':
@@ -277,8 +306,12 @@ DEFAULT_FROM_EMAIL = parser.get('global', 'default_from_email')
 if DEBUG_SETTINGS:
     print "Email via %s: %s" % (EMAIL_BACKEND_TYPE, EMAIL_BACKEND)
     print "Account Activation Days: %s" % ACCOUNT_ACTIVATION_DAYS
-    print "Email Host:Port: %s:%s (%s)" % (EMAIL_HOST, EMAIL_PORT, EMAIL_PORT_NO)
+    print "Email Host:Port: %s:%s" % (EMAIL_HOST, EMAIL_PORT)
     print "Credentials: [%s]/[%s]" % (EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
+
+# END of DJANGO Registration Settings Section
+
+
 
 # Django 1.6+ implement a new test runner
 # Suppress error 1_6.W001 by adding:

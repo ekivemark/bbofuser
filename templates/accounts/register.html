@@ -1,4 +1,4 @@
-{% extends "registration/registration_base.html" %}
+{% extends "base.html" %}
 {% load i18n %}
 
 {% block title %}{% trans "Register for an account" %}{% endblock %}
@@ -9,9 +9,9 @@
     {% csrf_token %}
     <table>
         <tr>
-            <td style="width:35%;vertical-align:text-top">
+            <td style="width:40%;vertical-align:text-top">
 
-                 {{ form.as_p }}
+                {{ form.as_p }}
 
                 <a href="/"><input type="button" class="btn-danger" value="Cancel" /></a>
 
