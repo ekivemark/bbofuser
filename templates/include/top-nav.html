@@ -7,22 +7,22 @@
         <li><a class="navbar-brand" href="/" contenteditable="false">{{APPLICATION_TITLE }}</a></li>
 
         <li class="active">
-            <a href="/" class="" contenteditable="false">Home</a>
+            <a href="{% url "home" %}" class="" contenteditable="false">Home</a>
         </li>
   {% if user.is_authenticated %}
       <li>
-          <a href="/accounts/logout">{% trans "Logout" %}</a>
+          <a href="{% url "accounts:logout" %}">{% trans "Logout" %}</a>
       </li>
       <li>
-{# TODO: create /accounts/app_management #}
-          <a href="/developer/app_management">{% trans "My Applications" %}</a>
+{# DONE: create /accounts/app_management - redirect to accounts:manage_account #}
+          <a href="{%  url 'accounts:manage_account' %}">{% trans "My Dashboard" %}</a>
       </li>
   {% else %}
       <li>
-          <a href="/accounts/login?next=/">{% trans "Login" %}</a>
+          <a href="{% url "accounts:login" %}?next=/">{% trans "Login" %}</a>
       </li>
       <li>
-          <a href="/registration/register/">{% trans "Register" %}</a>
+          <a href="{% url "register" %}">{% trans "Register" %}</a>
       </li>
   {% endif %}
         <li class="divider-vertical"></li>
@@ -35,7 +35,7 @@
 {# TODO: /accounts/support page  #}
         	<li><a href="/developer/support" class="">Support</a></li>
         	<li class="divider"></li>
-        	<li><a href="/demo/demoapi" class="">Demo..</a></li>
+        	<li><a href="{% url "demo:demoapi" %}" class="">Demo..</a></li>
 {# DONE: /admin access page  #}
             {% if user.is_admin %}
                 <li class="divider"></li>

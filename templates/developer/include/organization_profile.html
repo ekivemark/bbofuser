@@ -1,0 +1,36 @@
+{% load i18n %}
+<h2>My Organization</h2>
+    {% if user.is_authenticated and user.affiliated_to %}
+    <table>
+        <tr>
+            <td>
+               Organization:
+            </td>
+            <td>
+                {{ user.affiliated_to }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+               Role:
+            </td>
+            <td>
+                {{ user.organization_role }}
+            </td>
+        </tr>
+
+    </table>
+    {%  else %}
+    <table>
+        <tr>
+            <td>
+                <p>Connect an Organization Profile to your account. <br/>
+                    An email can only be connected to one organization</p>
+                <a href="{% url "accounts:connect_organization" %}" class="btn btn-primary btn-large">
+                    Connect an Organization</a>
+
+            </td>
+        </tr>
+    </table>
+     {% endif %}
+

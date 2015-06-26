@@ -16,9 +16,9 @@
     	<div class="col-md-6"><p>Use this framework to manage developer accounts that want
        access to the BlueButton+ FHIR Framework.</p>
             {% if user.is_authenticated %}
-                <a href="/accounts/manage_account" class="btn btn-primary btn-large">Manage Your Account</a>
+                <a href="{% url "accounts:manage_account" %}" class="btn btn-primary btn-large">Manage Your Account</a>
             {%  else %}
-                    <a href="/accounts/login?next=/"><input type="button" class="active btn btn-large btn-success" value="{% trans "log in" %}" /></a>
+                    <a href="{% url "accounts:login" %}?next=/"><input type="button" class="active btn btn-large btn-success" value="{% trans "log in" %}" /></a>
             {%  endif %}
         </div>
 

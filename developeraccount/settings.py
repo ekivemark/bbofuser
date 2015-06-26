@@ -210,7 +210,9 @@ USE_L10N = True
 
 USE_TZ = True
 
-SITE_ID = 1
+# SITE_ID = 1 = prod - dev.bbonfhir.com
+# SITE_ID = 2 = local - localhost:8000
+SITE_ID = 2
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
