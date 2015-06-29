@@ -17,7 +17,7 @@ Renamed to accounts from developer
 
 
 """
-
+import random
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import (
@@ -25,10 +25,14 @@ from django.contrib.auth.models import (
 
 from django.contrib.auth.signals import user_logged_out
 from datetime import date, datetime, timedelta
+from django.utils import timezone
+from django.utils.timezone import make_aware
 from stdnum.us.itin import is_valid
 
 from django.contrib import auth
 from django.contrib.auth.models import AbstractBaseUser
+from utils import strip_url, CARRIER_EMAIL_GATEWAY, CARRIER_SELECTION, cell_email, send_sms_pin
+from phonenumber_field.modelfields import PhoneNumberField
 
 # Create models here.
 
@@ -43,11 +47,15 @@ USER_ROLE_CHOICES = (('primary','Account Owner'),
 
 class Organization(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=200, blank=True, default="")
     site_url = models.URLField(verbose_name="Site Home Page",
                                default="",
                                unique=True,
                                blank=False)
+    domain = models.CharField(max_length=254, blank=False,
+                              unique=True,
+                              default="domain.com"
+                              )
+    name = models.CharField(max_length=200, blank=True, default="")
 
     privacy_url = models.URLField(verbose_name="Privacy Terms Page",
                                   default="http://")
@@ -60,8 +68,35 @@ class Organization(models.Model):
 
     def __unicode__(self):
         return '%s (%s)' % (self.name,
-                            self.site_url)
+                            self.domain)
 
+
+class Application(models.Model):
+    # Application keys
+    name = models.CharField(max_length=255,
+                            blank=True,
+                            default="")
+    organization = models.ForeignKey(Organization,
+                                     related_name='+',
+                                     blank=True,
+                                     null=True,
+                                     )
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
+                              related_name='+',
+                              blank=True,
+                              null=True,
+                              )
+    key = models.CharField(max_length=255,
+                           blank=True,
+                           default="",
+                           )
+    callback = models.CharField(max_length=255,
+                                blank=True,
+                                default="",
+                                )
+    icon_link = models.URLField(blank=True,
+                                null=True,
+                                default="")
 
 class UserManager(BaseUserManager):
     def create_user(self,
@@ -135,6 +170,15 @@ class User(AbstractBaseUser):
                                       )
     organization_role = models.CharField(max_length=30,choices=USER_ROLE_CHOICES,
                                          blank=True, default="none")
+    # DONE: Add mobile number and carrier
+    mobile = PhoneNumberField(blank=True)
+    carrier = models.CharField(max_length=100,
+                               blank=True,
+                               default="None",
+                               choices=CARRIER_SELECTION,
+                               )
+    # DONE: Add switch for Multi-factor Authentication via mobile
+    mfa = models.BooleanField(default=False)
 
     objects = UserManager()
 
@@ -205,3 +249,38 @@ def alertme(sender, user, request, **kwargs):
     print ("USER LOGGED OUT!") #or more sophisticated logging
 
 user_logged_out.connect(alertme)
+
+
+class ValidSMSCode(models.Model):
+    user               = models.ForeignKey(settings.AUTH_USER_MODEL)
+    sms_code           = models.CharField(max_length=4, blank=True)
+    expires            = models.DateTimeField(default=datetime.now)
+
+
+    def __unicode__(self):
+        return '%s for user %s expires at %s' % (self.sms_code,
+                                                 self.user,
+                                                 self.expires)
+
+    def save(self, **kwargs):
+        up=self.user
+        rand_code=random.randint(1000,9999)
+        if not self.sms_code:
+            if up.mobile != '+19999999999':
+                self.sms_code = rand_code
+            else:
+                self.sms_code = '9999'
+            if settings.DEBUG:
+                print self.sms_code
+
+        now = timezone.now()
+        expires = now + timedelta(minutes=settings.SMS_LOGIN_TIMEOUT_MIN)
+        self.expires = expires
+
+        if up.mfa:
+            new_number = cell_email(up.mobile, up.carrier)
+            #send an sms code
+            x = send_sms_pin(up.mobile, new_number, self.sms_code )
+        else:
+            x=''
+        super(ValidSMSCode, self).save(**kwargs)

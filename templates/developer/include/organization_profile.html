@@ -1,23 +1,39 @@
 {% load i18n %}
 <h2>My Organization</h2>
-    {% if user.is_authenticated and user.affiliated_to %}
+    {% if user.is_authenticated %}
     <table>
         <tr>
-            <td>
-               Organization:
-            </td>
-            <td>
-                {{ user.affiliated_to }}
-            </td>
+            <th>Edit</th>
+            <th>Organization</th>
+            <th>Name</th>
+            <th>site url</th>
+            <th>Owner</th>
+            <th>Backup</th>
+            <th>Add App</th>
+
         </tr>
+         {%  for organization in organizations %}
         <tr>
+            <td>Edit</td>
             <td>
-               Role:
+                {{ organization.domain }}
             </td>
             <td>
-                {{ user.organization_role }}
+                {{ organization.name }}
             </td>
+            <td>
+                {{ organization.site_url }}
+            </td>
+            <td>
+                {{ organization.owner.first_name }} {{ organization.owner.last_name }}
+            </td>
+            <td>
+                {{ organization.alternate_owner.first_name }} {{ organization.alternate_owner.last_name }}
+            </td>
+            <td>Add App</td>
+
         </tr>
+        {% endfor %}
 
     </table>
     {%  else %}

@@ -19,7 +19,7 @@
       </li>
   {% else %}
       <li>
-          <a href="{% url "accounts:login" %}?next=/">{% trans "Login" %}</a>
+          <a href="{% url "accounts:sms_code" %}?next=/">{% trans "Login" %}</a>
       </li>
       <li>
           <a href="{% url "register" %}">{% trans "Register" %}</a>

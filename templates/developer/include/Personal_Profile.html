@@ -12,21 +12,30 @@
         </tr>
         <tr>
             <td>
-               First name:
+               Name:
             </td>
             <td>
-                {{ user.first_name }}
+                {{ user.first_name }}&nbsp; {{ user.last_name }}
             </td>
         </tr>
        <tr>
             <td>
-               Last name:
+               Organization:
             </td>
             <td>
-                {{ user.last_name }}
+                {{ user.affiliated_to }} ({{  user.organization_role }})
             </td>
-        </tr>
-
+       </tr>
+            {%  if user.mobile %}
+                <tr>
+                    <td>
+                        Phone:
+                    </td>
+                    <td>
+                        {{ user.mobile }} on {{ user.carrier }} ({{ mfa_address }})
+                    </td>
+                </tr>
+            {%  endif %}
     </table>
     {%  else %}
 

@@ -14,6 +14,12 @@ class AuthenticationForm(forms.Form):
     """
     email = forms.EmailField(widget=forms.widgets.TextInput)
     password = forms.CharField(widget=forms.widgets.PasswordInput)
+    sms_code  = forms.CharField(widget=forms.PasswordInput, max_length=5, label="SMS Code")
 
     class Meta:
-        fields = ['email', 'password']
+        fields = ['email', 'password', 'smscode']
+
+
+class SMSCodeForm(forms.Form):
+    email= forms.CharField(max_length=255, label="email address")
+

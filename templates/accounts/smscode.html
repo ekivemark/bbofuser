@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Log in - step 1" %}{% endblock %}
+{% block pagename %}Welcome{% endblock %}
+{% block content %}
+
+
+<div class="login-box">
+
+    <form action='.' method='POST'>
+
+        {% if form.errors %}
+            <p class="error">Sorry, that's not a valid SMS Code.</p>
+            {{ form.errors }}
+        {% endif %}
+
+        <p>
+            <label for="smscode">email:</label><br/>
+            <input type="text" name="email" value="" id="email" class="text">
+        </p>
+        <input type="submit" class="active btn btn-lg btn-success" value="{%  trans 'Send Access Code' %}"/>
+        <input type="hidden" name="next" value="{{ next|escape }}" />
+        {% csrf_token %}
+    </form>
+
+</div>
+{% endblock %}

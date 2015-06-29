@@ -5,7 +5,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
 # Register your models here.
-from accounts.models import Agreement, Organization, User
+from accounts.models import Application, Agreement, Organization, User, ValidSMSCode
 # Account
 
 
@@ -15,7 +15,9 @@ class UserCreationForm(forms.ModelForm):
     fields, plus a repeated password.
     """
     password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
+    password2 = forms.CharField(label='Password confirmation',
+                                widget=forms.PasswordInput,
+                                help_text="<br/>Enter your password again to confirm.")
 
     class Meta:
         model = User
@@ -73,9 +75,17 @@ class UserAdmin(UserAdmin):
         ('Personal info', {'fields': ('first_name',
                                       'last_name',
                                       'affiliated_to',
-                                      'organization_role')}),
+                                      'organization_role',
+                                      'mobile',
+                                      'carrier',
+                                      'mfa',)}),
         ('Permissions', {'fields': ('is_admin','is_active', 'is_staff',)}),
     )
+
+    # TODO: Need to make phone number formatting more user friendly
+    # Currently requires +Country code
+
+
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
     # overrides get_fieldsets to use this attribute when creating a user.
     add_fieldsets = (
@@ -93,12 +103,23 @@ class OrganizationAdmin(admin.ModelAdmin):
     """
     Tailor the Organization page in the admin module
     """
-    list_display = ('name', 'site_url', 'privacy_url')
+    list_display = ('name', 'domain', 'site_url', 'privacy_url','owner','alternate_owner')
+# DONE: Add owner and alternate_owner to admin view
+
+
+class ApplicationAdmin(admin.ModelAdmin):
+    """
+    Tailor the Application page in the main Admin module
+    """
+    # DONE: Add Admin view for applications
+    list_display = ('name', 'callback', 'owner', 'organization')
 
 
 admin.site.register(Agreement)
 #admin.site.register(Account)
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(User, UserAdmin)
+admin.site.register(Application, ApplicationAdmin)
+admin.site.register(ValidSMSCode)
 
 admin.site.unregister(Group)

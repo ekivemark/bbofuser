@@ -121,6 +121,9 @@ THIRD_PARTY_APPS = (
     'bootstrapform',
     # this installs django-registration-redux
     'registration',
+    'oauth2_provider',
+    'corsheaders',
+
 )
 
 LOCAL_APPS = (
@@ -144,6 +147,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 )
 
 ROOT_URLCONF = 'developeraccount.urls'
@@ -300,6 +304,11 @@ else:
 
 LOGIN_REDIRECT_URL = '/'
 
+# SMS code Time out in Minutes (used for Multi-factor Authentication
+SMS_LOGIN_TIMEOUT_MIN = 5
+
+
+
 # to use console open terminal and run:
 # python -m smtpd -n -c DebuggingServer localhost:1025
 # Replacing localhost:1025 with EMAIL_HOST:EMAIL_PORT if different
@@ -313,7 +322,11 @@ if DEBUG_SETTINGS:
 
 # END of DJANGO Registration Settings Section
 
+# CORSHEADERS Configuration
+# Set ALLOW_ALL to True for testing only
+CORS_ORIGIN_ALLOW_ALL = True
 
+# End of CORSHEADERS Section
 
 # Django 1.6+ implement a new test runner
 # Suppress error 1_6.W001 by adding:

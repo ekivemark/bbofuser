@@ -1,0 +1,48 @@
+{% load i18n %}
+{% if user.is_authenticated %}
+    <table>
+        <tr>
+            <td><h2>My Applications</h2></td>
+            <td>   </td>
+            <td>
+                <a href="{% url "accounts:connect_application" %}" class="btn btn-success btn">
+                    Add application</a>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <th>Edit</th>
+            <th>App Icon</th>
+            <th>Name</th>
+            <th>Key</th>
+            <th>Owner</th>
+            <th>Callback</th>
+        </tr>
+         {%  for application in applications %}
+        <tr>
+            <td>
+                Edit
+            </td>
+            <td>
+                <img src="{% if application.icon_link %}{{ application.icon_link }}{% else %}
+                {{ STATIC_URL }}/img/layout/bb-2dir-icon.png{% endif %}" style="width:90px;height:90px;">
+            </td>
+            <td>
+                {{ application.name }}
+            </td>
+            <td>
+                {{ application.key }}
+            </td>
+            <td>
+                {{ application.owner.first_name }} {{ application.owner.last_name }}
+            </td>
+            <td>
+                {{ application.callback }}
+            </td>
+
+        </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+

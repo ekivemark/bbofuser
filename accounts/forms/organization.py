@@ -12,6 +12,7 @@ from django.shortcuts import render, get_object_or_404
 from django import forms
 
 from accounts.models import Organization, User, USER_ROLE_CHOICES
+from accounts.utils import strip_url
 
 
 class Url(forms.URLField):
@@ -40,29 +41,35 @@ class OrganizationCheckForm(forms.Form):
 #    site_url = forms.CharField(label="Organization URL",
 #                               help_text="enter the top level organization domain. eg. domain.com")
 
-    site_url = Url(label="Organization URL",
+    domain = Url(label="Organization Domain",
                    help_text="<br/>Enter the top level organization domain. <br/>eg. domain.com")
     print "in OrganizationCheckForm"
 
-    def clean_site_url(self):
+    def clean_domain(self):
 
-        check_for = self.cleaned_data['site_url'].lower()
-        check_for = check_for.replace("http://","")
-        check_for = check_for.replace("https://","")
-        check_for = check_for.replace("www.","")
+        print "checking for this:" , self.cleaned_data['domain']
+        check_for = strip_url(self.cleaned_data['domain'],"www")
+        #check_for = check_for.replace("http://","")
+        #check_for = check_for.replace("https://","")
+        #check_for = check_for.replace("www.","")
 
         print "Check_for:", check_for
 
-        org_compare = Organization(site_url=check_for)
-        print "[", org_compare, "]"
-        if (org_compare.site_url.lower() == check_for):
+        try:
+            org_compare = Organization.objects.get(domain=check_for)
+        except:
+            print check_for, "Domain Not Found. That is good!"
+            return check_for
 
-            print "matched on ", org_compare.site_url
+        print "[", org_compare, "]"
+        if (org_compare.domain.lower() == check_for):
+
+            print "matched on ", org_compare.domain
 
             primary_email = "[Add function here]"
             backup_email =  "[Add email obscuring function here]"
 
-            validation_msg = "This organization is already registered."
+            validation_msg = "This domain is already registered."
             validation_msg = validation_msg + " Contact "
             validation_msg = validation_msg + primary_email + " or "
             validation_msg = validation_msg + backup_email
@@ -70,8 +77,7 @@ class OrganizationCheckForm(forms.Form):
 
             raise forms.ValidationError(validation_msg)
         else:
-            print "Organization does not exist"
+            print "Domain does not exist"
             print "(%s)" % check_for
-
             return check_for
 

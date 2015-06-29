@@ -8,6 +8,7 @@
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" class="active btn btn-lg btn-success" value="{% trans 'Log in' %}" />
+{# Required for Registration and OAuth handling #}
     <input type="hidden" name="next" value="{{ next }}" />
 </form>
 
