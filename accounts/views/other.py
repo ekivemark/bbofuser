@@ -19,7 +19,7 @@ from django.core.urlresolvers import reverse_lazy, reverse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
 from django.conf import settings
 from django.utils import timezone
 from django.utils.timezone import make_aware
@@ -27,13 +27,15 @@ from django.contrib.auth import login as django_login, authenticate, \
     logout as django_logout
 from django.views.generic.detail import DetailView
 
-from models import Application, Agreement, Organization, User, ValidSMSCode
+from accounts.models import OrgApplication, Agreement, Organization, User, \
+    ValidSMSCode
 from accounts.forms.authenticate import AuthenticationForm, SMSCodeForm
 from accounts.forms.register import RegistrationForm
 from accounts.forms.organization import OrganizationCheckForm
-from accounts.forms.application import ApplicationCheckForm, application_view
+from accounts.forms.application import ApplicationCheckForm, \
+    application_view
 from accounts.admin import UserCreationForm
-from utils import strip_url, cell_email
+from accounts.utils import strip_url, cell_email
 from django.contrib import messages
 
 def login(request):
@@ -44,8 +46,11 @@ def login(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
-            user = authenticate(email=request.POST['email'], password=request.POST['password'])
+            user = authenticate(email=request.POST['email'],
+                                password=request.POST['password'])
             if user is not None:
+                if settings.DEBUG:
+                    print "User is not Empty!"
                 if user.is_active:
                     django_login(request, user)
                     return redirect('/')
@@ -176,7 +181,7 @@ def manage_account(request):
     # Get a list of organizations for this user
     # org_list = list(Organization.objects.all())
     org_list = list(Organization.objects.filter(owner=user))
-    app_list = list(Application.objects.filter(owner=user))
+    app_list = list(OrgApplication.objects.filter(user=user))
     context = {"APPLICATION_TITLE": application_title,
                "user": user,
                "mfa_address": mfa_address,
@@ -238,6 +243,7 @@ def connect_organization(request):
                 print "user", u
             u.affiliated_to = org
             u.organization_role = "primary"
+            u.save()
 
             return redirect(reverse_lazy('accounts:manage_account'))
         else:
@@ -258,7 +264,7 @@ def connect_organization(request):
 @login_required()
 def connect_application(request):
     """
-    Connect application ot Organization and User
+    Connect application to Organization and User
     :param request:
     :return:
     """
@@ -284,13 +290,18 @@ def connect_application(request):
             if DEBUG:
                 print "form is valid"
                 print "form", form.cleaned_data
-            app = Application()
+
+            app = OrgApplication()
             app.name = form.cleaned_data['name']
             app.callback = form.cleaned_data['callback'].lower()
             app.icon_link = form.cleaned_data['icon_link'].lower()
 
             app.owner = request.user
+            app.user_id = request.user.id
             app.organization = user.affiliated_to
+            if settings.DEBUG:
+                print "OrgApp:", app, app.owner, app.organization, user
+
             app.save()
 
 
@@ -311,106 +322,3 @@ def connect_application(request):
     return render_to_response('developer/connect_application.html',
                              context,
                               context_instance=RequestContext(request))
-
-
-def validate_sms(username, smscode):
-
-    if settings.DEBUG:
-        print "%s, %s" % (username, smscode)
-
-    try:
-        u = User.objects.get(email=username)
-        vc = ValidSMSCode.objects.get(user=u, sms_code=smscode)
-        if settings.DEBUG:
-            print "vc: %s" % vc
-        now = timezone.now()
-        if vc.expires < now:
-            vc.delete()
-            return False
-    except(User.DoesNotExist):
-        if settings.DEBUG:
-            print "User does not exist"
-        return False
-    except(ValidSMSCode.DoesNotExist):
-        if settings.DEBUG:
-            print "ValidSMS does not exist"
-        return False
-    if settings.DEBUG:
-        print "Success! Deleting %s" % vc
-    vc.delete()
-    return True
-
-
-def sms_login(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request.POST)
-        if form.is_valid():
-            #print "Authenticate"
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            sms_code = form.cleaned_data['sms_code']
-            if not validate_sms(username=email, smscode=sms_code):
-                messages.error(request, "Invalid Access Code.")
-                return render_to_response('accounts/login.html',
-                                          {'form': AuthenticationForm()},
-                              RequestContext(request))
-
-            user=authenticate(username=email, password=password)
-
-            if user is not None:
-
-                if user.is_active:
-                    django_login(request, user)
-                    return HttpResponseRedirect(reverse('home'))
-                else:
-
-                    messages.error(request, "Your account is not active.")
-                    return HttpResponseRedirect(reverse('sms_code'))
-            else:
-                messages.error(request, "Invalid username or password.")
-                return render_to_response('accounts/login.html',
-                                          {'form': AuthenticationForm()},
-                              RequestContext(request))
-        else:
-            return render_to_response('accounts/login.html', {'form': form},
-                              RequestContext(request))
-    return render_to_response('accounts/login.html', {'form': AuthenticationForm()},
-                              RequestContext(request))
-
-def sms_code(request):
-
-    if settings.DEBUG:
-        print "in accounts.views.sms_code"
-    if request.method == 'POST':
-        if settings.DEBUG:
-            print "request.POST:%s" % request.POST
-        form = SMSCodeForm(request.POST)
-        if form.is_valid():
-            try:
-                u=User.objects.get(email=form.cleaned_data['email'])
-                mfa_required = u.mfa
-                if settings.DEBUG:
-                    print "Require MFA Login:%s" % mfa_required
-                if u.is_active:
-                    if mfa_required:
-                        ValidSMSCode.objects.create(user=u)
-                        messages.success(request, "A text message was sent to your mobile phone.")
-                    else:
-                        messages.success(request, "Your account is active. Continue Login.")
-                else:
-                    messages.error(request, "Your account is inactive.")
-                    return HttpResponseRedirect(reverse('sms_code'))
-            except(User.DoesNotExist):
-                messages.error(request, "You are not recognized.")
-                return HttpResponseRedirect(reverse('sms_code'))
-                # except(UserProfile.DoesNotExist):
-                #     messages.error(request, "You do not have a user profile.")
-                #     return HttpResponseRedirect(reverse('sms_code'))
-            return HttpResponseRedirect(reverse('accounts:login'))
-
-        else:
-            return render_to_response('accounts/smscode.html',
-                                      RequestContext(request, {'form': form}))
-
-    return render_to_response('accounts/smscode.html',
-                              context_instance = RequestContext(request))

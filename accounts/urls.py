@@ -3,19 +3,18 @@
 """
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from registration.views import RegistrationView
 
-from accounts.forms.other import RegistrationFormTOSAndEmail
+from accounts.views.other import AgreementDetailView, \
+    OrganizationDetailView
 
-from accounts.views import AgreementDetailView, \
-    OrganizationDetailView, sms_code, sms_login
+from accounts.views.sms import sms_code, sms_login
 
 admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
-    url(r'^login$', 'accounts.views.sms_login', name='login'),
-    url(r'smscode/', 'accounts.views.sms_code', name='sms_code'),
+    url(r'^login$', 'accounts.views.sms.sms_login', {'email': ""} , name='login'),
+    url(r'smscode/', 'accounts.views.sms.sms_code', {'email': ""}, name='sms_code'),
     url(r'^logout$', 'accounts.views.logout', name='logout'),
     url(r'^$', 'accounts.views.home_index', name='home'),
     url(r'^manage_account$', 'accounts.views.manage_account', name='manage_account'),
@@ -28,5 +27,6 @@ urlpatterns = patterns('',
     # Manage Account
     # Remove Account
 
+    #TODO: Restructure SMSCode to come after login and check for mfa setting
 
 )

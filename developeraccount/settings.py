@@ -216,7 +216,9 @@ USE_TZ = True
 
 # SITE_ID = 1 = prod - dev.bbonfhir.com
 # SITE_ID = 2 = local - localhost:8000
-SITE_ID = 2
+SITE_ID = 3
+if DEBUG_SETTINGS:
+    print "Site_ID: %s" % SITE_ID
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
@@ -327,6 +329,9 @@ if DEBUG_SETTINGS:
 CORS_ORIGIN_ALLOW_ALL = True
 
 # End of CORSHEADERS Section
+# Change to OAuth2 Provider Application Model
+#OAUTH2_PROVIDER_APPLICATION_MODEL='accounts.MyApplication'
+
 
 # Django 1.6+ implement a new test runner
 # Suppress error 1_6.W001 by adding:

@@ -11,12 +11,13 @@ from django.shortcuts import render, get_object_or_404
 from django import forms
 from django.conf import settings
 
-from accounts.models import Application, Organization, User, USER_ROLE_CHOICES
+from accounts.models import OrgApplication, Organization, \
+    User, USER_ROLE_CHOICES
 
 def application_view(request, mymodel_id):
     class MyModelForm(forms.ModelForm):
         class Meta:
-            model = Application
+            model = OrgApplication
 
     model = get_object_or_404(Organization, pk=mymodel_id)
     form = MyModelForm(instance=model)
@@ -46,7 +47,7 @@ class ApplicationCheckForm(forms.Form):
 
         check_for = self.cleaned_data['name']
 
-        print "Check_for:", check_for
-
+        if settings.DEBUG:
+            print "Check_for:", check_for
 
         return self.cleaned_data

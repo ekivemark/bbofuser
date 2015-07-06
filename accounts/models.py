@@ -31,8 +31,12 @@ from stdnum.us.itin import is_valid
 
 from django.contrib import auth
 from django.contrib.auth.models import AbstractBaseUser
-from utils import strip_url, CARRIER_EMAIL_GATEWAY, CARRIER_SELECTION, cell_email, send_sms_pin
+from utils import strip_url, CARRIER_EMAIL_GATEWAY, CARRIER_SELECTION, \
+    cell_email, send_sms_pin
 from phonenumber_field.modelfields import PhoneNumberField
+
+# Extending Application with OAuth Toolkit
+from oauth2_provider.models import AbstractApplication
 
 # Create models here.
 
@@ -71,32 +75,24 @@ class Organization(models.Model):
                             self.domain)
 
 
-class Application(models.Model):
+#class Application(models.Model):
+class OrgApplication(AbstractApplication):
     # Application keys
-    name = models.CharField(max_length=255,
-                            blank=True,
-                            default="")
+    # owner = models.ForeignKey(settings.AUTH_USER_MODEL,
+    #                           related_name='+',
+    #                           blank=True,
+    #                           null=True,
+    #                           )
+
     organization = models.ForeignKey(Organization,
-                                     related_name='+',
-                                     blank=True,
-                                     null=True,
-                                     )
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL,
-                              related_name='+',
-                              blank=True,
-                              null=True,
-                              )
-    key = models.CharField(max_length=255,
-                           blank=True,
-                           default="",
-                           )
-    callback = models.CharField(max_length=255,
-                                blank=True,
-                                default="",
-                                )
+                                      related_name='+',
+                                      blank=True,
+                                      null=True,
+                                      )
     icon_link = models.URLField(blank=True,
                                 null=True,
                                 default="")
+
 
 class UserManager(BaseUserManager):
     def create_user(self,

@@ -11,7 +11,8 @@ from django.shortcuts import render, get_object_or_404
 from django import forms
 from django.utils.safestring import mark_safe
 
-from registration.forms import RegistrationFormUniqueEmail, RegistrationFormTermsOfService
+from registration.forms import RegistrationFormUniqueEmail, \
+    RegistrationFormTermsOfService
 
 from accounts.models import User, Agreement, Organization
 

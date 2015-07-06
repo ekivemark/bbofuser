@@ -3,6 +3,7 @@ developeraccount
 FILE: register
 Created: 6/22/15 12:31 PM
 
+Remember to add new classes to accounts.forms.__init__.py
 
 """
 __author__ = 'Mark Scrimshire:@ekivemark'

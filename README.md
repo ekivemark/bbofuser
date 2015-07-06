@@ -16,5 +16,9 @@ registration. This required some overrides to use email and not username.
 
 The custom user model is in accounts.
 
+The custom user model also implements multi-factor authentication. 
+This uses telephone and carrier information in the User model to send
+a 4-digit code to the cell phone of the user as part of the login process.
+
 
 

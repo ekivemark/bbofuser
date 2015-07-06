@@ -7,7 +7,9 @@
 <form method="post" action="">
     {% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" class="active btn btn-lg btn-success" value="{% trans 'Log in' %}" />
+     <input type="submit" class="active btn btn-lg btn-success" name="login" value="{% trans 'Login' %}" />
+    <input type="submit" class="active btn btn-lg btn-fail" name="login" value="{% trans 'Resend Code' %}" />
+
     <input type="hidden" name="next" value="{{ next }}" />
 </form>
 

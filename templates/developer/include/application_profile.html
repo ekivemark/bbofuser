@@ -15,9 +15,11 @@
             <th>Edit</th>
             <th>App Icon</th>
             <th>Name</th>
-            <th>Key</th>
-            <th>Owner</th>
-            <th>Callback</th>
+            <th>Organization</th>
+            <th>Redirect URLs</th>
+            <th>Client Type</th>
+            <th>Grant Type</th>
+            <th>Client Id</th>
         </tr>
          {%  for application in applications %}
         <tr>
@@ -32,13 +34,19 @@
                 {{ application.name }}
             </td>
             <td>
-                {{ application.key }}
+                {{ application.organization }}
             </td>
             <td>
-                {{ application.owner.first_name }} {{ application.owner.last_name }}
+                {{ application.redirect_urls }}
             </td>
             <td>
-                {{ application.callback }}
+                {{ application.client_type }}
+            </td>
+            <td>
+                {{ application.authorization_grant_type }}
+            </td>
+            <td>
+                {{ application.client_id }}
             </td>
 
         </tr>

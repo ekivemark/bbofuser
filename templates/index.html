@@ -9,8 +9,7 @@
 
 <div class="hero-unit">
 
-    <h1>BB+ on FHIR</h1>
-    <h2>Developer Account Framework</h2>
+    <h1>BB+ on FHIR: Developer Accounts</h2>
 
     <div class="container-fluid">
     	<div class="col-md-6"><p>Use this framework to manage developer accounts that want
@@ -18,11 +17,11 @@
             {% if user.is_authenticated %}
                 <a href="{% url "accounts:manage_account" %}" class="btn btn-primary btn-large">Manage Your Account</a>
             {%  else %}
-                    <a href="{% url "accounts:login" %}?next=/"><input type="button" class="active btn btn-large btn-success" value="{% trans "log in" %}" /></a>
+                    <a href="{% url "accounts:sms_code" %}?next=/"><input type="button" class="active btn btn-large btn-success" value="{% trans "login" %}" /></a>
             {%  endif %}
         </div>
 
-  	    <div class="col-md-6"><img src="{{ STATIC_URL }}img/layout/blue-button.png"></div>
+  	    <div class="col-md-6"><img src="{{ STATIC_URL }}img/layout/blue-button.png" style="height:300px"></div>
 
     </div>
 </div>

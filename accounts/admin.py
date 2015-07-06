@@ -5,9 +5,9 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
 # Register your models here.
-from accounts.models import Application, Agreement, Organization, User, ValidSMSCode
+from accounts.models import OrgApplication, Agreement, Organization, \
+    User, ValidSMSCode
 # Account
-
 
 class UserCreationForm(forms.ModelForm):
     """
@@ -112,14 +112,15 @@ class ApplicationAdmin(admin.ModelAdmin):
     Tailor the Application page in the main Admin module
     """
     # DONE: Add Admin view for applications
-    list_display = ('name', 'callback', 'owner', 'organization')
+    list_display = ('name', 'organization', 'user' )
 
 
 admin.site.register(Agreement)
 #admin.site.register(Account)
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(User, UserAdmin)
-admin.site.register(Application, ApplicationAdmin)
+admin.site.register(OrgApplication, ApplicationAdmin)
+#admin.site.register(ApplicationKey)
 admin.site.register(ValidSMSCode)
 
 admin.site.unregister(Group)
