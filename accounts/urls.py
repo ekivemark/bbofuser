@@ -7,12 +7,14 @@ from django.contrib import admin
 from accounts.views.other import AgreementDetailView, \
     OrganizationDetailView
 
-from accounts.views.sms import sms_code, sms_login
+from accounts.views.sms import sms_code, sms_login, login_optional_sms, login_optional
 
 admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
+    #url(r'^login_alt$', 'accounts.views.sms.login_optional', name='login_sms'),
+    #url(r'^login_alt$', 'accounts.views.sms.login_optional_sms', name='login_sms'),
     url(r'^login$', 'accounts.views.sms.sms_login', {'email': ""} , name='login'),
     url(r'smscode/', 'accounts.views.sms.sms_code', {'email': ""}, name='sms_code'),
     url(r'^logout$', 'accounts.views.logout', name='logout'),
