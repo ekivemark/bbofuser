@@ -1,6 +1,9 @@
+<<<<<<< HEAD
 # Created by .ignore support plugin (hsz.mobi)
 developeraccount/local_settings.py
 ### Python template
+=======
+>>>>>>> 791547b52449e17e3cd25221126566122b5a1c9b
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -16,6 +19,10 @@ develop-eggs/
 dist/
 downloads/
 eggs/
+<<<<<<< HEAD
+=======
+.eggs/
+>>>>>>> 791547b52449e17e3cd25221126566122b5a1c9b
 lib/
 lib64/
 parts/
@@ -39,9 +46,17 @@ pip-delete-this-directory.txt
 htmlcov/
 .tox/
 .coverage
+<<<<<<< HEAD
 .cache
 nosetests.xml
 coverage.xml
+=======
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+>>>>>>> 791547b52449e17e3cd25221126566122b5a1c9b
 
 # Translations
 *.mo
@@ -55,7 +70,10 @@ docs/_build/
 
 # PyBuilder
 target/
+<<<<<<< HEAD
 
 local_settings.py
 # database
 db/db.db
+=======
+>>>>>>> 791547b52449e17e3cd25221126566122b5a1c9b
