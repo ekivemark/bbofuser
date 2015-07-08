@@ -1,26 +1,31 @@
 {% extends "base.html" %}
-{% block pretitle %}Manage Your Account{% endblock %}
+{% block pretitle %}Edit Profile{% endblock %}
 {% block extra_head %}
 
 
 {% endblock %}
 
-{% block pagename %}Dashboard{% endblock %}
+{% block pagename %}Edit Profile ({{ email }}){% endblock %}
 {% block content %}
     <div class="section">
         <div class="container">
             <div class="row">
-                <div class="col-lg-4 well">
-                    {% include 'developer/include/personal_profile.html' %}
-                </div>
+                <form method="post" action="" xmlns="http://www.w3.org/1999/html">
+    {% csrf_token %}
+    <table>
+        <tr>
+            <td>
 
-                <div class="col-lg-4 well">
-                    {% include 'developer/include/organization_profile.html' %}
-                </div>
+                 {{ form.as_p }}
 
-                <div class="col-lg-4 well">
-                    {% include 'developer/include/application_profile.html' %}
-                 </div>
+                <a href="{%  url "accounts:manage_account" %}"><input type="button" class="btn-danger" value="Cancel" /></a>
+
+                <input class="btn-success" type="submit" value="Save" />
+            </td>
+        </tr>
+    </table>
+</form>
+
             </div>
         </div>
     </div>

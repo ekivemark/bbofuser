@@ -19,6 +19,8 @@ Renamed to accounts from developer
 """
 import random
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.auth.models import (
     User, BaseUserManager, AbstractBaseUser)
@@ -71,11 +73,12 @@ class Organization(models.Model):
                                         null=True)
 
     def __unicode__(self):
-        return '%s (%s)' % (self.name,
-                            self.domain)
-
+        #return '%s (%s)' % (self.name,
+        #                    self.domain)
+        return unicode(self.domain)
 
 #class Application(models.Model):
+#@login_required()
 class OrgApplication(AbstractApplication):
     # Application keys
     # owner = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -92,6 +95,9 @@ class OrgApplication(AbstractApplication):
     icon_link = models.URLField(blank=True,
                                 null=True,
                                 default="")
+
+    def get_absolute_url(self):
+        return reverse('accounts:orgapplication_detail', args=[str(self.pk)])
 
 
 class UserManager(BaseUserManager):
@@ -209,9 +215,14 @@ class User(AbstractBaseUser):
     #     return self.is_admin
 
     def __unicode__(self):                      # __str__ on Python 3
-        return "%s %s (%s)" % (self.first_name,
-                               self.last_name,
-                               self.email)
+        #return "%s %s (%s)" % (self.first_name,
+        #                       self.last_name,
+        #                       self.email)
+        return unicode(self.email)
+
+    def __meta(self):
+        verbose_name = _('User')
+        verbose_name_plural = _('Users')
 
 
 class Agreement(models.Model):

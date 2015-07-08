@@ -1,6 +1,7 @@
 {% load i18n %}
-<h2>My Profile</h2>
-    {% if user.is_authenticated %}
+{% if user.is_authenticated %}
+<h2>My Profile  <a href="{%  url 'accounts:user_edit' %}" class="btn btn-lg btn-success" >{% trans 'Edit' %}</a>
+</h2>
     <table>
         <tr>
             <td>
@@ -37,7 +38,7 @@
                 </tr>
             {%  endif %}
     </table>
-    {%  else %}
+{%  else %}
 
-     {% endif %}
+{% endif %}
 

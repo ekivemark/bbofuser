@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block pretitle %}Manage Your Account{% endblock %}
+{% block extra_head %}
+
+
+{% endblock %}
+
+{% block pagename %}Dashboard{% endblock %}
+{% block content %}
+    <div class="section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 well">
+                    {% include 'accounts/include/personal_profile.html' %}
+                </div>
+
+                <div class="col-lg-4 well">
+                    {% include 'accounts/include/organization_profile.html' %}
+                </div>
+
+                <div class="col-lg-4 well">
+                    {% include 'accounts/include/application_profile.html' %}
+                 </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="row clearfix">
+
+        <div class="col-md-12 column" >
+            <!--- Template is in developeraccount/templates/developer --->
+            <p>Close and Delete Account. All your application keys will be deleted if you close your account.
+            </p>
+{#  TODO: Link to Delete Account process  #}
+            <p> Apply for access to the CMS Live BlueButton API Platform.
+            </p>
+{#  TODO: Link to Production Platform Access approval  #}
+{#  DONE: Link to Manage Application Keys  #}
+        </div>
+    </div>
+
+
+{% endblock %}

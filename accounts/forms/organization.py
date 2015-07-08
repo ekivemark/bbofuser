@@ -10,6 +10,7 @@ __author__ = 'Mark Scrimshire:@ekivemark'
 
 from django.shortcuts import render, get_object_or_404
 from django import forms
+from django.conf import settings
 
 from accounts.models import Organization, User, USER_ROLE_CHOICES
 from accounts.utils import strip_url
@@ -43,7 +44,8 @@ class OrganizationCheckForm(forms.Form):
 
     domain = Url(label="Organization Domain",
                    help_text="<br/>Enter the top level organization domain. <br/>eg. domain.com")
-    print "in OrganizationCheckForm"
+    if settings.DEBUG:
+        print "in OrganizationCheckForm"
 
     def clean_domain(self):
 

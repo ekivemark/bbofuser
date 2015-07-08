@@ -24,7 +24,7 @@
          {%  for application in applications %}
         <tr>
             <td>
-                Edit
+                <a href="/accounts/orgapplication_detail/{{ application.id }}/">Edit</a>
             </td>
             <td>
                 <img src="{% if application.icon_link %}{{ application.icon_link }}{% else %}

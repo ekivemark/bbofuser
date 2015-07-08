@@ -102,6 +102,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 
 DEFAULT_APPS = (
+    'django_admin_bootstrapped',
     'django.contrib.admin',
     'django.contrib.admindocs',
     # add django.contrib.auth to support django registration
@@ -123,6 +124,7 @@ THIRD_PARTY_APPS = (
     'registration',
     'oauth2_provider',
     'corsheaders',
+    'crispy_forms',
 
 )
 
@@ -332,6 +334,9 @@ CORS_ORIGIN_ALLOW_ALL = True
 # Change to OAuth2 Provider Application Model
 #OAUTH2_PROVIDER_APPLICATION_MODEL='accounts.MyApplication'
 
+# Add Bootstrap awareness to Crispy Forms
+CRISPY_TEMPLATE_PACK = "bootstrap3"
+CRISPY_FAIL_SILENTLY = not DEBUG
 
 # Django 1.6+ implement a new test runner
 # Suppress error 1_6.W001 by adding:

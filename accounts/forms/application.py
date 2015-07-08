@@ -14,6 +14,9 @@ from django.conf import settings
 from accounts.models import OrgApplication, Organization, \
     User, USER_ROLE_CHOICES
 
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit
+
 def application_view(request, mymodel_id):
     class MyModelForm(forms.ModelForm):
         class Meta:
@@ -34,7 +37,8 @@ class ApplicationCheckForm(forms.Form):
     callback = forms.URLField(label="Callback URL", help_text="Enter the callback url")
     icon_link =forms.URLField(required=False, label="Link to Application Icon", help_text="Enter a web address where your application icon is available")
 
-    print "in ApplicationCheckForm"
+    if settings.DEBUG:
+        print "in ApplicationCheckForm"
 
     def clean(self):
 
@@ -51,3 +55,15 @@ class ApplicationCheckForm(forms.Form):
             print "Check_for:", check_for
 
         return self.cleaned_data
+
+class OrgApplication_Form(forms.ModelForm):
+    class Meta:
+        model = OrgApplication
+        fields = ['icon_link', 'organization', 'id']
+
+        def __init__(self, *args, **kwargs):
+            super(OrgApplication_Form, self).__init__(*args, **kwargs)
+            self.helper = FormHelper(self)
+            self.helper.layout.append(Submit('submit', 'Submit'))
+
+

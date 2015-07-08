@@ -25,6 +25,7 @@ from django.utils import timezone
 from django.utils.timezone import make_aware
 from django.contrib.auth import login as django_login, authenticate, \
     logout as django_logout
+from django.views import generic
 from django.views.generic.detail import DetailView
 
 from accounts.models import OrgApplication, Agreement, Organization, User, \
@@ -33,7 +34,7 @@ from accounts.forms.authenticate import AuthenticationForm, SMSCodeForm
 from accounts.forms.register import RegistrationForm
 from accounts.forms.organization import OrganizationCheckForm
 from accounts.forms.application import ApplicationCheckForm, \
-    application_view
+    application_view, OrgApplication_Form
 from accounts.admin import UserCreationForm
 from accounts.utils import strip_url, cell_email
 from django.contrib import messages
@@ -188,7 +189,7 @@ def manage_account(request):
                "organizations": org_list,
                "applications": app_list}
 
-    return render_to_response('developer/manage_account.html',
+    return render_to_response('accounts/manage_account.html',
                               RequestContext(request, context,))
 
 
@@ -256,7 +257,7 @@ def connect_organization(request):
     if DEBUG:
         print context
 
-    return render_to_response('developer/connect_organization.html',
+    return render_to_response('accounts/connect_organization.html',
                              context,
                               context_instance=RequestContext(request))
 
@@ -319,6 +320,14 @@ def connect_application(request):
     if DEBUG:
         print context
 
-    return render_to_response('developer/connect_application.html',
+    return render_to_response('accounts/connect_application.html',
                              context,
                               context_instance=RequestContext(request))
+
+
+class OrgApplication_Detail(DetailView):
+    model = OrgApplication
+
+
+
+
