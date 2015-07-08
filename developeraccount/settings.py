@@ -7,7 +7,10 @@ https://docs.djangoproject.com/en/1.7/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
-from ConfigParser import RawConfigParser
+# ConfigParser in Python2 changes to configparser in Python3
+# print changes to print() in Python3
+
+from configparser import RawConfigParser
 parser = RawConfigParser()
 # http://stackoverflow.com/questions/4909958/django-local-settings/14545196#14545196
 
@@ -16,7 +19,7 @@ parser = RawConfigParser()
 import os
 import sys
 from platform import python_version
-from util import str2bool, str2int
+from .util import str2bool, str2int
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -35,7 +38,7 @@ APPLICATION_ROOT = BASE_DIR
 
 CONFIG_FILE = 'local.ini'
 # Read the config file
-parser.readfp(open(os.path.join(APPLICATION_ROOT, CONFIG_FILE)))
+parser.read_file(open(os.path.join(APPLICATION_ROOT, CONFIG_FILE)))
 # Then use parser.get(SECTION, VARIABLE) to read in value
 # Value is in string format
 # Use util functions to convert strings to boolean or Integer
@@ -75,18 +78,19 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-APPLICATION_TITLE = "BB+ Developer Accounts"
-APPLICATION_TITLE = parser.get('global', 'application_title')
 
+APPLICATION_TITLE = parser.get('global', 'application_title')
+if APPLICATION_TITLE == "":
+    APPLICATION_TITLE = "BB+ Developer Accounts"
 
 if DEBUG_SETTINGS:
-    print "Application: %s" % APPLICATION_TITLE
-    print "Running on Python_version: %s" % python_version()
-    print ""
-    print "BASE_DIR:%s " % BASE_DIR
-    print "APPLICATION_ROOT:%s " % APPLICATION_ROOT
+    print("Application: ",APPLICATION_TITLE)
+    print("Running on Python_version: ", python_version())
+    print("")
+    print("BASE_DIR:", BASE_DIR)
+    print("APPLICATION_ROOT:", APPLICATION_ROOT)
     FULL_CONFIG_FILE = APPLICATION_ROOT.strip()+'/'+CONFIG_FILE
-    print "Config File: %s" % FULL_CONFIG_FILE
+    print("Config File: ", FULL_CONFIG_FILE)
 
 # Application definition
 
@@ -102,6 +106,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 
 DEFAULT_APPS = (
+    # django_admin_bootstrapped Must appear ahead of django.contrib.admin
     'django_admin_bootstrapped',
     'django.contrib.admin',
     'django.contrib.admindocs',
@@ -161,7 +166,7 @@ WSGI_APPLICATION = 'developeraccount.wsgi.application'
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 DBPATH = os.path.join(BASE_DIR, 'db/db.db')
 if DEBUG_SETTINGS:
-    print "DBPATH:",DBPATH
+    print("DBPATH:",DBPATH)
 
 
 # Standard sqlite3 settings
@@ -179,29 +184,6 @@ DATABASES = {
 # Use Postgreql for Production
 
 # Use SQL platform for user and session management
-# Use MongoDb for documents
-
-#Mongo DB settings
-# MONGO_HOST = "127.0.0.1"
-# MONGO_HOST = "172.31.13.249"
-# MONGO_PORT = 27017
-# MONGO_DB_NAME = "BlueButtonRepository"
-# MONGO_ALIAS = "default"
-# MONGO_MASTER_COLLECTION = "main"
-# MONGO_HISTORYDB_NAME = "history"
-# MONGO_LIMIT = 100
-# MONGO_USER = ""
-# MONGO_PASSWORD = ""
-#
-# from mongoengine import connect
-# MONGO_CONNECTION = connect(MONGO_DB_NAME,
-#                            alias=MONGO_ALIAS,
-#                            username=MONGO_USER, password=MONGO_PASSWORD,
-#                            host=MONGO_HOST, port=MONGO_PORT,
-#                            )
-# if DEBUG_SETTINGS:
-#     print "MONGO_CONNECTION:",MONGO_CONNECTION
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
@@ -216,11 +198,13 @@ USE_L10N = True
 
 USE_TZ = True
 
+if DEBUG_SETTINGS:
+    print("Check the valid site id in the site table")
 # SITE_ID = 1 = prod - dev.bbonfhir.com
 # SITE_ID = 2 = local - localhost:8000
-SITE_ID = 3
+SITE_ID = 4
 if DEBUG_SETTINGS:
-    print "Site_ID: %s" % SITE_ID
+    print("SITE_ID: ", SITE_ID)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
@@ -247,7 +231,7 @@ STATICFILES_FINDERS = (
 )
 
 SESSION_COOKIE_SECURE = False
-SESSON_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 STATIC_URL = '/static/'
 
@@ -277,17 +261,17 @@ try:
 except:
     ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
 
-REGISTRATION_AUTO_LOGIN = False # Automatically log the user in.
+#REGISTRATION_AUTO_LOGIN = False # Automatically log the user in.
 REGISTRATION_AUTO_LOGIN = str2bool(parser.get('global', 'registration_auto_login'))
 
 #REGISTRATION_FORM = 'accounts.admin.UserCreationForm'
 
 # Django Registration
 #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'localhost'
+#EMAIL_HOST = 'localhost'
 EMAIL_HOST = parser.get('global', 'email_host').strip()
 # EMAIL_PORT = 1025 # local
-EMAIL_PORT = 645 # SSL
+#EMAIL_PORT = 645 # SSL
 EMAIL_PORT = str2int(parser.get('global', 'email_port'))
 
 
@@ -297,7 +281,7 @@ EMAIL_HOST_PASSWORD = parser.get('global','email_host_password')
 #EMAIL_USE_TLS = True
 # Port 465 = SSL
 # Port 587 = TLS
-EMAIL_USE_SSL = True
+#EMAIL_USE_SSL = True
 EMAIL_USE_SSL = str2bool(parser.get('global', 'email_use_ssl'))
 
 EMAIL_BACKEND_TYPE = parser.get('global', 'email_backend_type')
@@ -312,17 +296,16 @@ LOGIN_REDIRECT_URL = '/'
 SMS_LOGIN_TIMEOUT_MIN = 5
 
 
-
 # to use console open terminal and run:
 # python -m smtpd -n -c DebuggingServer localhost:1025
 # Replacing localhost:1025 with EMAIL_HOST:EMAIL_PORT if different
 DEFAULT_FROM_EMAIL = parser.get('global', 'default_from_email')
 
 if DEBUG_SETTINGS:
-    print "Email via %s: %s" % (EMAIL_BACKEND_TYPE, EMAIL_BACKEND)
-    print "Account Activation Days: %s" % ACCOUNT_ACTIVATION_DAYS
-    print "Email Host:Port: %s:%s" % (EMAIL_HOST, EMAIL_PORT)
-    print "Credentials: [%s]/[%s]" % (EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
+    print("Email via %s: %s" % (EMAIL_BACKEND_TYPE, EMAIL_BACKEND))
+    print("Account Activation Days: %s" % ACCOUNT_ACTIVATION_DAYS)
+    print("Email Host:Port: %s:%s" % (EMAIL_HOST, EMAIL_PORT))
+    print("Credentials: [%s]/[%s]" % (EMAIL_HOST_USER, EMAIL_HOST_PASSWORD))
 
 # END of DJANGO Registration Settings Section
 
@@ -331,6 +314,7 @@ if DEBUG_SETTINGS:
 CORS_ORIGIN_ALLOW_ALL = True
 
 # End of CORSHEADERS Section
+
 # Change to OAuth2 Provider Application Model
 #OAUTH2_PROVIDER_APPLICATION_MODEL='accounts.MyApplication'
 
@@ -348,11 +332,11 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 # try:
 #     from developeraccount.local_settings import *
 # except Exception as e:
-#     print "ERROR: local_settings not loaded"
+#     print("ERROR: local_settings not loaded")
 #     pass
 
 if DEBUG_SETTINGS:
-    print "SECRET_KEY:%s" % SECRET_KEY
-    print "================================================================"
+    print("SECRET_KEY:%s" % SECRET_KEY)
+    print("================================================================")
 # SECURITY WARNING: keep the secret key used in production secret!
 

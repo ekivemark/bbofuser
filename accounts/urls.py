@@ -8,6 +8,7 @@ from accounts.views.other import AgreementDetailView, OrganizationDetailView, Or
 
 from accounts.views.sms import sms_code, sms_login, login_optional_sms, login_optional
 from accounts.views.user import user_edit
+from accounts.views.organization import Organization_EditForm, OrgApplication_EditForm
 
 admin.autodiscover()
 
@@ -27,8 +28,10 @@ urlpatterns = patterns('',
         OrganizationDetailView.as_view(),
         name='organization-detail'),
     url(r'^user/edit$', 'accounts.views.user.user_edit', name='user_edit'),
-    url(r'^orgapplication_detail/(?P<pk>\d+)/$',
-        OrgApplication_Detail.as_view(), name='orgapplication_detail'),
+    url(r'^organization/edit$', 'accounts.views.organization.organization_edit',
+        name='organization_edit'),
+   url(r'^application/edit/(?P<pk>[-\w]+)/$', 'accounts.views.organization.orgapplication_edit',
+        name='orgapplication_edit'),
 
     url(r'^admin/', include(admin.site.urls)),
 

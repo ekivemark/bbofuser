@@ -33,7 +33,7 @@ from stdnum.us.itin import is_valid
 
 from django.contrib import auth
 from django.contrib.auth.models import AbstractBaseUser
-from utils import strip_url, CARRIER_EMAIL_GATEWAY, CARRIER_SELECTION, \
+from accounts.utils import strip_url, CARRIER_EMAIL_GATEWAY, CARRIER_SELECTION, \
     cell_email, send_sms_pin
 from phonenumber_field.modelfields import PhoneNumberField
 
@@ -72,10 +72,10 @@ class Organization(models.Model):
                                         blank=True,
                                         null=True)
 
-    def __unicode__(self):
+    def __str__(self):
         #return '%s (%s)' % (self.name,
         #                    self.domain)
-        return unicode(self.domain)
+        return str(self.domain)
 
 #class Application(models.Model):
 #@login_required()
@@ -139,10 +139,10 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         if settings.DEBUG == True:
 
-            print "%s, active=%s,admin=%s, %s" % (user.email,
-                                                           user.is_active,
-                                                           user.is_admin,
-                                                           user.password)
+            print("%s, active=%s,admin=%s, %s" % (user.email,
+                                                  user.is_active,
+                                                  user.is_admin,
+                                                  user.password))
         return user
 
 
@@ -214,13 +214,13 @@ class User(AbstractBaseUser):
     #     # Simplest possible answer: All admins are staff
     #     return self.is_admin
 
-    def __unicode__(self):                      # __str__ on Python 3
-        #return "%s %s (%s)" % (self.first_name,
+    def __str__(self):                      # __unicode__ on Python 2
+       #return "%s %s (%s)" % (self.first_name,
         #                       self.last_name,
         #                       self.email)
-        return unicode(self.email)
+        return str(self.email)
 
-    def __meta(self):
+    def Meta(self):
         verbose_name = _('User')
         verbose_name_plural = _('Users')
 
@@ -234,7 +234,7 @@ class Agreement(models.Model):
                                 default="http://dev.bbonfhir.com/static/accounts/terms_of_use.html")
     effective_date = models.DateTimeField()
 
-    def __unicode__(self):
+    def __str__(self):
         # format object return python 2.x
         # Use __str__ in python 3.x
         # formats output - useful for admin interface instead of seeing model object
@@ -253,7 +253,7 @@ class Agreement(models.Model):
 
 
 def alertme(sender, user, request, **kwargs):
-    print ("USER LOGGED OUT!") #or more sophisticated logging
+    print("USER LOGGED OUT!") #or more sophisticated logging
 
 user_logged_out.connect(alertme)
 
@@ -264,7 +264,7 @@ class ValidSMSCode(models.Model):
     expires            = models.DateTimeField(default=datetime.now)
 
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s for user %s expires at %s' % (self.sms_code,
                                                  self.user,
                                                  self.expires)
@@ -278,7 +278,7 @@ class ValidSMSCode(models.Model):
             else:
                 self.sms_code = '9999'
             if settings.DEBUG:
-                print self.sms_code
+                print(self.sms_code)
 
         now = timezone.now()
         expires = now + timedelta(minutes=settings.SMS_LOGIN_TIMEOUT_MIN)

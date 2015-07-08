@@ -51,12 +51,12 @@ class AuthenticationSMSForm(forms.Form):
         cleaned_data = super(AuthenticationSMSForm, self).clean()
         u = User.objects.get(email=self.cleaned_data['email'])
         mfa = u.mfa
-        print self.cleaned_data
+        if settings.DEBUG:
+            print(self.cleaned_data)
         if (self.cleaned_data.get('sms_code') == "" and mfa):
             if settings.DEBUG:
-                print "MFA:%s for %s" % (mfa, u.email)
+                print("MFA:%s for %s" % (mfa, u.email))
             raise forms.ValidationError("Pin Code is required")
 
         return self.cleaned_data
-
 

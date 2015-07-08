@@ -45,28 +45,33 @@ class OrganizationCheckForm(forms.Form):
     domain = Url(label="Organization Domain",
                    help_text="<br/>Enter the top level organization domain. <br/>eg. domain.com")
     if settings.DEBUG:
-        print "in OrganizationCheckForm"
+        print("in OrganizationCheckForm")
 
     def clean_domain(self):
 
-        print "checking for this:" , self.cleaned_data['domain']
+        if settings.DEBUG:
+            print("checking for this:" , self.cleaned_data['domain'])
         check_for = strip_url(self.cleaned_data['domain'],"www")
         #check_for = check_for.replace("http://","")
         #check_for = check_for.replace("https://","")
         #check_for = check_for.replace("www.","")
 
-        print "Check_for:", check_for
+        if settings.DEBUG:
+            print("Check_for:", check_for)
 
         try:
             org_compare = Organization.objects.get(domain=check_for)
         except:
-            print check_for, "Domain Not Found. That is good!"
+            if settings.DEBUG:
+                print(check_for, "Domain Not Found. That is good!")
             return check_for
 
-        print "[", org_compare, "]"
+        if settings.DEBUG:
+            print("[", org_compare, "]")
         if (org_compare.domain.lower() == check_for):
 
-            print "matched on ", org_compare.domain
+            if settings.DEBUG:
+                print("matched on ", org_compare.domain)
 
             primary_email = "[Add function here]"
             backup_email =  "[Add email obscuring function here]"
@@ -79,7 +84,18 @@ class OrganizationCheckForm(forms.Form):
 
             raise forms.ValidationError(validation_msg)
         else:
-            print "Domain does not exist"
-            print "(%s)" % check_for
+            if settings.DEBUG:
+                print("Domain does not exist")
+                print("(%s)" % check_for)
             return check_for
+
+
+class Organization_EditForm(forms.ModelForm):
+
+    class Meta:
+        model = Organization
+        fields = ['name',
+                  'privacy_url',
+                  ]
+
 

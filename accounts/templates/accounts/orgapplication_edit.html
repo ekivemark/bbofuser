@@ -6,14 +6,8 @@
 
 {% endblock %}
 
-{% block pagename %}Application Details{% endblock %}
+{% block pagename %}Application Details ({{ application }}){% endblock %}
 {% block content %}
-
-                -----------------
-                {% load crispy_forms_tags %}
-                {% crispy OrgApplication_Form  %}
-                -----------------
-
 
 
 <div class="container col-lg-4 well">

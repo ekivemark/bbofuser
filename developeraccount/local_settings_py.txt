@@ -15,6 +15,6 @@ SECRET_KEY = 'Your_secret_key goes here'
 # used for development here.
 # I find this useful if I am working on multiple projects.
 # Admin account and password
-# admin / password
+# mark@healthca.mp / secret
 # email: mscrimshire@gmail.com
 

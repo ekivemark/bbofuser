@@ -12,10 +12,10 @@ def str2int(inp):
     return output
 
 def str2bool(inp):
+    output = False
     if inp.upper() == "TRUE":
         output = True
     elif inp.upper() == "FALSE":
         output = False
 
     return output
-

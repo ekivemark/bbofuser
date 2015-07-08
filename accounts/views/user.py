@@ -5,6 +5,7 @@ Created: 7/6/15 9:39 PM
 
 
 """
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 __author__ = 'Mark Scrimshire:@ekivemark'
@@ -26,30 +27,51 @@ from accounts.forms.user import User_EditForm
 def user_edit(request):
 
     if settings.DEBUG:
-        print request.user
-        print "User:%s" % request.user.email
+        print(request.user)
+        print("Entering User Edit with:%s" % request.user.email)
 
     u = User.objects.get(email=request.user.email)
+    if settings.DEBUG:
+        print("User returned:", u, "[", u.first_name," ", u.last_name, "]")
 
-    form = ModelForm(data = request.POST or None, instance=u)
+    form = User_EditForm(data = request.POST or None, instance=u)
 
     if request.POST:
         form = User_EditForm(request.POST)
         if form.is_valid():
-            form.save()
+            #form.save()
             if settings.DEBUG:
-                print "current record:", u
+                print("Form is valid - current record:", u)
+
+            u.first_name = form.cleaned_data['first_name']
+            u.last_name  = form.cleaned_data['last_name']
+            u.mobile     = form.cleaned_data['mobile']
+            u.carrier    = form.cleaned_data['carrier']
+            u.mfa        = form.cleaned_data['mfa']
+            if settings.DEBUG:
+                print("Updated to:", u)
+            u.save()
 
             return HttpResponseRedirect(reverse('accounts:manage_account'),
                                         RequestContext(request))
+        else:
+            if settings.DEBUG:
+                print("Form is invalid")
+
+            messages.error(request, "There was an input problem.")
+            return render(request, 'accounts/user_edit.html', {'form':form} )
+
     else:
-        form = User_EditForm(instance=u)
+        u = User.objects.get(email=request.user.email)
         if settings.DEBUG:
-            print "Not in the post"
-        return render_to_response('accounts/useredit.html',
-                                  RequestContext(request,
+            print("in the get with User:",u.first_name," ", u.last_name," ", u.mobile)
+        form = User_EditForm(initial={'first_name':u.first_name, 'last_name':u.last_name,
+                                      'mobile':u.mobile, 'carrier':u.carrier, 'mfa': u.mfa})
+        if settings.DEBUG:
+            print("Not in the post in the get")
+        return render(request, 'accounts/user_edit.html',
                                                  {'form': form,
-                                                  'email': u.email}))
+                                                  'email': u.email})
 
 
 

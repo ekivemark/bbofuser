@@ -1,9 +1,9 @@
 {% load i18n %}
-<h2>My Organization</h2>
+<h3>My Organization <a href="{%  url 'accounts:organization_edit' %}" class="btn btn-lg btn-success" >{% trans 'Edit' %}</a></h3>
     {% if user.affiliated_to %}
     <table>
         <tr>
-            <th>Edit</th>
+
             <th>Organization</th>
             <th>Name</th>
             <th>site url</th>
@@ -14,7 +14,7 @@
         </tr>
          {%  for organization in organizations %}
         <tr>
-            <td>Edit</td>
+
             <td>
                 {{ organization.domain }}
             </td>

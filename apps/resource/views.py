@@ -28,7 +28,7 @@ def home_index(request):
     DEBUG = settings.DEBUG_SETTINGS
 
     if DEBUG:
-        print application_title, "in resource.views.home_index"
+        print(application_title, "in resource.views.home_index")
 
     context = {"APPLICATION_TITLE": application_title}
     return render_to_response('index.html', RequestContext(request, context,))

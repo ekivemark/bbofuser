@@ -51,7 +51,7 @@ def login(request):
                                 password=request.POST['password'])
             if user is not None:
                 if settings.DEBUG:
-                    print "User is not Empty!"
+                    print("User is not Empty!")
                 if user.is_active:
                     django_login(request, user)
                     return redirect('/')
@@ -132,7 +132,7 @@ def home_index(request):
     DEBUG = settings.DEBUG_SETTINGS
 
     if DEBUG:
-        print application_title, "in accounts.views.home_index"
+        print(application_title, "in accounts.views.home_index")
 
     context = {"APPLICATION_TITLE": application_title}
     return render_to_response('index.html', RequestContext(request, context,))
@@ -147,7 +147,7 @@ def agree_to_terms(request):
     DEBUG = settings.DEBUG_SETTINGS
 
     if DEBUG:
-        print application_title, "in accounts.views.agree_to_terms"
+        print(application_title, "in accounts.views.agree_to_terms")
 
     if request.method == 'POST':
         form = UserCreationForm(data=request.POST)
@@ -175,7 +175,7 @@ def manage_account(request):
     DEBUG = settings.DEBUG_SETTINGS
 
     if DEBUG:
-        print application_title, "in accounts.views.manage_account"
+        print(application_title, "in accounts.views.manage_account")
     user = request.user
     mfa_address = cell_email(user.mobile, user.carrier)
 
@@ -220,18 +220,18 @@ def connect_organization(request):
     DEBUG = settings.DEBUG_SETTINGS
 
     if DEBUG:
-        print application_title, "in accounts.views.connect_organization"
-        print "request.method:"
-        print request.method
-        print request.POST
+        print(application_title, "in accounts.views.connect_organization")
+        print("request.method:")
+        print(request.method)
+        print(request.POST)
 
     if request.method == 'POST':
         form = OrganizationCheckForm(data=request.POST)
 
         if form.is_valid():
             if DEBUG:
-                print "form is valid"
-                print "form", form.cleaned_data['domain']
+                print("form is valid")
+                print("form", form.cleaned_data['domain'])
             org = Organization()
             org.domain = form.cleaned_data['domain']
             org.site_url = "http://"+form.cleaned_data['domain']
@@ -241,21 +241,21 @@ def connect_organization(request):
 
             u = request.user
             if DEBUG:
-                print "user", u
+                print("user", u)
             u.affiliated_to = org
             u.organization_role = "primary"
             u.save()
 
             return redirect(reverse_lazy('accounts:manage_account'))
         else:
-            print "OrganizationCheckForm", request.POST, " NOT Valid"
+            print("OrganizationCheckForm", request.POST, " NOT Valid")
     else:
         form = OrganizationCheckForm()
 
     context['form'] = form
 
     if DEBUG:
-        print context
+        print(context)
 
     return render_to_response('accounts/connect_organization.html',
                              context,
@@ -279,46 +279,46 @@ def connect_application(request):
     DEBUG = settings.DEBUG_SETTINGS
 
     if DEBUG:
-        print application_title, "in accounts.views.connect_application"
-        print "request.method:"
-        print request.method
-        print request.POST
+        print(application_title, "in accounts.views.connect_application")
+        print("request.method:")
+        print(request.method)
+        print(request.POST)
 
     if request.method == 'POST':
         form = ApplicationCheckForm(data=request.POST)
 
         if form.is_valid():
             if DEBUG:
-                print "form is valid"
-                print "form", form.cleaned_data
+                print("form is valid")
+                print("form", form.cleaned_data)
 
             app = OrgApplication()
             app.name = form.cleaned_data['name']
             app.callback = form.cleaned_data['callback'].lower()
-            app.icon_link = form.cleaned_data['icon_link'].lower()
+            app.icon_link = form.cleaned_data['icon_link']
 
             app.owner = request.user
             app.user_id = request.user.id
             app.organization = user.affiliated_to
             if settings.DEBUG:
-                print "OrgApp:", app, app.owner, app.organization, user
+                print("OrgApp:", app, app.owner, app.organization, user)
 
             app.save()
 
 
             if DEBUG:
-                print "user", user
+                print("user", user)
 
             return redirect(reverse_lazy('accounts:manage_account'))
         else:
-            print "ApplicationCheckForm", request.POST, " NOT Valid"
+            print("ApplicationCheckForm", request.POST, " NOT Valid")
     else:
         form = ApplicationCheckForm()
 
     context['form'] = form
 
     if DEBUG:
-        print context
+        print(context)
 
     return render_to_response('accounts/connect_application.html',
                              context,

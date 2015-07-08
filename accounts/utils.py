@@ -157,11 +157,11 @@ def strip_url(domain,www=None):
 
     u = str(domain)
     u = u.lower()
-    check_for  = "http://"
-    check_fors = "https://"
+    check_for_http  = "http://"
+    check_for_https = "https://"
 
-    result = u.replace(check_for,"")
-    result = result.replace(check_fors,"")
+    result = u.replace(check_for_http,"")
+    result = result.replace(check_for_https,"")
 
     if www != None:
         result  = result.replace(www.lower()+".","")
@@ -175,8 +175,8 @@ def cell_email(phone, carrier):
     :param carrier:
     :return: email
     """
-
-    print phone
+    if settings.DEBUG:
+        print(phone)
     # make sure it is in 10 digit phone number format
     # no + or . or - or ( or )
     phone_digits = str(phone)
@@ -185,7 +185,8 @@ def cell_email(phone, carrier):
     if (carrier == "" or carrier == None):
         return None
 
-    print carrier
+    if settings.DEBUG:
+        print(carrier)
     # lookup email
     carrier_email = dict(CARRIER_EMAIL_GATEWAY)
     carrier_address = carrier_email[carrier]
@@ -209,6 +210,6 @@ def send_sms_pin(phone, email, pin):
     send_to = []
     send_to.append(email)
     if settings.DEBUG:
-        print "Sending %s to %s" % (msg, send_to)
+        print("Sending %s to %s" % (msg, send_to))
 
     return send_mail(subject,msg, from_email, send_to, fail_silently=False)

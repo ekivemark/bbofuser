@@ -19,24 +19,25 @@
                 {{ user.first_name }}&nbsp; {{ user.last_name }}
             </td>
         </tr>
-       <tr>
-            <td>
-               Organization:
-            </td>
-            <td>
-                {{ user.affiliated_to }} ({{  user.organization_role }})
-            </td>
-       </tr>
             {%  if user.mobile %}
                 <tr>
                     <td>
                         Phone:
                     </td>
                     <td>
-                        {{ user.mobile }} on {{ user.carrier }} ({{ mfa_address }})
+                        {{ user.mobile }} on {{ user.carrier | upper }} ({{ mfa_address }})
                     </td>
                 </tr>
             {%  endif %}
+        <tr>
+            <td>
+               Role in Organization:
+            </td>
+            <td>
+                {{ user.organization_role }}
+            </td>
+        </tr>
+
     </table>
 {%  else %}
 

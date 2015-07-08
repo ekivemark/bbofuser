@@ -20,6 +20,4 @@ class User_EditForm(forms.ModelForm):
                   'last_name',
                   'mobile',
                   'carrier',
-                  'affiliated_to',
-                  'organization_role',
                   'mfa', ]

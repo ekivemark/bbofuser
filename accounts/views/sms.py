@@ -30,7 +30,7 @@ from django.contrib import messages
 def validate_sms(username, smscode):
 
     if settings.DEBUG:
-        print "%s, %s" % (username, smscode)
+        print("%s, %s" % (username, smscode))
 
     mfa_on = False
     try:
@@ -38,44 +38,43 @@ def validate_sms(username, smscode):
         mfa_on = u.mfa
         vc = ValidSMSCode.objects.get(user=u, sms_code=smscode)
         if settings.DEBUG:
-            print "vc: %s - %s" % (vc, mfa_on)
+            print("vc: %s - %s" % (vc, mfa_on))
         now = timezone.now()
         if vc.expires < now:
             vc.delete()
             return False
     except(User.DoesNotExist):
         if settings.DEBUG:
-            print "User does not exist"
+            print("User does not exist")
         return False
     except(ValidSMSCode.DoesNotExist):
         if not mfa_on:
             if settings.DEBUG:
-                print "MFA disabled" \
-                      ""
+                print("MFA disabled","")
             return True
         else:
             if settings.DEBUG:
-                print "ValidSMS does not exist"
+                print("ValidSMS does not exist")
             return False
     if settings.DEBUG:
-        print "Success! Deleting %s" % vc
+        print("Success! Deleting %s" % vc)
     vc.delete()
     return True
 
 
 def sms_login(request, email="", *args, **kwargs):
     if settings.DEBUG:
-        print request.GET
-        print "SMS_LOGIN.GET:email:[%s]" % (email)
-        print request.POST
-        print args
+        print(request.GET)
+        print("SMS_LOGIN.GET:email:[%s]" % (email))
+        print(request.POST)
+        print(args)
 
 
     if request.method == 'POST':
         form = AuthenticationForm(request.POST)
         if request.POST['login'].lower() == 'resend code':
             if settings.DEBUG:
-                print "Resending Code for %s" % request.POST['email']
+                print("Resending Code for %s" % request.POST['email'])
             form = SMSCodeForm(request.POST)
             form.email = request.POST['email']
             args = {}
@@ -114,8 +113,8 @@ def sms_login(request, email="", *args, **kwargs):
                               RequestContext(request))
     else:
         if settings.DEBUG:
-            print "in sms_login. Setting up Form"
-            print "email:%s" % email
+            print("in sms_login. Setting up Form")
+            print("email:%s" % email)
         form = AuthenticationForm(initial={'email':email})
     return render_to_response('accounts/login.html', {'form': AuthenticationForm()},
                               RequestContext(request))
@@ -124,17 +123,17 @@ def sms_code(request, email=""):
 
     status = "NONE"
     if settings.DEBUG:
-        print "in accounts.views.sms.sms_code"
-        print "Email:", email
+        print("in accounts.views.sms.sms_code")
+        print("Email:", email)
 
     if request.method == 'POST':
         if request.POST.__contains__('email'):
             email = request.POST['email']
-            print "POST email on entry:[%s]" % (email)
+            print("POST email on entry:[%s]" % (email))
     if request.method == 'POST':
         if settings.DEBUG:
-            print "request.POST:%s" % request.POST
-            print "POST email:%s" % request.POST['email']
+            print("request.POST:%s" % request.POST)
+            print("POST email:%s" % request.POST['email'])
 
         form = SMSCodeForm(request.POST)
 
@@ -144,7 +143,7 @@ def sms_code(request, email=""):
                 mfa_required = u.mfa
                 email_address = u.email
                 if settings.DEBUG:
-                    print "Require MFA Login:%s" % mfa_required
+                    print("Require MFA Login:%s" % mfa_required)
                 if u.is_active:
                     if mfa_required:
                         ValidSMSCode.objects.create(user=u)
@@ -165,9 +164,9 @@ def sms_code(request, email=""):
                 #     messages.error(request, "You do not have a user profile.")
                 #     return HttpResponseRedirect(reverse('sms_code'))
             if settings.DEBUG:
-                print "dropping out of valid form"
-                print "Status:", status
-                print "email Address: %s" % email_address
+                print("dropping out of valid form")
+                print("Status:", status)
+                print("email Address: %s" % email_address)
             # Change the form and move to login
             form = AuthenticationForm(initial={'email':email_address})
             args = {}
@@ -175,14 +174,14 @@ def sms_code(request, email=""):
             return HttpResponseRedirect(reverse('accounts:login'),args )
         else:
             if settings.DEBUG:
-                print "invalid form"
+                print("invalid form")
             form.email = email
 
             return render_to_response('accounts/login.html',
                                       RequestContext(request, {'form': form}))
     else:
         if settings.DEBUG:
-            print "setting up the POST in sms_code"
+            print("setting up the POST in sms_code")
 
     return render_to_response('accounts/smscode.html',
                               context_instance = RequestContext(request))
@@ -209,12 +208,12 @@ def login_optional_sms(request):
     """
 
     if settings.DEBUG:
-        print "in accounts.views.sms.login_optional_sms"
+        print("in accounts.views.sms.login_optional_sms")
 
     if request.method == 'POST':
         # handle the form input
         if settings.DEBUG:
-            print "in the POST"
+            print("in the POST")
         form = AuthenticationSMSForm(request.POST)
 
         # check for Login Method:
@@ -222,7 +221,7 @@ def login_optional_sms(request):
         # 2. = Send Pin Code
         if request.POST['login'].lower() == 'send pin code':
             if settings.DEBUG:
-                print "Sending Code to %s" % (request.POST['email'])
+                print("Sending Code to %s" % (request.POST['email']))
 
             try:
                 u = User.objects.get(email = request.POST['email'])
@@ -250,11 +249,11 @@ def login_optional_sms(request):
 
         elif request.POST['login'].lower() == 'login':
             if settings.DEBUG:
-                print "in login step"
+                print("in login step")
 
         if form.is_valid:
             if settings.DEBUG:
-                print "Valid form received"
+                print("Valid form received")
             # print "Authenticate"
             email = form.cleaned_data.get['email']
             password = form.cleaned_data.get['password']
@@ -291,7 +290,7 @@ def login_optional_sms(request):
     else:
         # setup the form. We are entering with a GET to the page.
         if settings.DEBUG:
-            print "setting up sms.login_optional_sms form"
+            print("setting up sms.login_optional_sms form")
         form = AuthenticationSMSForm
     return render_to_response('accounts/login_sms.html',
                               context_instance = RequestContext(request, {'form':form},))
@@ -317,24 +316,24 @@ def login_optional(request):
     """
     args = {}
     if settings.DEBUG:
-        print "in accounts.views.sms.login_optional"
+        print("in accounts.views.sms.login_optional")
 
     if request.POST:
         form = AuthenticationSMSForm(request.POST)
         if settings.DEBUG:
-            print "test login before is_valid()"
-            print request.POST['login']
+            print("test login before is_valid()")
+            print(request.POST['login'])
 
-            print "pin needed? [%s]" % request.POST['send_pin']
+            print("pin needed? [%s]" % request.POST['send_pin'])
         if form.is_valid():
             if settings.DEBUG:
-                print "in the post section with form instance"
-                print form
-                print "Email:", form.cleaned_data['email']
+                print("in the post section with form instance")
+                print(form)
+                print("Email:", form.cleaned_data['email'])
             # Do the evaluation logic here
             if request.POST['login'].lower() == 'send pin code':
                 if settings.DEBUG:
-                    print "Sending PIN"
+                    print("Sending PIN")
                 try:
                     u = User.objects.get(email = request.POST['email'])
                 except User.DoesNotExist:
@@ -371,7 +370,7 @@ def login_optional(request):
                                           RequestContext(request))
         else:            # FORM IS NOT VALID
             if settings.DEBUG:
-                print "Form is invalid"
+                print("Form is invalid")
             args['form'] = form
             return render(request, 'accounts/login_sms.html', args )
 

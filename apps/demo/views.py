@@ -109,7 +109,7 @@ def DemoApi(request):
     DEBUG = settings.DEBUG_SETTINGS
 
     if DEBUG:
-        print application_title, "in demo.views.DemoApi"
+        print(application_title, "in demo.views.DemoApi")
 
     fhir_server_url = "http://localhost:8080/fhir-p/"
     fhir_server_param = "baseDstu2/Patient/1/$everything?_format=json"
@@ -118,8 +118,8 @@ def DemoApi(request):
     r = requests.get(fhir_server_url+fhir_server_param, )
 
 
-    #print r.json
-    #print r.content
+    #print(r.json)
+    #print(r.content)
 
     result = r.content
     result_content = json.loads(r.content)
@@ -128,7 +128,7 @@ def DemoApi(request):
     xmlresult = dicttoxml.dicttoxml(result_content)
 
     dom = parseString(xmlresult)
-    #print dom.toprettyxml()
+    #print(dom.toprettyxml())
 
     context = {"APPLICATION_TITLE": application_title,"result": result, "xmlresult": dom.toprettyxml(),
                "url": fhir_server_url, "params": fhir_server_param }
