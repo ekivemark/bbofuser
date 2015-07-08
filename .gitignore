@@ -76,4 +76,7 @@ local_settings.py
 # database
 db/db.db
 =======
+# Pycharm
+.idea*
+
 >>>>>>> 791547b52449e17e3cd25221126566122b5a1c9b
