@@ -29,7 +29,8 @@ class AuthenticationForm(forms.Form):
 
 
 class SMSCodeForm(forms.Form):
-    email= forms.CharField(max_length=255, label="email address")
+    email = forms.EmailField(widget=forms.widgets.TextInput, label="email address")
+
 
 class AuthenticationSMSForm(forms.Form):
     """

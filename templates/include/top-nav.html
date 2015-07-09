@@ -1,10 +1,14 @@
 {% load i18n %}
+{% load staticfiles %}
 
 <div class="container-fluid">
 <div class="navbar navbar-default navbar-static">
   <ul class="nav nav-pills">
-       <li><a class="navbar-brand" href="#" contenteditable="false"><img src="{{ STATIC_URL }}img/layout/blue-button.png" align="top" alt="{{APPLICATION_TITLE }}" height="100" width="100"></a></li>
-        <li><a class="navbar-brand" href="/" contenteditable="false">{{APPLICATION_TITLE }}</a></li>
+       <li><a href="{%  url 'home' %}" contenteditable="false" class="navbar-brand" >
+           <img src="{% static 'img/layout/blue-button.png' %}" align="vtop" alt="{{ APPLICATION_TITLE }}" height="80px" width="80px">
+            </a>
+       </li>
+        <li><a class="navbar-brand" href="/" contenteditable="false">{{ APPLICATION_TITLE }}</a></li>
 
         <li class="active">
             <a href="{% url "home" %}" class="" contenteditable="false">Home</a>
@@ -15,7 +19,7 @@
       </li>
       <li>
 {# DONE: create /accounts/app_management - redirect to accounts:manage_account #}
-          <a href="{%  url 'accounts:manage_account' %}">{% trans "My Dashboard" %}</a>
+          <a href="{% url 'accounts:manage_account' %}">{% trans "My Dashboard" %}</a>
       </li>
   {% else %}
       <li>

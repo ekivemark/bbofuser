@@ -62,25 +62,29 @@ def validate_sms(username, smscode):
     return True
 
 
-def sms_login(request, email="", *args, **kwargs):
+def sms_login(request, *args, **kwargs):
+    if 'email' in request.session:
+        if request.session['email'] != "":
+            email = request.session['email']
+        else:
+            email = ""
+    else:
+        email = ""
     if settings.DEBUG:
         print(request.GET)
         print("SMS_LOGIN.GET:email:[%s]" % (email))
         print(request.POST)
         print(args)
 
-
     if request.method == 'POST':
         form = AuthenticationForm(request.POST)
         if request.POST['login'].lower() == 'resend code':
             if settings.DEBUG:
                 print("Resending Code for %s" % request.POST['email'])
-            form = SMSCodeForm(request.POST)
-            form.email = request.POST['email']
-            args = {}
-            args['form'] = form
-            return render_to_response('accounts/smscode.html',
-                                      RequestContext(request, args))
+            #form = SMSCodeForm(request.POST)
+            #form.email = request.POST['email']
+            request.session['email'] = request.POST['email']
+            return HttpResponseRedirect(reverse('accounts:sms_code'))
         if form.is_valid():
             #print "Authenticate"
             email = form.cleaned_data['email']
@@ -112,28 +116,43 @@ def sms_login(request, email="", *args, **kwargs):
             return render_to_response('accounts/login.html', {'form': form},
                               RequestContext(request))
     else:
+        if 'email' in request.session:
+            email = request.session['email']
+        else:
+            email = ""
         if settings.DEBUG:
-            print("in sms_login. Setting up Form")
-            print("email:%s" % email)
-        form = AuthenticationForm(initial={'email':email})
-    return render_to_response('accounts/login.html', {'form': AuthenticationForm()},
+            print("in sms_login. Setting up Form [", email, "]")
+        form = AuthenticationForm(initial={'email': email, })
+    if settings.DEBUG:
+        print(form)
+    return render_to_response('accounts/login.html', {'form': form},
                               RequestContext(request))
 
-def sms_code(request, email=""):
-
+def sms_code(request):
+    if 'email' in request.session:
+        if request.session['email'] != "":
+            email = request.session['email']
+        else:
+            email = ""
+    else:
+        email = ""
     status = "NONE"
     if settings.DEBUG:
         print("in accounts.views.sms.sms_code")
-        print("Email:", email)
 
     if request.method == 'POST':
         if request.POST.__contains__('email'):
             email = request.POST['email']
             print("POST email on entry:[%s]" % (email))
-    if request.method == 'POST':
+        else:
+            if 'email' in request.session:
+                if request.session['email'] != "":
+                    email = request.session['email']
+            else:
+                email = ""
         if settings.DEBUG:
             print("request.POST:%s" % request.POST)
-            print("POST email:%s" % request.POST['email'])
+            print("email:%s" % email)
 
         form = SMSCodeForm(request.POST)
 
@@ -141,10 +160,12 @@ def sms_code(request, email=""):
             try:
                 u=User.objects.get(email=form.cleaned_data['email'])
                 mfa_required = u.mfa
-                email_address = u.email
+                email = u.email
                 if settings.DEBUG:
                     print("Require MFA Login:%s" % mfa_required)
                 if u.is_active:
+                    # posting a session variable for login page
+                    request.session['email'] = email
                     if mfa_required:
                         ValidSMSCode.objects.create(user=u)
                         messages.success(request, "A text message was sent to your mobile phone.")
@@ -153,10 +174,12 @@ def sms_code(request, email=""):
                         messages.success(request, "Your account is active. Continue Login.")
                         status = "Account Active"
                 else:
+                    request.session['email'] = ""
                     messages.error(request, "Your account is inactive.")
                     status = "Inactive Account"
                     return HttpResponseRedirect(reverse('accounts:sms_code'))
             except(User.DoesNotExist):
+                request.session['email'] = ""
                 messages.error(request, "You are not recognized.")
                 status = "User UnRecognized"
                 return HttpResponseRedirect(reverse('accounts:sms_code'))
@@ -166,9 +189,10 @@ def sms_code(request, email=""):
             if settings.DEBUG:
                 print("dropping out of valid form")
                 print("Status:", status)
-                print("email Address: %s" % email_address)
+                print("email: %s" % email)
             # Change the form and move to login
-            form = AuthenticationForm(initial={'email':email_address})
+
+            form = AuthenticationForm(initial={'email':email})
             args = {}
             args['form'] = form
             return HttpResponseRedirect(reverse('accounts:login'),args )
@@ -180,11 +204,21 @@ def sms_code(request, email=""):
             return render_to_response('accounts/login.html',
                                       RequestContext(request, {'form': form}))
     else:
+        if 'email' in request.session:
+            if request.session['email'] != "":
+                email = request.session['email']
+            else:
+                email = ""
+        else:
+            email = ""
         if settings.DEBUG:
-            print("setting up the POST in sms_code")
+            print("setting up the POST in sms_code [",email, "]" )
+        form = SMSCodeForm(initial={'email': email, })
 
-    return render_to_response('accounts/smscode.html',
-                              context_instance = RequestContext(request))
+    if settings.DEBUG:
+        print(form)
+    return render_to_response('accounts/smscode.html', {'form': form },
+                              RequestContext(request))
 
 
 def login_optional_sms(request):

@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load staticfiles %}
+{% load url from future %}
 {% block pretitle %}{% endblock %}
 {% block extra_head %}
 {% endblock %}
@@ -9,7 +11,7 @@
 
 <div class="hero-unit">
 
-    <h1>BB+ on FHIR: Developer Accounts</h2>
+    <h2>BB+ on FHIR: Developer Accounts</h2>
 
     <div class="container-fluid">
     	<div class="col-md-6"><p>Use this framework to manage developer accounts that want
@@ -21,11 +23,10 @@
             {%  endif %}
         </div>
 
-  	    <div class="col-md-6"><img src="{{ STATIC_URL }}img/layout/blue-button.png" style="height:300px"></div>
+  	    <div class="col-md-6"><img src="{% static 'img/layout/blue-button.png' %}" style="height:300px"></div>
 
     </div>
 </div>
-
 
 
 {% endblock %}

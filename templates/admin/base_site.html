@@ -1,7 +1,8 @@
-{% extends "admin/base.html" %}
+{% extends "base.html" %}
 {% load staticfiles %}
+{% load url from future %}
 {% load i18n %}
-
+]
 {% block title %}{{ APPLICATION_TITLE }} | {{ title }} | {% trans 'Django site admin' %}{% endblock %}
 {% block extrahead %}
     <meta charset="utf-8">
@@ -17,17 +18,17 @@
     <link rel="shortcut icon" href="{% static 'img/layout/favicon.png' %}" type="image/x-icon">
 
 {% endblock %}
-{% block branding %}
-<h3 id="site-name">
-    <a href="{% url 'home' %}"><img src="{% static 'img/layout/favicon.png' %}" width="60">{% trans 'Home: ' %}</a>
+{% block content_title %}
+<h1>
+    <a href="{% url 'home' %}"><img src="{% static 'img/layout/favicon.png' %}" width="60">{{ APPLICATION_TITLE }}</a>
     <a href="{% url 'admin:index' %}">{% trans 'Site Administration' %}</a>
-</h3>
+</h1>
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
     <!-- Add scripts at end of page for faster loading -->
 
     <!-- Optional: Include the jQuery library -->
-    <script src="{%  static 'js/jquery-1.8.1.min.js' %}"></script>
+    <script src="{% static 'js/jquery-1.8.1.min.js' %}"></script>
     <!-- Optional: Incorporate the Bootstrap JavaScript plugins -->
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
