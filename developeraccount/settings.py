@@ -345,6 +345,15 @@ CRISPY_FAIL_SILENTLY = not DEBUG
 
 # Django Debug Toolbar
 INTERNAL_IPS = '127.0.0.1,50.153.126.133'
+SHOW_TOOLBAR_CALLBACK = 'developeraccount.debug'
+
+from .debug import Debug_Toolbar_Display
+
+
+print("Django Debug Toolbar")
+print("Internal IPs", INTERNAL_IPS)
+print("Debug:", DEBUG)
+print("Override:", Debug_Toolbar_Display())
 
 
 # Django 1.6+ implement a new test runner
