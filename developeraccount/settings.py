@@ -167,6 +167,7 @@ THIRD_PARTY_APPS = (
     'oauth2_provider',
     'corsheaders',
     'crispy_forms',
+    'debug_toolbar',
 
 )
 
@@ -191,6 +192,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'developeraccount.urls'
