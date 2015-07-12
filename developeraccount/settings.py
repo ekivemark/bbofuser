@@ -343,6 +343,10 @@ CORS_ORIGIN_ALLOW_ALL = True
 CRISPY_TEMPLATE_PACK = "bootstrap3"
 CRISPY_FAIL_SILENTLY = not DEBUG
 
+# Django Debug Toolbar
+INTERNAL_IPS = '127.0.0.1,50.153.126.133'
+
+
 # Django 1.6+ implement a new test runner
 # Suppress error 1_6.W001 by adding:
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
