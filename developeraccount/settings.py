@@ -345,7 +345,8 @@ CRISPY_FAIL_SILENTLY = not DEBUG
 
 # Django Debug Toolbar
 INTERNAL_IPS = '127.0.0.1,50.153.126.133'
-SHOW_TOOLBAR_CALLBACK = 'developeraccount.debug'
+#SHOW_TOOLBAR_CALLBACK = 'developeraccount.debug'
+SHOW_TOOLBAR_CALLBACK = 'debug_toolbar.middleware.show_toolbar'
 
 
 print("Django Debug Toolbar")

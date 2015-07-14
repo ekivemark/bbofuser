@@ -29,8 +29,10 @@ class AuthenticationForm(forms.Form):
 
 
 class SMSCodeForm(forms.Form):
-    email = forms.EmailField(widget=forms.widgets.TextInput, label="email address")
-
+    email = forms.EmailField(widget=forms.widgets.TextInput,
+                             label="Enter your email address:",
+                             help_text="Your email address is used as the username for your account. "
+                                       "We will ask for your password in the next step.")
 
 class AuthenticationSMSForm(forms.Form):
     """

@@ -262,6 +262,7 @@ class ValidSMSCode(models.Model):
     user               = models.ForeignKey(settings.AUTH_USER_MODEL)
     sms_code           = models.CharField(max_length=4, blank=True)
     expires            = models.DateTimeField(default=datetime.now)
+    send_outcome       = models.CharField(max_length=250, blank=True)
 
 
     def __str__(self):
@@ -287,7 +288,9 @@ class ValidSMSCode(models.Model):
         if up.mfa:
             new_number = cell_email(up.mobile, up.carrier)
             #send an sms code
-            x = send_sms_pin(up.mobile, new_number, self.sms_code )
+            self.send_outcome = send_sms_pin(up.mobile,
+                                             new_number,
+                                             self.sms_code )
         else:
-            x=''
+            self.send_outcome = ''
         super(ValidSMSCode, self).save(**kwargs)

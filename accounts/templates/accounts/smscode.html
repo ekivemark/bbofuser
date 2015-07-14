@@ -14,11 +14,10 @@
             {{ form.errors }}
         {% endif %}
 
-        <p>
-            <label form="smscode">email:</label><br/>
-            <input type="text" name="email" value="" id="email" class="text">
-        </p>
-        <p>&nbsp;</p>
+        <p>{{ form.email.label }}</p>
+        <p>{{ form.email }}</p>
+        <p>{{ form.email.help_text }}</p>
+
         <p>&nbsp;</p>
         <input type="submit" class="active btn btn-lg btn-success" value="{%  trans 'Login' %}"/>
         <input type="hidden" name="next" value="{{ next|escape }}" />

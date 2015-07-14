@@ -212,4 +212,14 @@ def send_sms_pin(phone, email, pin):
     if settings.DEBUG:
         print("Sending %s to %s" % (msg, send_to))
 
-    return send_mail(subject,msg, from_email, send_to, fail_silently=False)
+    try:
+        result = send_mail(subject,msg, from_email, send_to, fail_silently=False)
+        if settings.DEBUG:
+            print("Result of send:", result)
+    except:
+        result = "FAIL"
+
+    if settings.DEBUG:
+        print("Send Result:", result)
+
+    return result

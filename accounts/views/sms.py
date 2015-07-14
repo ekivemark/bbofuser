@@ -167,9 +167,15 @@ def sms_code(request):
                     # posting a session variable for login page
                     request.session['email'] = email
                     if mfa_required:
-                        ValidSMSCode.objects.create(user=u)
-                        messages.success(request, "A text message was sent to your mobile phone.")
-                        status = "Text Message Sent"
+                        trigger = ValidSMSCode.objects.create(user=u)
+                        if str(trigger.send_outcome).lower() != "fail":
+                            messages.success(request,
+                                             "A text message was sent to your mobile phone.")
+                            status = "Text Message Sent"
+                        else:
+                            messages.error(request, "There was a problem sending your pin code. Please try again.")
+                            status = "Send Error"
+                            return HttpResponseRedirect(reverse('accounts:sms_code'))
                     else:
                         messages.success(request, "Your account is active. Continue Login.")
                         status = "Account Active"
@@ -214,6 +220,9 @@ def sms_code(request):
         if settings.DEBUG:
             print("setting up the POST in sms_code [",email, "]" )
         form = SMSCodeForm(initial={'email': email, })
+        form.email = email
+        if settings.DEBUG:
+            print("form email",form.email)
 
     if settings.DEBUG:
         print(form)
