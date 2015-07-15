@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse_lazy
 
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'developeraccount.views.home', name='home'),
+    # url(r'^$', 'bbonfhiruser.views.home', name='home'),
     url(r'^$', 'accounts.views.home_index', name='home'),
     url(r'^accounts/', include('accounts.urls', namespace='accounts')),
     url(r'^demo/', include('apps.demo.urls', namespace='demo')),

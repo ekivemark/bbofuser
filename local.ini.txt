@@ -1,24 +1,24 @@
 [global]
-secret_key = $(cliu!t0pf-7h20z6**6kt&-m$4qbs*89=5x0)%6eo&!h-t9$
-domain = dev.bbonfhir.com
+secret_key = --INSERT_SECRET_KEY_HERE--
+domain = __ADD_DOMAIN_HERE__
 debug = True
 template_debug = True
 debug_settings = True
-email_host = box905.bluehost.com
-#email_host = 69.195.124.105
+email_host = __ADD_EMAIL_HOST_IN_LOCAL.INI__
+#email_host = __ADD_EMAIL_HOST_IN_LOCAL.INI__
 application_title = 'Beneficiary Accounts'
 email_port = 465
 #email_backend = 'django.core.mail.backends.console.EmailBackend'
 #email_backend = django.core.mail.backends.smtp.EmailBackend
 email_backend_type = smtp
-email_host_user = accounts@dev.bbonfhir.com
-email_host_password = FH1R0utbound
+email_host_user = __ADD_EMAIL_HOST_USER_IN_LOCAL.INI__
+email_host_password = __ADD_EMAIL_HOST_PASSWORD_IN_LOCAL.INI__
 # EMAIL_USE_TLS and EMAIL_USE_SSL are mutually exclusive. Use only one
 # email_use_tls = True
 # TLS = True if port = 587
 # SSL = True if port = 465
 email_use_ssl = True
-default_from_email = accounts@dev.bbonfhir.com
+default_from_email = __ADD_DEFAULT_FROM_EMAIL_IN_LOCAL.INI__
 account_activation_days = 5
 registration_auto_login = False
 

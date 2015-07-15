@@ -9,7 +9,7 @@ from django.contrib import admin
 
 urlpatterns = patterns('',
                        # Examples:
-                       # url(r'^$', 'developeraccount.views.home', name='home'),
+                       # url(r'^$', 'bbonfhiruser.views.home', name='home'),
                        # url(r'^blog/', include('blog.urls')),
 
                        url(r'^$', 'apps.resource.views.home_index', name='home'),

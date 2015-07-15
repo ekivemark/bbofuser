@@ -1,8 +1,8 @@
 """
-Django settings for developeraccount project.
+Django settings for bbofuser project.
 
 For more information on this file, see
-https://docs.djangoproject.com/en/1.7/topics/settings/
+https://docs.djangoproject.com/en/1.8/topics/settings/
 
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
@@ -195,9 +195,9 @@ MIDDLEWARE_CLASSES = (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
-ROOT_URLCONF = 'developeraccount.urls'
+ROOT_URLCONF = 'bbonfhiruser.urls'
 
-WSGI_APPLICATION = 'developeraccount.wsgi.application'
+WSGI_APPLICATION = 'bbonfhiruser.wsgi.application'
 
 
 # Database
@@ -344,8 +344,8 @@ CRISPY_TEMPLATE_PACK = "bootstrap3"
 CRISPY_FAIL_SILENTLY = not DEBUG
 
 # Django Debug Toolbar
-INTERNAL_IPS = '127.0.0.1,50.153.126.133'
-#SHOW_TOOLBAR_CALLBACK = 'developeraccount.debug'
+INTERNAL_IPS = '127.0.0.1'
+#SHOW_TOOLBAR_CALLBACK = 'bbonfhiruser.debug'
 SHOW_TOOLBAR_CALLBACK = 'debug_toolbar.middleware.show_toolbar'
 
 
@@ -362,7 +362,7 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 # Get Local Settings that you want to keep private.
 # Make sure Local_settings.py is excluded from Git
 # try:
-#     from developeraccount.local_settings import *
+#     from bbonfhiruser.local_settings import *
 # except Exception as e:
 #     print("ERROR: local_settings not loaded")
 #     pass
@@ -372,6 +372,7 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 SETTINGS_EXPORT = [
     'DEBUG',
     'APPLICATION_TITLE',
+    'EMAIL_HOST_USER',
 ]
 
 
