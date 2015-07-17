@@ -7,6 +7,7 @@ Created: 7/6/15 9:39 PM
 """
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+import ldap
 
 __author__ = 'Mark Scrimshire:@ekivemark'
 
@@ -22,6 +23,14 @@ from django.shortcuts import get_object_or_404, render_to_response, render
 from django.http import request
 
 from accounts.forms.user import User_EditForm
+
+from django_auth_ldap.config import LDAPSearch
+
+AUTH_LDAP_BIND_DN = ""
+AUTH_LDAP_BIND_PASSWORD = ""
+AUTH_LDAP_USER_SEARCH = LDAPSearch("ou=People,dc=bbonfhir,dc=com",
+    ldap.SCOPE_SUBTREE, "(uid=%(mail)s)")
+
 
 @login_required()
 def user_edit(request):

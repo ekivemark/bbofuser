@@ -1,5 +1,5 @@
 """
-developeraccount
+bbonfhirUser
 FILE: backends
 Created: 6/22/15 12:49 PM
 
@@ -17,6 +17,7 @@ from registration.models import RegistrationProfile
 from registration.backends.default import *
 
 from accounts.models import User
+
 
 class Backend(object):
     def register(self, request, **kwargs):

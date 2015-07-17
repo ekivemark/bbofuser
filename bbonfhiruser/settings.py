@@ -104,10 +104,8 @@ TEMPLATES = [
         # This should always be the last in the list because it is our default.
                 os.path.join(BASE_DIR, 'templates'),
         ],
-        # …
         'OPTIONS': {
             'context_processors': [
-                # …
                 'django_settings_export.settings_export',
                 'django.contrib.auth.context_processors.auth',
                 'django.core.context_processors.debug',
@@ -159,15 +157,15 @@ DEFAULT_APPS = (
 
 THIRD_PARTY_APPS = (
     # Add third party libraries here
-    # 'mongoengine',
     'bootstrap3',
     'bootstrapform',
     # this installs django-registration-redux
     'registration',
     'oauth2_provider',
     'corsheaders',
-    'crispy_forms',
+    'django_auth_ldap',
     'debug_toolbar',
+    'ldap',
 
 )
 
@@ -182,6 +180,10 @@ INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 AUTH_USER_MODEL= "accounts.User"
 USERNAME_FIELD = "email"
 #AUTHENTICATION_BACKENDS = ['accounts.backends.EmailAuthBackend',]
+AUTHENTICATION_BACKENDS = (
+    'django_auth_ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -238,9 +240,9 @@ USE_TZ = True
 
 if DEBUG_SETTINGS:
     print("Check the valid site id in the site table")
-# SITE_ID = 1 = prod - dev.bbonfhir.com
-# SITE_ID = 2 = local - localhost:8000
-SITE_ID = 4
+# SITE_ID = 4 = prod - dev.bbonfhir.com
+# SITE_ID = 5 = local - localhost:8000
+SITE_ID = 5
 if DEBUG_SETTINGS:
     print("SITE_ID: ", SITE_ID)
 
@@ -316,6 +318,12 @@ LOGIN_REDIRECT_URL = '/'
 # SMS code Time out in Minutes (used for Multi-factor Authentication
 SMS_LOGIN_TIMEOUT_MIN = 5
 
+DEFAULT_VALID_UNTIL = int(parser.get('global', 'default_valid_until'))
+if DEFAULT_VALID_UNTIL < 1:
+    DEFAULT_VALID_UNTIL = 365
+
+if DEBUG_SETTINGS:
+    print("Default_Valid_Until:", DEFAULT_VALID_UNTIL)
 
 # to use console open terminal and run:
 # python -m smtpd -n -c DebuggingServer localhost:1025
@@ -340,18 +348,18 @@ CORS_ORIGIN_ALLOW_ALL = True
 #OAUTH2_PROVIDER_APPLICATION_MODEL='accounts.MyApplication'
 
 # Add Bootstrap awareness to Crispy Forms
-CRISPY_TEMPLATE_PACK = "bootstrap3"
-CRISPY_FAIL_SILENTLY = not DEBUG
+#CRISPY_TEMPLATE_PACK = "bootstrap3"
+#CRISPY_FAIL_SILENTLY = not DEBUG
 
 # Django Debug Toolbar
 INTERNAL_IPS = '127.0.0.1'
 #SHOW_TOOLBAR_CALLBACK = 'bbonfhiruser.debug'
 SHOW_TOOLBAR_CALLBACK = 'debug_toolbar.middleware.show_toolbar'
 
-
-print("Django Debug Toolbar")
-print("Internal IPs", INTERNAL_IPS)
-print("Debug:", DEBUG)
+if DEBUG_SETTINGS:
+    print("Django Debug Toolbar")
+    print("Internal IPs", INTERNAL_IPS)
+    print("Debug:", DEBUG)
 
 
 # Django 1.6+ implement a new test runner
@@ -375,9 +383,43 @@ SETTINGS_EXPORT = [
     'EMAIL_HOST_USER',
 ]
 
-
 if DEBUG_SETTINGS:
     print("SECRET_KEY:%s" % SECRET_KEY)
     print("================================================================")
 # SECURITY WARNING: keep the secret key used in production secret!
+
+# django-auth-ldap
+AUTH_LDAP_SERVER_URI = "ldap://dev.bbonfhir.com"
+AUTH_LDAP_BIND_DN = "cn=django-agent,dc=bbonfhir,dc=com"
+
+import ldap
+from django_auth_ldap.config import LDAPSearch
+
+AUTH_LDAP_USER_SEARCH = LDAPSearch("ou=people,dc=bbonfhir,dc=com",
+    ldap.SCOPE_SUBTREE, "(uid=%(user)s)")
+AUTH_LDAP_SCOPE = parser.get('global', 'auth_ldap_scope').strip()
+AUTH_LDAP_SCOPE = AUTH_LDAP_SCOPE.replace('"','')
+if AUTH_LDAP_SCOPE == "":
+    AUTH_LDAP_SCOPE= "ou=people,dc=bbonfhir,dc=com"
+
+if DEBUG_SETTINGS:
+    print("AUTH_LDAP_SCOPE:", AUTH_LDAP_SCOPE)
+    l = ldap.initialize(AUTH_LDAP_SERVER_URI)
+    try:
+        l.simple_bind_s("","")
+        ldap_result =l.search_s(AUTH_LDAP_SCOPE,
+                                ldap.SCOPE_SUBTREE,
+                                "objectclass=*")
+        print("=========================================")
+        print("LDAP Access Test:")
+        for key, value in ldap_result:
+            print("key:", key,": ", value)
+        print("=========================================")
+
+    except ldap.SERVER_DOWN:
+        print("ERROR! LDAP Server:", AUTH_LDAP_SERVER_URI, "is not accessible")
+
+    except ldap.LDAPError:
+        print("LDAP Error:")
+
 

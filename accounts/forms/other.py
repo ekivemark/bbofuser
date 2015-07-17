@@ -11,11 +11,10 @@ from django.shortcuts import render, get_object_or_404
 from django import forms
 from django.utils.safestring import mark_safe
 
-from registration.forms import RegistrationFormUniqueEmail, \
-    RegistrationFormTermsOfService
+from registration.forms import (RegistrationFormUniqueEmail,
+                                RegistrationFormTermsOfService)
 
-from accounts.models import User, Agreement, Organization
-
+from accounts.models import User
 
 class Email(forms.EmailField):
     def clean(self, value):
@@ -54,23 +53,4 @@ class RegistrationFormTOSAndEmail(
                                   RegistrationFormTermsOfService):
     pass
 
-
-def agreement_view(request, mymodel_id):
-    class MyModelForm(forms.ModelForm):
-        class Meta:
-            model = Agreement
-
-    model = get_object_or_404(Agreement, pk=mymodel_id)
-    form = MyModelForm(instance=model)
-    return render(request, 'developer/model.html', { 'form': form})
-
-
-def organization_view(request, mymodel_id):
-    class MyModelForm(forms.ModelForm):
-        class Meta:
-            model = Organization
-
-    model = get_object_or_404(Organization, pk=mymodel_id)
-    form = MyModelForm(instance=model)
-    return render(request, 'developer/model.html', { 'form': form})
 

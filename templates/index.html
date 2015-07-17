@@ -11,10 +11,10 @@
 
 <div class="hero-unit">
 
-    <h2>BB+ on FHIR: Developer Accounts</h2>
+    <h2>BB+ on FHIR: {{ settings.APPLICATION_TITLE }}</h2>
 
     <div class="container-fluid">
-    	<div class="col-md-6"><p>Use this framework to manage developer accounts that want
+    	<div class="col-md-6"><p>Use this framework to manage user accounts that want
        access to the BlueButton+ FHIR Framework.</p>
             {% if user.is_authenticated %}
                 <a href="{% url "accounts:manage_account" %}" class="btn btn-primary btn-large">Manage Your Account</a>

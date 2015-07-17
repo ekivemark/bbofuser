@@ -131,6 +131,9 @@ coverage.xml
 local_settings.py
 local.ini
 
+# exclude migrations
+????_initial.py
+
 # Sphinx documentation
 docs/_build/
 

@@ -1,5 +1,5 @@
 """
-developeraccount
+BBonFHIRUser
 FILE: application
 Created: 6/27/15 7:58 PM
 
@@ -11,8 +11,7 @@ from django.shortcuts import render, get_object_or_404
 from django import forms
 from django.conf import settings
 
-from accounts.models import OrgApplication, Organization, \
-    User, USER_ROLE_CHOICES
+from accounts.models import Application, User, USER_ROLE_CHOICES
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
@@ -21,9 +20,9 @@ from oauth2_provider.validators import validate_uris
 def application_view(request, mymodel_id):
     class MyModelForm(forms.ModelForm):
         class Meta:
-            model = OrgApplication
+            model = Application
 
-    model = get_object_or_404(Organization, pk=mymodel_id)
+    model = get_object_or_404(Application, pk=mymodel_id)
     form = MyModelForm(instance=model)
     return render(request, 'developer/model.html', { 'form': form})
 
@@ -59,22 +58,21 @@ class ApplicationCheckForm(forms.Form):
 
         return self.cleaned_data
 
-class OrgApplication_Form(forms.ModelForm):
+class Application_Form(forms.ModelForm):
     class Meta:
-        model = OrgApplication
-        fields = ['icon_link', 'organization', 'id']
+        model = Application
+        fields = ['id']
 
         def __init__(self, *args, **kwargs):
-            super(OrgApplication_Form, self).__init__(*args, **kwargs)
+            super(Application_Form, self).__init__(*args, **kwargs)
             self.helper = FormHelper(self)
             self.helper.layout.append(Submit('submit', 'Submit'))
 
-class OrgApplication_EditForm(forms.ModelForm):
+class Application_EditForm(forms.ModelForm):
 
     class Meta:
-        model = OrgApplication
-        fields = ['icon_link',
-                  'redirect_uris',
+        model = Application
+        fields = ['redirect_uris',
                   'client_type',
                   'authorization_grant_type',
                   'skip_authorization',

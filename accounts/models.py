@@ -1,10 +1,9 @@
 """
-Models for DeveloperAccount
-Renamed to accounts from developer
+Models for bbonfhir Users
 
 # Terms = Agreement
 # Developer = Account
-# Organization
+
 
 # Django Registration uses username. To switch to using email requires
 # a custom user model. This is defined in settings and needs to be done
@@ -43,43 +42,20 @@ from oauth2_provider.models import AbstractApplication
 # Create models here.
 
 # Pre-defined Values
-USERTYPE_CHOICES =(('accounts','Developer'), ('owner','Account Owner'))
+
+# TODO: Remove Organization
+# TODO: Remove Application until we work out beneficiary application link
+
+USERTYPE_CHOICES =(('owner','Account Owner'))
 
 USER_ROLE_CHOICES = (('primary','Account Owner'),
                      ('backup', 'Backup Owner'),
-                     ('member', 'Member'),
                      ('none', 'NONE'),
                      )
 
-class Organization(models.Model):
-    id = models.AutoField(primary_key=True)
-    site_url = models.URLField(verbose_name="Site Home Page",
-                               default="",
-                               unique=True,
-                               blank=False)
-    domain = models.CharField(max_length=254, blank=False,
-                              unique=True,
-                              default="domain.com"
-                              )
-    name = models.CharField(max_length=200, blank=True, default="")
-
-    privacy_url = models.URLField(verbose_name="Privacy Terms Page",
-                                  default="http://")
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='+',
-                              blank=True, null=True)
-    alternate_owner = models.ForeignKey(settings.AUTH_USER_MODEL,
-                                        related_name='+',
-                                        blank=True,
-                                        null=True)
-
-    def __str__(self):
-        #return '%s (%s)' % (self.name,
-        #                    self.domain)
-        return str(self.domain)
-
 #class Application(models.Model):
 #@login_required()
-class OrgApplication(AbstractApplication):
+class Application(AbstractApplication):
     # Application keys
     # owner = models.ForeignKey(settings.AUTH_USER_MODEL,
     #                           related_name='+',
@@ -87,17 +63,19 @@ class OrgApplication(AbstractApplication):
     #                           null=True,
     #                           )
 
-    organization = models.ForeignKey(Organization,
-                                      related_name='+',
-                                      blank=True,
-                                      null=True,
-                                      )
-    icon_link = models.URLField(blank=True,
-                                null=True,
-                                default="")
+    valid_until = models.DateTimeField(editable=False)
+    # editable=False to hide in admin
+
+    def save(self):
+        d = timedelta(days=365)
+
+        # only add 365 days if it's the first time the model is saved
+        if not self.id:
+            self.mydate = datetime.now() + d
+            super(MyModel, self).save()
 
     def get_absolute_url(self):
-        return reverse('accounts:orgapplication_detail', args=[str(self.pk)])
+        return reverse('accounts:application_detail', args=[str(self.pk)])
 
 
 class UserManager(BaseUserManager):
@@ -166,12 +144,7 @@ class User(AbstractBaseUser):
     is_superuser = models.BooleanField(default=False)
     # DONE: Create link to Organization
     # DONE: Create Organization Role
-    affiliated_to = models.ForeignKey(Organization,
-                                      null=True,
-                                      default="",
-                                      )
-    organization_role = models.CharField(max_length=30,choices=USER_ROLE_CHOICES,
-                                         blank=True, default="none")
+
     # DONE: Add mobile number and carrier
     mobile = PhoneNumberField(blank=True)
     carrier = models.CharField(max_length=100,
@@ -223,33 +196,6 @@ class User(AbstractBaseUser):
     def Meta(self):
         verbose_name = _('User')
         verbose_name_plural = _('Users')
-
-
-class Agreement(models.Model):
-    id = models.AutoField(primary_key=True)
-    description = models.CharField(max_length=100,blank = True,
-                                   default = "Terms of Use")
-    version = models.CharField(max_length=20, blank=True)
-    terms_url = models.URLField(verbose_name="Link to Terms",
-                                default="http://dev.bbonfhir.com/static/accounts/terms_of_use.html")
-    effective_date = models.DateTimeField()
-
-    def __str__(self):
-        # format object return python 2.x
-        # Use __str__ in python 3.x
-        # formats output - useful for admin interface instead of seeing model object
-        return '%s:%s (v%s)' % (self.id,
-                             self.description,
-                             self.version)
-
-    def save(self, *args, **kwargs):
-        """
-        On save update the Effective_Date
-        """
-        if not self.id:
-                self.effective_date = datetime.today()
-
-        return super(Agreement, self).save(*args, **kwargs)
 
 
 def alertme(sender, user, request, **kwargs):

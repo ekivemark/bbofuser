@@ -5,8 +5,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
 # Register your models here.
-from accounts.models import OrgApplication, Agreement, Organization, \
-    User, ValidSMSCode
+from accounts.models import (User, ValidSMSCode, Application)
 # Account
 
 class UserCreationForm(forms.ModelForm):
@@ -74,8 +73,6 @@ class UserAdmin(UserAdmin):
         (None, {'fields': ('email', 'password')}),
         ('Personal info', {'fields': ('first_name',
                                       'last_name',
-                                      'affiliated_to',
-                                      'organization_role',
                                       'mobile',
                                       'carrier',
                                       'mfa',)}),
@@ -99,27 +96,17 @@ class UserAdmin(UserAdmin):
     filter_horizontal = ()
 
 
-class OrganizationAdmin(admin.ModelAdmin):
-    """
-    Tailor the Organization page in the admin module
-    """
-    list_display = ('name', 'domain', 'site_url', 'privacy_url','owner','alternate_owner')
-# DONE: Add owner and alternate_owner to admin view
-
-
 class ApplicationAdmin(admin.ModelAdmin):
     """
     Tailor the Application page in the main Admin module
     """
     # DONE: Add Admin view for applications
-    list_display = ('name', 'organization', 'user' )
+    list_display = ('name', 'user' )
 
 
-admin.site.register(Agreement)
 #admin.site.register(Account)
-admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(User, UserAdmin)
-admin.site.register(OrgApplication, ApplicationAdmin)
+admin.site.register(Application, ApplicationAdmin)
 #admin.site.register(ApplicationKey)
 admin.site.register(ValidSMSCode)
 

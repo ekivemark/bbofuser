@@ -11,21 +11,107 @@ __author__ = 'Mark Scrimshire:@ekivemark'
 from datetime import datetime
 from django.core.urlresolvers import reverse_lazy, reverse
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, render_to_response, redirect, get_object_or_404
+from django.shortcuts import (render,
+                              render_to_response,
+                              redirect,
+                              get_object_or_404)
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
 from django.conf import settings
 from django.utils import timezone
 from django.utils.timezone import make_aware
-from django.contrib.auth import login as django_login, authenticate, logout as django_logout
+from django.contrib.auth import (login as django_login,
+                                 authenticate,
+                                 logout as django_logout)
 
-from accounts.models import OrgApplication, Agreement, Organization, User, ValidSMSCode
-from accounts.forms.authenticate import AuthenticationForm, SMSCodeForm, AuthenticationSMSForm
+from accounts.models import (Application, User, ValidSMSCode)
+from accounts.forms.authenticate import (AuthenticationForm,
+                                         SMSCodeForm,
+                                         AuthenticationSMSForm)
 
 from accounts.admin import UserCreationForm
 from accounts.utils import strip_url, cell_email
 from django.contrib import messages
 
+import ldap
+
+
+def validate_ldap_user(request, email):
+    # Do the ldapSearch for user
+    result = {}
+    if email == "":
+        return result
+
+    l = ldap.initialize(settings.AUTH_LDAP_SERVER_URI)
+    try:
+        l.simple_bind_s("","")
+        # We only want LDAP to return information for the specific email user
+        user_scope = "cn=" + email + "," + settings.AUTH_LDAP_SCOPE
+
+        if settings.DEBUG:
+            print("user_scope:",user_scope)
+        try:
+            ldap_result = l.search_s(user_scope,
+                                 ldap.SCOPE_SUBTREE, "objectclass=*")
+        except:
+            ldap_result = []
+        if settings.DEBUG:
+            print("ldap returned:",ldap_result)
+
+        # ldap returned:
+        # ('cn=mark@ekivemark.com,ou=people,dc=bbonfhir,dc=com',
+        # {'sn': [b'Scrimshire'], 'givenName': [b'Mark'],
+        # 'cn': [b'mark@ekivemark.com'],
+        # 'mail': [b'mark@ekivemark.com'],
+        # 'objectClass': [b'inetOrgPerson'],
+        # 'displayName': [b'Mark Scrimshire']}
+        # )
+
+        if ldap_result == []:
+            result = ""
+        else:
+            result_subset = ldap_result[0][1]
+            result_mail = result_subset['mail']
+            result = result_mail[0].decode("utf-8")
+            if settings.DEBUG:
+                print("email:",result)
+
+    except ldap.SERVER_DOWN:
+        if settings.DEBUG:
+            print("LDAP Server", settings.AUTH_LDAP_SERVER_URI, "is Down")
+        messages.error(request, "MyMedicare.gov is unable to Log you in at this time. Please try later.")
+        result = "ERROR"
+    except ldap.LDAPError:
+        if settings.DEBUG:
+            print("LDAP Server error:", settings.AUTH_LDAP_SERVER_URI)
+        messages.error(request, "We had a problem reaching MyMedicare.gov. Please try later.")
+        result = "ERROR"
+
+    return result
+
+
+def validate_user(request, email):
+    # We will lookup the email address in LDAP and then find in
+    # accounts.user
+
+    # step 1 is to look up email in LDAP
+
+    result = validate_ldap_user(request, email)
+    # Check the result for the mail field
+    # Compare to the email received
+
+
+    if settings.DEBUG:
+        print("ldap email:", result)
+    # step 2 is to look up email in accounts.User
+    if result.lower() == email.lower():
+        email_match = True
+    else:
+        email_match = False
+    if settings.DEBUG:
+        print("Match?:", email_match)
+
+    return email_match
 
 def validate_sms(username, smscode):
 
@@ -157,46 +243,58 @@ def sms_code(request):
         form = SMSCodeForm(request.POST)
 
         if form.is_valid():
-            try:
-                u=User.objects.get(email=form.cleaned_data['email'])
-                mfa_required = u.mfa
-                email = u.email
-                if settings.DEBUG:
-                    print("Require MFA Login:%s" % mfa_required)
-                if u.is_active:
-                    # posting a session variable for login page
-                    request.session['email'] = email
-                    if mfa_required:
-                        trigger = ValidSMSCode.objects.create(user=u)
-                        if str(trigger.send_outcome).lower() != "fail":
-                            messages.success(request,
-                                             "A text message was sent to your mobile phone.")
-                            status = "Text Message Sent"
-                        else:
-                            messages.error(request, "There was a problem sending your pin code. Please try again.")
-                            status = "Send Error"
-                            return HttpResponseRedirect(reverse('accounts:sms_code'))
-                    else:
-                        messages.success(request, "Your account is active. Continue Login.")
-                        status = "Account Active"
-                else:
-                    request.session['email'] = ""
-                    messages.error(request, "Your account is inactive.")
-                    status = "Inactive Account"
-                    return HttpResponseRedirect(reverse('accounts:sms_code'))
-            except(User.DoesNotExist):
+            if not validate_user(request, form.cleaned_data['email']):
                 request.session['email'] = ""
-                messages.error(request, "You are not recognized.")
-                status = "User UnRecognized"
+                messages.error(request, "Email address not recognized. Do you need to register?")
+                status = "Email UnRecognized"
                 return HttpResponseRedirect(reverse('accounts:sms_code'))
-                # except(UserProfile.DoesNotExist):
-                #     messages.error(request, "You do not have a user profile.")
-                #     return HttpResponseRedirect(reverse('sms_code'))
-            if settings.DEBUG:
-                print("dropping out of valid form")
-                print("Status:", status)
-                print("email: %s" % email)
-            # Change the form and move to login
+            else:
+                if settings.DEBUG:
+                    print("Valid form with a valid email")
+                # True if email found in LDAP
+                try:
+                    u=User.objects.get(email=form.cleaned_data['email'])
+                    if settings.DEBUG:
+                        print("returned u:",u)
+                    #u=User.objects.get(email=form.cleaned_data['email'])
+                    mfa_required = u.mfa
+                    email = u.email
+                    if settings.DEBUG:
+                        print("Require MFA Login:%s" % mfa_required)
+                    if u.is_active:
+                        # posting a session variable for login page
+                        request.session['email'] = email
+                        if mfa_required:
+                            trigger = ValidSMSCode.objects.create(user=u)
+                            if str(trigger.send_outcome).lower() != "fail":
+                                messages.success(request,
+                                                 "A text message was sent to your mobile phone.")
+                                status = "Text Message Sent"
+                            else:
+                                messages.error(request, "There was a problem sending your pin code. Please try again.")
+                                status = "Send Error"
+                                return HttpResponseRedirect(reverse('accounts:sms_code'))
+                        else:
+                            messages.success(request, "Your account is active. Continue Login.")
+                            status = "Account Active"
+                    else:
+                        request.session['email'] = ""
+                        messages.error(request, "Your account is inactive.")
+                        status = "Inactive Account"
+                        return HttpResponseRedirect(reverse('accounts:sms_code'))
+                except(User.DoesNotExist):
+                    request.session['email'] = ""
+                    messages.error(request, "You are not recognized.")
+                    status = "User UnRecognized"
+                    return HttpResponseRedirect(reverse('accounts:sms_code'))
+                    # except(UserProfile.DoesNotExist):
+                    #     messages.error(request, "You do not have a user profile.")
+                    #     return HttpResponseRedirect(reverse('sms_code'))
+                if settings.DEBUG:
+                    print("dropping out of valid form")
+                    print("Status:", status)
+                    print("email: %s" % email)
+                # Change the form and move to login
 
             form = AuthenticationForm(initial={'email':email})
             args = {}
@@ -228,197 +326,3 @@ def sms_code(request):
         print(form)
     return render_to_response('accounts/smscode.html', {'form': form },
                               RequestContext(request))
-
-
-def login_optional_sms(request):
-    """
-    One screen Login with SMS
-    :param request:
-    :return:
-
-    Prompt for: email, password.
-    Offer "Send Pin Code" and "Login" Submit buttons
-
-    Test email and password. Check for MFA setting.
-    If MFA is enabled and Login button used with no Pin Code then fail validation
-    If User and Password are correct and no MFA then allow login
-
-    If User and Password and MFA and Pin Code then allow Login
-
-    Else fail validation
-
-
-    """
-
-    if settings.DEBUG:
-        print("in accounts.views.sms.login_optional_sms")
-
-    if request.method == 'POST':
-        # handle the form input
-        if settings.DEBUG:
-            print("in the POST")
-        form = AuthenticationSMSForm(request.POST)
-
-        # check for Login Method:
-        # 1. = Login
-        # 2. = Send Pin Code
-        if request.POST['login'].lower() == 'send pin code':
-            if settings.DEBUG:
-                print("Sending Code to %s" % (request.POST['email']))
-
-            try:
-                u = User.objects.get(email = request.POST['email'])
-            except User.DoesNotExist:
-                messages.error(request, "Something went wrong.")
-                form = AuthenticationSMSForm(request.POST)
-                form.email = request.POST['email']
-                return render_to_response('accounts/login_sms.html',
-                                          {'form': form},
-                                            RequestContext(request))
-            mfa_required = u.mfa
-            email_address = u.email
-
-            if u.is_active:
-                form = AuthenticationSMSForm()
-                form.email = email_address
-
-                if mfa_required:
-                    ValidSMSCode.objects.create(user=u)
-                    messages.success(request, "A text message was sent to your mobile phone.")
-                else:
-                    messages.success(request, "Your account is active. Continue Login.")
-            return render_to_response('accounts/login_sms.html',
-                                      RequestContext(request,{'form': form} ))
-
-        elif request.POST['login'].lower() == 'login':
-            if settings.DEBUG:
-                print("in login step")
-
-        if form.is_valid:
-            if settings.DEBUG:
-                print("Valid form received")
-            # print "Authenticate"
-            email = form.cleaned_data.get['email']
-            password = form.cleaned_data.get['password']
-            sms_code = form.cleaned_data.get['sms_code']
-            if not validate_sms(username=email, smscode=sms_code):
-                messages.error(request, "Invalid Access Code.")
-                return render_to_response('accounts/login_sms.html',
-                                          {'form': AuthenticationSMSForm()},
-                                            RequestContext(request))
-
-            user=authenticate(username=email, password=password)
-
-            if user is not None:
-
-                if user.is_active:
-                    django_login(request, user)
-                    return HttpResponseRedirect(reverse('home'))
-                else:
-
-                    messages.error(request, "Your account is not active.")
-                    return HttpResponseRedirect(reverse('sms_code'))
-            else:
-                messages.error(request, "Invalid username or password.")
-                return render_to_response('accounts/login.html',
-                                          {'form': AuthenticationForm()},
-                              RequestContext(request))
-
-        else:
-            # form is not valid
-            form.email = form.cleaned_data['email']
-            form.password = form.cleaned_data['password']
-            render_to_response('accounts/login_sms.html',
-                              context_instance = RequestContext(request, {'form':form},))
-    else:
-        # setup the form. We are entering with a GET to the page.
-        if settings.DEBUG:
-            print("setting up sms.login_optional_sms form")
-        form = AuthenticationSMSForm
-    return render_to_response('accounts/login_sms.html',
-                              context_instance = RequestContext(request, {'form':form},))
-
-def login_optional(request):
-    """
-    One screen Login with SMS
-    :param request:
-    :return:
-
-    Prompt for: email, password.
-    Offer "Send Pin Code" and "Login" Submit buttons
-
-    Test email and password. Check for MFA setting.
-    If MFA is enabled and Login button used with no Pin Code then fail validation
-    If User and Password are correct and no MFA then allow login
-
-    If User and Password and MFA and Pin Code then allow Login
-
-    Else fail validation
-
-
-    """
-    args = {}
-    if settings.DEBUG:
-        print("in accounts.views.sms.login_optional")
-
-    if request.POST:
-        form = AuthenticationSMSForm(request.POST)
-        if settings.DEBUG:
-            print("test login before is_valid()")
-            print(request.POST['login'])
-
-            print("pin needed? [%s]" % request.POST['send_pin'])
-        if form.is_valid():
-            if settings.DEBUG:
-                print("in the post section with form instance")
-                print(form)
-                print("Email:", form.cleaned_data['email'])
-            # Do the evaluation logic here
-            if request.POST['login'].lower() == 'send pin code':
-                if settings.DEBUG:
-                    print("Sending PIN")
-                try:
-                    u = User.objects.get(email = request.POST['email'])
-                except User.DoesNotExist:
-                    messages.error(request, "Something went wrong.")
-                    form = AuthenticationSMSForm(request.POST)
-                    form.email = request.POST['email']
-                    return render_to_response('accounts/login_sms.html',
-                                            RequestContext(request,{'form': form},))
-            else:
-                email = form.cleaned_data['email']
-                password = form.cleaned_data['password']
-                sms_code = form.cleaned_data['sms_code']
-                if not validate_sms(username=email, smscode=sms_code):
-                    messages.error(request, "Invalid Access Code.")
-                    return render_to_response('accounts/login_sms.html',
-                                              {'form': AuthenticationForm()},
-                                              RequestContext(request))
-
-                user=authenticate(username=email, password=password)
-
-                if user is not None:
-
-                    if user.is_active:
-                        django_login(request, user)
-                        return HttpResponseRedirect(reverse('home'))
-                    else:
-
-                        messages.error(request, "Your account is not active.")
-                        return HttpResponseRedirect(reverse('login_sms'))
-                else:
-                    messages.error(request, "Invalid username or password.")
-                    return render_to_response('accounts/login_sms.html',
-                                          {'form': AuthenticationForm()},
-                                          RequestContext(request))
-        else:            # FORM IS NOT VALID
-            if settings.DEBUG:
-                print("Form is invalid")
-            args['form'] = form
-            return render(request, 'accounts/login_sms.html', args )
-
-    else: # Not a POST
-        form = AuthenticationSMSForm()
-        return render_to_response('accounts/login_sms.html',
-                                  context_instance=RequestContext(request,
-                                                                  {'form': form}))
