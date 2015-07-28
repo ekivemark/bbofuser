@@ -36,6 +36,8 @@ from accounts.utils import strip_url, CARRIER_EMAIL_GATEWAY, CARRIER_SELECTION, 
     cell_email, send_sms_pin
 from phonenumber_field.modelfields import PhoneNumberField
 
+from uuid import uuid4
+
 # Extending Application with OAuth Toolkit
 from oauth2_provider.models import AbstractApplication
 
@@ -240,3 +242,46 @@ class ValidSMSCode(models.Model):
         else:
             self.send_outcome = ''
         super(ValidSMSCode, self).save(**kwargs)
+
+
+class Crosswalk(models.Model):
+    """
+
+    HICN to UUID Crosswalk and back.
+    Linked to User Account
+
+    """
+
+    user         = models.ForeignKey(settings.AUTH_USER_MODEL)
+    guid         = models.CharField(max_length=40)
+    hicn         = models.CharField(max_length=40)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        created = self.date_created is None
+        if not self.pk or created is None:
+            if settings.DEBUG:
+                print("Overrriding Crosswalk save")
+
+            # Assign a GUID with the save
+            uid = str(uuid4().urn)[9:]
+            # uid4.urn returns string:
+            # eg. 'urn:uuid:aec9931c-101b-4803-8666-f047c9159c0c'
+            # str()[9:] strips leading "urn:uuid:"
+            self.guid = uid
+
+        super(Crosswalk, self).save(*args, **kwargs)
+
+
+    def __str__(self):
+        return "%s %s[%s]" % (self.user.first_name,
+                              self.user.last_name,
+                              self.guid)
+
+    def get_guid(self):
+        # return the uuid
+        return self.guid
+
+    def get_email(self):
+        # Return the email/username
+        return self.user_id

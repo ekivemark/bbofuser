@@ -14,23 +14,18 @@ __author__ = 'Mark Scrimshire:@ekivemark'
 from django import forms
 from django.forms import *
 from django.template import RequestContext
-from accounts.models import User
+from accounts.models import (User,
+                             Crosswalk)
 from django.conf import settings
 
 from django.views.generic.edit import *
 from django.core.urlresolvers import *
-from django.shortcuts import get_object_or_404, render_to_response, render
+from django.shortcuts import (get_object_or_404,
+                              render_to_response,
+                              render)
 from django.http import request
 
 from accounts.forms.user import User_EditForm
-
-from django_auth_ldap.config import LDAPSearch
-
-AUTH_LDAP_BIND_DN = ""
-AUTH_LDAP_BIND_PASSWORD = ""
-AUTH_LDAP_USER_SEARCH = LDAPSearch("ou=People,dc=bbonfhir,dc=com",
-    ldap.SCOPE_SUBTREE, "(uid=%(mail)s)")
-
 
 @login_required()
 def user_edit(request):
@@ -81,6 +76,54 @@ def user_edit(request):
         return render(request, 'accounts/user_edit.html',
                                                  {'form': form,
                                                   'email': u.email})
+
+@login_required()
+def Get_ID(Look_for="UUID", Find_with=""):
+    """
+
+    :param Look_for: "ICODE" or "UUID"
+
+    :param Find_with: Code to search for
+    :return: Code or empty string
+
+    Default is to look for UUID and return ICODE
+    """
+    if Find_with == "":
+        # return blank if no code to search for
+        return ""
+
+    looking_for = ""
+    if Look_for.upper() == "ICODE":
+        looking_for = "ICODE"
+    else:
+        looking_for = "UUID"
+
+    # We have a value type and value to search for and a
+
+    lu = {}
+
+    luv = ""
+    result = ""
+
+    if looking_for=="ICODE":
+        try:
+            luv = Crosswalk.objects.get(guid=Find_with)
+            result = luv.hicn
+        except Crosswalk.DoesNotExist:
+            result = ""
+    else:
+        try:
+            luv = Crosswalk.objects.get(hicn=Find_with)
+            result = luv
+        except Crosswalk.DoesNotExist:
+            result = ""
+
+    lu = {looking_for: result}
+    if settings.DEBUG:
+        print("lu returned:", lu)
+    return lu
+
+
 
 
 

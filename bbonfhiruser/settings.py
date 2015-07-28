@@ -172,6 +172,7 @@ THIRD_PARTY_APPS = (
 LOCAL_APPS = (
     # Add custom apps here
     'accounts',
+    'apps.uploader',
 )
 
 

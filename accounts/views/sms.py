@@ -113,6 +113,28 @@ def validate_user(request, email):
 
     return email_match
 
+def make_local_user(request, email):
+    """
+
+    :param request:
+    :param email:
+    :return:
+
+    get email address of a user validated via LDAP
+
+    pull user details from LDAP
+
+    create local user account using email address as key
+
+    return user
+
+    """
+
+    User = form.save(commit=False)
+    # Get info from LDAP
+
+    return User
+
 def validate_sms(username, smscode):
 
     if settings.DEBUG:
@@ -283,6 +305,12 @@ def sms_code(request):
                         status = "Inactive Account"
                         return HttpResponseRedirect(reverse('accounts:sms_code'))
                 except(User.DoesNotExist):
+                    # User is in LDAP but not in User Table
+                    u = make_local_user(request, email=form.cleaned_data['email'])
+                    # TODO: Create User Account using LDAP info
+                    # TODO: Import data from LDAP
+                    # TODO: Redirect user to educate, acknowledge, validate step
+
                     request.session['email'] = ""
                     messages.error(request, "You are not recognized.")
                     status = "User UnRecognized"

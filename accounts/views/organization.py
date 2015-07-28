@@ -16,7 +16,6 @@ from django.db.models import Q
 from accounts.models import User, Application
 from accounts.forms.application import Application_EditForm
 
-
 __author__ = 'Mark Scrimshire:@ekivemark'
 
 
