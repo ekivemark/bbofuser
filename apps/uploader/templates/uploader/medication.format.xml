@@ -1,0 +1,20 @@
+<Medication xmlns="http://hl7.org/fhir">
+ <name value="{{ m.brand_name }}" />
+ <code>{{ m.ndc_code }}</code>
+ <isBrand value="{{ is_brand }}" />
+ <manufacturer>{{ m.brand_name_code }}</manufacturer>
+ <kind value="{{ m.drug_form_code }}" />
+ <product>
+  <ingredient>
+   <item>{{ m.product_name }}</item>
+    </ingredient>
+ </product>
+ <package>
+    <content>
+   <item>{{ m.ahfs_desc }}</item>
+   <amount>{{ m.package_size_amount }}</amount>
+  </content>
+ </package>
+</Medication>
+
+

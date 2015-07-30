@@ -403,7 +403,14 @@ AUTH_LDAP_SCOPE = AUTH_LDAP_SCOPE.replace('"','')
 if AUTH_LDAP_SCOPE == "":
     AUTH_LDAP_SCOPE= "ou=people,dc=bbonfhir,dc=com"
 
+FHIR_SERVER = parser.get('global', 'fhir_server')
+if FHIR_SERVER == '':
+    FHIR_SERVER = 'http://fhir.bbonfhir.com:8080/fhir-p'
+    # FHIR_SERVER = 'http://localhost:8080/fhir-p'
+
+
 if DEBUG_SETTINGS:
+    print("FHIR_SERVER:",FHIR_SERVER)
     print("AUTH_LDAP_SCOPE:", AUTH_LDAP_SCOPE)
     l = ldap.initialize(AUTH_LDAP_SERVER_URI)
     try:

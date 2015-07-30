@@ -10,6 +10,7 @@ from datetime import datetime
 from django.conf import settings
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.template.loader import render_to_string
 from datetime import datetime
 
 __author__ = 'Mark Scrimshire:@ekivemark'
@@ -70,6 +71,30 @@ PT_D_XTRCT[38] = {'len': 102,'type': "str",  'field': 'filler',}
 #    print("Part D Extract Definition")
 #    print(PT_D_XTRCT)
 
+
+PT_D_DRUG_XTRCT = OrderedDict()
+PT_D_DRUG_XTRCT[0] = {'len': 11,  'type': "str", 'field': 'ndc_code',}
+PT_D_DRUG_XTRCT[1] = {'len': 100, 'type': "str", 'field': 'product_name',}
+PT_D_DRUG_XTRCT[2] = {'len': 30,  'type': "str", 'field': 'brand_name',}
+PT_D_DRUG_XTRCT[3] = {'len': 10,  'type': "str", 'field': 'drug_obsolete_dt',}
+PT_D_DRUG_XTRCT[4] = {'len': 40,  'type': "str", 'field': 'ahfs_desc',}
+PT_D_DRUG_XTRCT[5] = {'len': 1,   'type': "str", 'field': 'drug_form_code',}
+PT_D_DRUG_XTRCT[6] = {'len': 1,   'type': "str", 'field': 'brand_name_code',}
+PT_D_DRUG_XTRCT[7] = {'len': 12,  'type': "num", 'field': 'package_size_amount', 'fmt': "{:9.3f}",}
+PT_D_DRUG_XTRCT[8] = {'len': 195, 'type': "str", 'field': 'filler',}
+
+"""
+# PROD_NDC_CD	X(11).
+# PROD_NDC_PROD_NAME	X(100).
+# PROD_NDC_BRAND_NAME	X(30).
+# PROD_NDC_DRUG_OBSLT_DT	X(10).
+# PROD_NDC_AHFS_DESC	X(40).
+# PROD_NDC_DRUG_FORM_CD	X(01).
+# NDC_BRND_NAME_CD	X(01).
+# PROD_NDC_PKG_SIZE_AMT	9(9)V9(3).
+# FILLER	X(195).
+"""
+
 def home_index(request):
 
     # Show UploaderHome Page
@@ -128,6 +153,11 @@ def upload_part_d_weekly(request, file_name="/Users/mark/PycharmProjects/bbofu/b
     # TODO: get file from upload directory - passed as parameter
     # TODO: limit access to function to special upload account(s)
 
+    if settings.DEBUG:
+        print("Processing Part D Weekly Extract")
+        print("file:",file_name)
+
+
     for line in fileinput.input([file_name]):
         process_line(line, PT_D_XTRCT)
 
@@ -135,6 +165,56 @@ def upload_part_d_weekly(request, file_name="/Users/mark/PycharmProjects/bbofu/b
     # TODO: post to FHIR API
 
     return
+
+
+def upload_drug_extract(request, file_name="/Users/mark/PycharmProjects/bbofu/bbofuser/sitestatic/week_drug_extract.txt", chunkSize=400):
+    """
+    receive file_name as reference
+    Open file
+
+    read line
+
+    split line to fields
+
+    post fields to url to load to fhir server
+
+    :param file_name:
+    :return: result
+    """
+    # TODO: get file from upload directory - passed as parameter
+    # TODO: limit access to function to special upload account(s)
+
+    fhir_post = settings.FHIR_SERVER
+    fhir_resource = "/Medications"
+
+    if settings.DEBUG:
+        print("Processing Drug Extract")
+        print("file:",file_name)
+
+    for line in fileinput.input([file_name]):
+        m = process_line(line, PT_D_DRUG_XTRCT)
+
+        if 'brand_name' in m:
+            is_brand = "true"
+        else:
+            is_brand = "false"
+
+        context = {'m': m,
+               'is_brand': is_brand}
+
+        # DONE: Create template and merge data for line item
+        xml_upload = render_to_string('uploader/medication.format.xml', context)
+
+
+
+
+    if settings.DEBUG:
+        print(xml_upload)
+
+    # TODO: test for error in return
+    # TODO: post to FHIR API
+
+    return xml_upload
 
 
 def process_line(file_line, format_dict):
