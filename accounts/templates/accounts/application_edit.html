@@ -10,21 +10,24 @@
 {% block content %}
 
 
-<div class="container col-lg-4 well">
-<form method="post" action="" xmlns="http://www.w3.org/1999/html">
-    {% csrf_token %}
-    <table>
-        <tr>
-            <td>
-                 {{ form.as_p }}
+    <div class="container col-lg-4 well">
+        <form method="post" action="" xmlns="http://www.w3.org/1999/html">
+            {% csrf_token %}
+            <table>
+                <tr>
+                    <td>
+                        {{ form.as_p }}
 
-                <a href="{%  url "accounts:manage_account" %}"><input type="button" class="btn-danger" value="Cancel" /></a>
+                        <a href="{% url "accounts:manage_account" %}"><input
+                                type="button" class="btn-danger"
+                                value="Cancel"/></a>
 
-                <input class="btn-success" type="submit" value="Save" />
-            </td>
-        </tr>
-    </table>
-</form>
-</div>
+                        <input class="btn-success" type="submit"
+                               value="Save"/>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
 
 {% endblock %}

@@ -6,6 +6,8 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
 # Register your models here.
 from accounts.models import (User, ValidSMSCode, Application)
+
+
 # Account
 
 class UserCreationForm(forms.ModelForm):
@@ -13,7 +15,8 @@ class UserCreationForm(forms.ModelForm):
     A form for creating new users. Includes all the required
     fields, plus a repeated password.
     """
-    password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
+    password1 = forms.CharField(label='Password',
+                                widget=forms.PasswordInput)
     password2 = forms.CharField(label='Password confirmation',
                                 widget=forms.PasswordInput,
                                 help_text="<br/>Enter your password again to confirm.")
@@ -76,7 +79,8 @@ class UserAdmin(UserAdmin):
                                       'mobile',
                                       'carrier',
                                       'mfa',)}),
-        ('Permissions', {'fields': ('is_admin','is_active', 'is_staff',)}),
+        (
+        'Permissions', {'fields': ('is_admin', 'is_active', 'is_staff',)}),
     )
 
     # TODO: Need to make phone number formatting more user friendly
@@ -89,7 +93,7 @@ class UserAdmin(UserAdmin):
         (None, {
             'classes': ('wide',),
             'fields': ('email', 'password1', 'password2')}
-        ),
+         ),
     )
     search_fields = ('email',)
     ordering = ('email',)
@@ -101,13 +105,13 @@ class ApplicationAdmin(admin.ModelAdmin):
     Tailor the Application page in the main Admin module
     """
     # DONE: Add Admin view for applications
-    list_display = ('name', 'user' )
+    list_display = ('name', 'user')
 
 
-#admin.site.register(Account)
+# admin.site.register(Account)
 admin.site.register(User, UserAdmin)
 admin.site.register(Application, ApplicationAdmin)
-#admin.site.register(ApplicationKey)
+# admin.site.register(ApplicationKey)
 admin.site.register(ValidSMSCode)
 
 admin.site.unregister(Group)

@@ -6,15 +6,10 @@ Created: 6/22/15 12:49 PM
 
 """
 __author__ = 'Mark Scrimshire:@ekivemark'
-from django.conf import settings
 from django.contrib.sites.models import RequestSite
 from django.contrib.sites.models import Site
-
 from registration import signals
-from registration.forms import RegistrationForm
 from registration.models import RegistrationProfile
-
-from registration.backends.default import *
 
 from accounts.models import User
 
@@ -27,10 +22,11 @@ class Backend(object):
             site = Site.objects.get_current()
         else:
             site = RequestSite(request)
-        new_user = RegistrationProfile.objects.create_inactive_user(username,
-                                                                    email,
-                                                                    password,
-                                                                    site)
+        new_user = RegistrationProfile.objects.create_inactive_user(
+            username,
+            email,
+            password,
+            site)
         signals.user_registered.send(sender=self.__class__,
                                      user=new_user,
                                      request=request)

@@ -1,0 +1,43 @@
+ {% extends "base.html" %}
+ {% load i18n %}
+ {% load staticfiles %}
+ {% block pretitle %}{% endblock %}
+ {% block extra_head %} {% endblock %}
+ {% block pagename %}About{% endblock %}
+ {% block content %}
+
+     <div class="row">
+         <div class="col-md-12">
+             <h1 contenteditable="true">Put Your Medicare Claims Information to Work For You</h1>
+         </div>
+     </div>
+<div class="section">
+     <div class="row">
+         <div class="col-lg-8">
+             <p>
+                 <span>
+                     <a href="https://www.mymedicare.gov/">MyMedicare.gov's</a>
+                 </span>
+                 <span>Blue Button provides you an easy way to put your data to work for you
+                     in the devices and applications you trust. Switching on the advanced functionality
+                     of Medicare's next generation BlueButton service lets you setup unique
+                     passwords for each device you use and lets you remove or change the password
+                     if you lose a device.&nbsp;
+                 </span>
+             </p>
+             <p>
+                 <span>To use this feature you will setup a device profile and copy
+                     the unique credentials (a custom user name and password). You can save those
+                     credentials and use them whenever you connect to the BlueButton service from that device.
+                 </span>
+             </p>
+         </div>
+         <div class="col-md-4">
+             <img src="{% static 'img/layout/blue-button.png' %}" style="height:300px">
+         </div>
+     </div>
+</div>
+
+
+
+ {% endblock %}

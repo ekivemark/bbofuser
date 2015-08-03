@@ -14,31 +14,22 @@
 
 # Work flow will use django-registration to enable Account sign up
 # After Activation
-from datetime import datetime
-from django.core.urlresolvers import reverse_lazy, reverse
+from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseRedirect, HttpRequest
 from django.conf import settings
-from django.utils import timezone
-from django.utils.timezone import make_aware
 from django.contrib.auth import (login as django_login,
                                  authenticate,
                                  logout as django_logout)
-from django.views import generic
 from django.views.generic.detail import DetailView
 
-from accounts.models import Application, User, ValidSMSCode
-from accounts.forms.authenticate import AuthenticationForm, SMSCodeForm
+from accounts.models import Application
+from accounts.forms.authenticate import AuthenticationForm
 from accounts.forms.register import RegistrationForm
-
-from accounts.forms.application import (ApplicationCheckForm,
-                                        application_view,
-                                        Application_Form)
+from accounts.forms.application import (ApplicationCheckForm)
 from accounts.admin import UserCreationForm
-from accounts.utils import strip_url, cell_email
-from django.contrib import messages
+from accounts.utils import cell_email
 
 
 def login(request):
@@ -106,27 +97,40 @@ def logout(request):
 
 
 def home_index(request):
-
     # Show Home Page
 
     DEBUG = settings.DEBUG_SETTINGS
 
     if DEBUG:
-        print(settings.APPLICATION_TITLE, "in accounts.views.home_index")
+        print(settings.APPLICATION_TITLE, "in accounts.views.other.home_index")
 
     context = {}
-    return render_to_response('index.html', RequestContext(request, context,))
+    return render_to_response('index.html',
+                              RequestContext(request, context, ))
+
+
+def about(request):
+    # Show About Page
+
+    DEBUG = settings.DEBUG_SETTINGS
+
+    if DEBUG:
+        print(settings.APPLICATION_TITLE, "in accounts.views.other.about")
+
+    context = {}
+    return render_to_response('about.html',
+                              RequestContext(request, context, ))
 
 
 def agree_to_terms(request):
-
     # Agree to Terms
     # Register for account
 
     DEBUG = settings.DEBUG_SETTINGS
 
     if DEBUG:
-        print(settings.APPLICATION_TITLE, "in accounts.views.agree_to_terms")
+        print(settings.APPLICATION_TITLE,
+              "in accounts.views.agree_to_terms")
 
     if request.method == 'POST':
         form = UserCreationForm(data=request.POST)
@@ -136,15 +140,14 @@ def agree_to_terms(request):
     else:
         form = UserCreationForm()
 
-
-    context = {'form': form,}
+    context = {'form': form, }
     #   return render_to_response('developer/agree_to_terms.html', RequestContext(request, context,))
-    return render_to_response(reverse_lazy('accounts:register'), RequestContext(request, context,))
+    return render_to_response(reverse_lazy('accounts:register'),
+                              RequestContext(request, context, ))
 
 
 @login_required
 def manage_account(request):
-
     # Manage Accounts entry page
 
     # DONE: Remove api.data.gov signup widget in manage_account.html
@@ -152,7 +155,8 @@ def manage_account(request):
     DEBUG = settings.DEBUG_SETTINGS
 
     if DEBUG:
-        print(settings.APPLICATION_TITLE, "in accounts.views.manage_account")
+        print(settings.APPLICATION_TITLE,
+              "in accounts.views.manage_account")
     user = request.user
     mfa_address = cell_email(user.mobile, user.carrier)
 
@@ -162,7 +166,7 @@ def manage_account(request):
                "applications": app_list}
 
     return render_to_response('accounts/manage_account.html',
-                              RequestContext(request, context,))
+                              RequestContext(request, context, ))
 
 
 # DONE: Add Connect_Organization View
@@ -216,7 +220,6 @@ def connect_application(request):
 
             app.save()
 
-
             if DEBUG:
                 print("user", user)
 
@@ -232,13 +235,9 @@ def connect_application(request):
         print(context)
 
     return render_to_response('accounts/connect_application.html',
-                             context,
+                              context,
                               context_instance=RequestContext(request))
 
 
 class Application_Detail(DetailView):
     model = Application
-
-
-
-

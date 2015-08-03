@@ -6,24 +6,27 @@
 {% block content %}
 
 
-<div class="login-box">
+    <div class="login-box">
 
-    <form action='' method='POST'>
+        <form action='' method='POST'>
 
-        {% if form.errors %}
-            {{ form.errors }}
-        {% endif %}
+            {% if form.errors %}
+                {{ form.errors }}
+            {% endif %}
 
-        <p>{{ form.email.label }}</p>
-        <p>{{ form.email }}</p>
-        <p>{{ form.email.help_text }}</p>
+            <p>{{ form.email.label }}</p>
 
-        <p>&nbsp;</p>
-        <input type="submit" class="active btn btn-lg btn-success" value="{%  trans 'Login' %}"/>
-        <input type="hidden" name="next" value="{{ next|escape }}" />
-        {% csrf_token %}
+            <p>{{ form.email }}</p>
 
-    </form>
+            <p>{{ form.email.help_text }}</p>
 
-</div>
+            <p>&nbsp;</p>
+            <input type="submit" class="active btn btn-lg btn-success"
+                   value="{% trans 'Login' %}"/>
+            <input type="hidden" name="next" value="{{ next|escape }}"/>
+            {% csrf_token %}
+
+        </form>
+
+    </div>
 {% endblock %}

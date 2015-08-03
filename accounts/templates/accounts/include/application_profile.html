@@ -2,11 +2,12 @@
 {% if user.is_authenticated %}
     <table>
         <tr>
-            <td><h2>My Applications</h2></td>
-            <td>   </td>
+            <td><h2>My Devices</h2></td>
+            <td></td>
             <td>
-                <a href="{% url "accounts:connect_application" %}" class="btn btn-success btn">
-                    Add application</a>
+                <a href="{% url "accounts:connect_application" %}"
+                   class="btn btn-success btn">
+                    Add a Device</a>
             </td>
         </tr>
     </table>
@@ -21,35 +22,37 @@
             <th>Grant Type</th>
             <th>Client Id</th>
         </tr>
-         {%  for application in applications %}
-        <tr>
-            <td>
-                <a href="/accounts/application/edit/{{ application.id }}/">Edit</a>
-            </td>
-            <td>
-                <img src="{% if application.icon_link %}{{ application.icon_link }}{% else %}
-                {{ STATIC_URL }}/img/layout/bb-2dir-icon.png{% endif %}" style="width:90px;height:90px;">
-            </td>
-            <td>
-                {{ application.name }}
-            </td>
-            <td>
-                {{ application.organization }}
-            </td>
-            <td>
-                {{ application.redirect_uris }}
-            </td>
-            <td>
-                {{ application.client_type }}
-            </td>
-            <td>
-                {{ application.authorization_grant_type }}
-            </td>
-            <td>
-                {{ application.client_id }}
-            </td>
+        {% for application in applications %}
+            <tr>
+                <td>
+                    <a href="/accounts/application/edit/{{ application.id }}/">Edit</a>
+                </td>
+                <td>
+                    <img src="
+                            {% if application.icon_link %}{{ application.icon_link }}{% else %}
+                {{ STATIC_URL }}/img/layout/bb-2dir-icon.png{% endif %}"
+                         style="width:90px;height:90px;">
+                </td>
+                <td>
+                    {{ application.name }}
+                </td>
+                <td>
+                    {{ application.organization }}
+                </td>
+                <td>
+                    {{ application.redirect_uris }}
+                </td>
+                <td>
+                    {{ application.client_type }}
+                </td>
+                <td>
+                    {{ application.authorization_grant_type }}
+                </td>
+                <td>
+                    {{ application.client_id }}
+                </td>
 
-        </tr>
+            </tr>
         {% endfor %}
     </table>
 {% endif %}

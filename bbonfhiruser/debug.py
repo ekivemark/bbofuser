@@ -17,4 +17,3 @@ def Debug_Toolbar_Display(request):
         return False
 
     return True
-

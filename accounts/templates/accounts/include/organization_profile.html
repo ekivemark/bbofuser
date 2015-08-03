@@ -1,6 +1,8 @@
 {% load i18n %}
-<h3>My Organization <a href="{%  url 'accounts:organization_edit' %}" class="btn btn-lg btn-success" >{% trans 'Edit' %}</a></h3>
-    {% if user.affiliated_to %}
+<h3>My Organization <a href="{% url 'accounts:organization_edit' %}"
+                       class="btn btn-lg btn-success">{% trans 'Edit' %}</a>
+</h3>
+{% if user.affiliated_to %}
     <table>
         <tr>
 
@@ -12,41 +14,42 @@
             <th>Add App</th>
 
         </tr>
-         {%  for organization in organizations %}
-        <tr>
+        {% for organization in organizations %}
+            <tr>
 
-            <td>
-                {{ organization.domain }}
-            </td>
-            <td>
-                {{ organization.name }}
-            </td>
-            <td>
-                {{ organization.site_url }}
-            </td>
-            <td>
-                {{ organization.owner.first_name }} {{ organization.owner.last_name }}
-            </td>
-            <td>
-                {{ organization.alternate_owner.first_name }} {{ organization.alternate_owner.last_name }}
-            </td>
-            <td>Add App</td>
+                <td>
+                    {{ organization.domain }}
+                </td>
+                <td>
+                    {{ organization.name }}
+                </td>
+                <td>
+                    {{ organization.site_url }}
+                </td>
+                <td>
+                    {{ organization.owner.first_name }} {{ organization.owner.last_name }}
+                </td>
+                <td>
+                    {{ organization.alternate_owner.first_name }} {{ organization.alternate_owner.last_name }}
+                </td>
+                <td>Add App</td>
 
-        </tr>
+            </tr>
         {% endfor %}
 
     </table>
-    {%  else %}
+{% else %}
     <table>
         <tr>
             <td>
                 <p>Connect an Organization Profile to your account. <br/>
                     An email can only be connected to one organization</p>
-                <a href="{% url "accounts:connect_organization" %}" class="btn btn-primary btn-large">
+                <a href="{% url "accounts:connect_organization" %}"
+                   class="btn btn-primary btn-large">
                     Connect an Organization</a>
 
             </td>
         </tr>
     </table>
-     {% endif %}
+{% endif %}
 

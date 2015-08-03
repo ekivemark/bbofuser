@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # print changes to print() in Python3
 
 from configparser import RawConfigParser
+
 parser = RawConfigParser()
 # http://stackoverflow.com/questions/4909958/django-local-settings/14545196#14545196
 
@@ -20,7 +21,6 @@ import os
 import sys
 from platform import python_version
 from .util import str2bool, str2int
-
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -73,23 +73,22 @@ DEBUG_SETTINGS = str2bool(parser.get('global', 'debug_settings'))
 
 ALLOWED_HOSTS = []
 ADMINS = (
-     ('Mark Scrimshire', 'mark@ekivemark.com'),
+    ('Mark Scrimshire', 'mark@ekivemark.com'),
 )
 
 MANAGERS = ADMINS
-
 
 APPLICATION_TITLE = parser.get('global', 'application_title')
 if APPLICATION_TITLE == "":
     APPLICATION_TITLE = "BB+ Developer Accounts"
 
 if DEBUG_SETTINGS:
-    print("Application: ",APPLICATION_TITLE)
+    print("Application: ", APPLICATION_TITLE)
     print("Running on Python_version: ", python_version())
     print("")
     print("BASE_DIR:", BASE_DIR)
     print("APPLICATION_ROOT:", APPLICATION_ROOT)
-    FULL_CONFIG_FILE = APPLICATION_ROOT.strip()+'/'+CONFIG_FILE
+    FULL_CONFIG_FILE = APPLICATION_ROOT.strip() + '/' + CONFIG_FILE
     print("Config File: ", FULL_CONFIG_FILE)
 
 # Application definition
@@ -98,11 +97,11 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-        # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-        # Always use forward slashes, even on Windows.
-        # Don't forget to use absolute paths, not relative paths.
-        # This should always be the last in the list because it is our default.
-                os.path.join(BASE_DIR, 'templates'),
+            # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+            # Always use forward slashes, even on Windows.
+            # Don't forget to use absolute paths, not relative paths.
+            # This should always be the last in the list because it is our default.
+            os.path.join(BASE_DIR, 'templates'),
         ],
         'OPTIONS': {
             'context_processors': [
@@ -123,8 +122,8 @@ TEMPLATES = [
     },
 ]
 
-#TEMPLATE_CONTEXT_PROCESSORS = (
-#)
+# TEMPLATE_CONTEXT_PROCESSORS = (
+# )
 
 
 # TEMPLATE_DIRS = (
@@ -175,12 +174,11 @@ LOCAL_APPS = (
     'apps.uploader',
 )
 
-
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
-AUTH_USER_MODEL= "accounts.User"
+AUTH_USER_MODEL = "accounts.User"
 USERNAME_FIELD = "email"
-#AUTHENTICATION_BACKENDS = ['accounts.backends.EmailAuthBackend',]
+# AUTHENTICATION_BACKENDS = ['accounts.backends.EmailAuthBackend',]
 AUTHENTICATION_BACKENDS = (
     'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
@@ -207,18 +205,21 @@ WSGI_APPLICATION = 'bbonfhiruser.wsgi.application'
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 DBPATH = os.path.join(BASE_DIR, 'db/db.db')
 if DEBUG_SETTINGS:
-    print("DBPATH:",DBPATH)
+    print("DBPATH:", DBPATH)
 
 
 # Standard sqlite3 settings
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': DBPATH,                  # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.sqlite3',
+    # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': DBPATH,  # Or path to database file if using sqlite3.
+        'USER': '',  # Not used with sqlite3.
+        'PASSWORD': '',  # Not used with sqlite3.
+        'HOST': '',
+    # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',
+    # Set to empty string for default. Not used with sqlite3.
     }
 }
 # Plan on sqlite3 for development environment
@@ -260,7 +261,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-os.path.join(BASE_DIR, 'sitestatic'),
+    os.path.join(BASE_DIR, 'sitestatic'),
 )
 
 # List of finder classes that know how to find static files in
@@ -268,7 +269,7 @@ os.path.join(BASE_DIR, 'sitestatic'),
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 SESSION_COOKIE_SECURE = False
@@ -279,33 +280,34 @@ STATIC_URL = '/static/'
 
 # For Django Registration:
 # settings are stored in local.ini in parent directory
-ACCOUNT_ACTIVATION_DAYS = str2int(parser.get('global', 'account_activation_days'))
+ACCOUNT_ACTIVATION_DAYS = str2int(
+    parser.get('global', 'account_activation_days'))
 try:
     ACCOUNT_ACTIVATION_DAYS = int(ACCOUNT_ACTIVATION_DAYS)
 except:
-    ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window; you may, of course, use a different value.
+    ACCOUNT_ACTIVATION_DAYS = 7  # One-week activation window; you may, of course, use a different value.
 
-#REGISTRATION_AUTO_LOGIN = False # Automatically log the user in.
-REGISTRATION_AUTO_LOGIN = str2bool(parser.get('global', 'registration_auto_login'))
+# REGISTRATION_AUTO_LOGIN = False # Automatically log the user in.
+REGISTRATION_AUTO_LOGIN = str2bool(
+    parser.get('global', 'registration_auto_login'))
 
-#REGISTRATION_FORM = 'accounts.admin.UserCreationForm'
+# REGISTRATION_FORM = 'accounts.admin.UserCreationForm'
 
 # Django Registration
-#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-#EMAIL_HOST = 'localhost'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'localhost'
 EMAIL_HOST = parser.get('global', 'email_host').strip()
 # EMAIL_PORT = 1025 # local
-#EMAIL_PORT = 645 # SSL
+# EMAIL_PORT = 645 # SSL
 EMAIL_PORT = str2int(parser.get('global', 'email_port'))
 
+EMAIL_HOST_USER = parser.get('global', 'email_host_user')
+EMAIL_HOST_PASSWORD = parser.get('global', 'email_host_password')
 
-EMAIL_HOST_USER = parser.get('global','email_host_user')
-EMAIL_HOST_PASSWORD = parser.get('global','email_host_password')
-
-#EMAIL_USE_TLS = True
+# EMAIL_USE_TLS = True
 # Port 465 = SSL
 # Port 587 = TLS
-#EMAIL_USE_SSL = True
+# EMAIL_USE_SSL = True
 EMAIL_USE_SSL = str2bool(parser.get('global', 'email_use_ssl'))
 
 EMAIL_BACKEND_TYPE = parser.get('global', 'email_backend_type')
@@ -335,7 +337,8 @@ if DEBUG_SETTINGS:
     print("Email via %s: %s" % (EMAIL_BACKEND_TYPE, EMAIL_BACKEND))
     print("Account Activation Days: %s" % ACCOUNT_ACTIVATION_DAYS)
     print("Email Host:Port: %s:%s" % (EMAIL_HOST, EMAIL_PORT))
-    print("Credentials: [%s]/[%s]" % (EMAIL_HOST_USER, EMAIL_HOST_PASSWORD))
+    print(
+        "Credentials: [%s]/[%s]" % (EMAIL_HOST_USER, EMAIL_HOST_PASSWORD))
 
 # END of DJANGO Registration Settings Section
 
@@ -346,15 +349,15 @@ CORS_ORIGIN_ALLOW_ALL = True
 # End of CORSHEADERS Section
 
 # Change to OAuth2 Provider Application Model
-#OAUTH2_PROVIDER_APPLICATION_MODEL='accounts.MyApplication'
+# OAUTH2_PROVIDER_APPLICATION_MODEL='accounts.MyApplication'
 
 # Add Bootstrap awareness to Crispy Forms
-#CRISPY_TEMPLATE_PACK = "bootstrap3"
-#CRISPY_FAIL_SILENTLY = not DEBUG
+# CRISPY_TEMPLATE_PACK = "bootstrap3"
+# CRISPY_FAIL_SILENTLY = not DEBUG
 
 # Django Debug Toolbar
 INTERNAL_IPS = '127.0.0.1'
-#SHOW_TOOLBAR_CALLBACK = 'bbonfhiruser.debug'
+# SHOW_TOOLBAR_CALLBACK = 'bbonfhiruser.debug'
 SHOW_TOOLBAR_CALLBACK = 'debug_toolbar.middleware.show_toolbar'
 
 if DEBUG_SETTINGS:
@@ -386,7 +389,8 @@ SETTINGS_EXPORT = [
 
 if DEBUG_SETTINGS:
     print("SECRET_KEY:%s" % SECRET_KEY)
-    print("================================================================")
+    print(
+        "================================================================")
 # SECURITY WARNING: keep the secret key used in production secret!
 
 # django-auth-ldap
@@ -397,37 +401,35 @@ import ldap
 from django_auth_ldap.config import LDAPSearch
 
 AUTH_LDAP_USER_SEARCH = LDAPSearch("ou=people,dc=bbonfhir,dc=com",
-    ldap.SCOPE_SUBTREE, "(uid=%(user)s)")
+                                   ldap.SCOPE_SUBTREE, "(uid=%(user)s)")
 AUTH_LDAP_SCOPE = parser.get('global', 'auth_ldap_scope').strip()
-AUTH_LDAP_SCOPE = AUTH_LDAP_SCOPE.replace('"','')
+AUTH_LDAP_SCOPE = AUTH_LDAP_SCOPE.replace('"', '')
 if AUTH_LDAP_SCOPE == "":
-    AUTH_LDAP_SCOPE= "ou=people,dc=bbonfhir,dc=com"
+    AUTH_LDAP_SCOPE = "ou=people,dc=bbonfhir,dc=com"
 
 FHIR_SERVER = parser.get('global', 'fhir_server')
 if FHIR_SERVER == '':
     FHIR_SERVER = 'http://fhir.bbonfhir.com:8080/fhir-p'
     # FHIR_SERVER = 'http://localhost:8080/fhir-p'
 
-
 if DEBUG_SETTINGS:
-    print("FHIR_SERVER:",FHIR_SERVER)
+    print("FHIR_SERVER:", FHIR_SERVER)
     print("AUTH_LDAP_SCOPE:", AUTH_LDAP_SCOPE)
     l = ldap.initialize(AUTH_LDAP_SERVER_URI)
     try:
-        l.simple_bind_s("","")
-        ldap_result =l.search_s(AUTH_LDAP_SCOPE,
-                                ldap.SCOPE_SUBTREE,
-                                "objectclass=*")
+        l.simple_bind_s("", "")
+        ldap_result = l.search_s(AUTH_LDAP_SCOPE,
+                                 ldap.SCOPE_SUBTREE,
+                                 "objectclass=*")
         print("=========================================")
         print("LDAP Access Test:")
         for key, value in ldap_result:
-            print("key:", key,": ", value)
+            print("key:", key, ": ", value)
         print("=========================================")
 
     except ldap.SERVER_DOWN:
-        print("ERROR! LDAP Server:", AUTH_LDAP_SERVER_URI, "is not accessible")
+        print("ERROR! LDAP Server:", AUTH_LDAP_SERVER_URI,
+              "is not accessible")
 
     except ldap.LDAPError:
         print("LDAP Error:")
-
-

@@ -5,30 +5,32 @@
 {% block pagename %}Register{% endblock %}
 {% block content %}
 
-<form method="post" action="" xmlns="http://www.w3.org/1999/html">
-    {% csrf_token %}
-    <table>
-        <tr>
-            <td style="width:40%;vertical-align:text-top">
+    <form method="post" action="" xmlns="http://www.w3.org/1999/html">
+        {% csrf_token %}
+        <table>
+            <tr>
+                <td style="width:40%;vertical-align:text-top">
 
-                {{ form.as_p }}
+                    {{ form.as_p }}
 
-                <a href="/"><input type="button" class="btn-danger" value="Cancel" /></a>
+                    <a href="/"><input type="button" class="btn-danger"
+                                       value="Cancel"/></a>
 
-                <input class="btn-success" type="submit" value="{% trans 'I Agree to the terms - Register Me' %}" />
-            </td>
-            <td style="width:60%">
-                <div class="terms" >
+                    <input class="btn-success" type="submit"
+                           value="{% trans 'I Agree to the terms - Register Me' %}"/>
+                </td>
+                <td style="width:60%">
+                    <div class="terms">
 
-                    <!--- Template is in bbonfhiruser/templates/developer --->
-                    {% include "developer/terms_of_use.html" %}
+                        <!--- Template is in bbonfhiruser/templates/developer --->
+                        {% include "developer/terms_of_use.html" %}
 
-                </div>
+                    </div>
 
-            </td>
-        </tr>
-    </table>
-</form>
+                </td>
+            </tr>
+        </table>
+    </form>
 {% endblock %}
 
 

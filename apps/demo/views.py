@@ -76,6 +76,7 @@ class FormWithFilesView(FormView):
             'file4': fieldfile,
         }
 
+
 class PaginationView(TemplateView):
     template_name = 'demo/pagination.html'
 
@@ -103,7 +104,6 @@ class MiscView(TemplateView):
 
 
 def DemoApi(request):
-
     # Demo API
     application_title = settings.APPLICATION_TITLE
     DEBUG = settings.DEBUG_SETTINGS
@@ -115,22 +115,23 @@ def DemoApi(request):
     fhir_server_param = "baseDstu2/Patient/1/$everything?_format=json"
 
     data = json.dumps({})
-    r = requests.get(fhir_server_url+fhir_server_param, )
+    r = requests.get(fhir_server_url + fhir_server_param, )
 
 
-    #print(r.json)
-    #print(r.content)
+    # print(r.json)
+    # print(r.content)
 
     result = r.content
     result_content = json.loads(r.content)
-    #result = result["resource"]
+    # result = result["resource"]
     result = json.dumps(result_content, indent=4, )
     xmlresult = dicttoxml.dicttoxml(result_content)
 
     dom = parseString(xmlresult)
-    #print(dom.toprettyxml())
+    # print(dom.toprettyxml())
 
-    context = {"APPLICATION_TITLE": application_title,"result": result, "xmlresult": dom.toprettyxml(),
-               "url": fhir_server_url, "params": fhir_server_param }
-    return render_to_response('demo/demoapi.html', RequestContext(request, context))
-
+    context = {"APPLICATION_TITLE": application_title, "result": result,
+               "xmlresult": dom.toprettyxml(),
+               "url": fhir_server_url, "params": fhir_server_param}
+    return render_to_response('demo/demoapi.html',
+                              RequestContext(request, context))

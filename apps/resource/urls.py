@@ -12,13 +12,13 @@ urlpatterns = patterns('',
                        # url(r'^$', 'bbonfhiruser.views.home', name='home'),
                        # url(r'^blog/', include('blog.urls')),
 
-                       url(r'^$', 'apps.resource.views.home_index', name='home'),
+                       url(r'^$', 'apps.resource.views.home_index',
+                           name='home'),
 
                        url(r'^admin/', include(admin.site.urls)),
 
                        # Manage Account
                        # Remove Account
                        # Add Associate User
-
 
                        )

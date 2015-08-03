@@ -1,11 +1,12 @@
 {% load i18n %}
 {% if user.is_authenticated %}
-<h2>My Profile  <a href="{%  url 'accounts:user_edit' %}" class="btn btn-lg btn-success" >{% trans 'Edit' %}</a>
-</h2>
+    <h2>My Profile <a href="{% url 'accounts:user_edit' %}"
+                      class="btn btn-md btn-success">{% trans 'Edit' %}</a>
+    </h2>
     <table>
         <tr>
             <td>
-               Email:
+                Email:
             </td>
             <td>
                 {{ user.email }}
@@ -13,25 +14,26 @@
         </tr>
         <tr>
             <td>
-               Name:
+                Name:
             </td>
             <td>
                 {{ user.first_name }}&nbsp; {{ user.last_name }}
             </td>
         </tr>
-            {%  if user.mobile %}
-                <tr>
-                    <td>
-                        Phone:
-                    </td>
-                    <td>
-                        {{ user.mobile }} on {{ user.carrier | upper }} ({{ mfa_address }})
-                    </td>
-                </tr>
-            {%  endif %}
+        {% if user.mobile %}
+            <tr>
+                <td>
+                    Phone:
+                </td>
+                <td>
+                    {{ user.mobile }} on {{ user.carrier | upper }}
+                    ({{ mfa_address }})
+                </td>
+            </tr>
+        {% endif %}
 
     </table>
-{%  else %}
+{% else %}
 
 {% endif %}
 

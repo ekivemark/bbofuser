@@ -1,40 +1,54 @@
-from django.conf.urls import patterns, include, url
 from django.conf import *
 from registration.backends.default.urls import *
 from django.contrib import admin
-from accounts.forms.other import RegistrationFormTOSAndEmail, RegistrationFormUserTOSAndEmail
 from django.contrib.auth import views as auth_views
 from django.core.urlresolvers import reverse_lazy
 
+from accounts.forms.other import RegistrationFormUserTOSAndEmail
+
 urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'bbonfhiruser.views.home', name='home'),
-    url(r'^$', 'accounts.views.home_index', name='home'),
-    url(r'^accounts/', include('accounts.urls', namespace='accounts')),
-    url(r'^upload/', include('apps.uploader.urls', namespace='upload')),
-    url(r'^demo/', include('apps.demo.urls', namespace='demo')),
-    url(r'^registration/register/$', RegistrationView.as_view(form_class=RegistrationFormUserTOSAndEmail),
-        name='register'),
-    url(r'^registration/', include('registration.backends.default.urls', )),
-    url(r'^password/reset/$',auth_views.password_reset,
-                           {'post_reset_redirect': reverse_lazy('password_reset_done')},
+                       # Examples:
+                       # url(r'^$', 'bbonfhiruser.views.home', name='home'),
+                       url(r'^$', 'accounts.views.other.home_index',
+                           name='home'),
+                       url(r'^about', 'accounts.views.other.about',
+                           name='about'),
+                       url(r'^accounts/',
+                           include('accounts.urls', namespace='accounts')),
+                       url(r'^upload/', include('apps.uploader.urls',
+                                                namespace='upload')),
+                       url(r'^demo/',
+                           include('apps.demo.urls', namespace='demo')),
+                       url(r'^registration/register/$',
+                           RegistrationView.as_view(
+                               form_class=RegistrationFormUserTOSAndEmail),
+                           name='register'),
+                       url(r'^registration/', include(
+                           'registration.backends.default.urls', )),
+                       url(r'^password/reset/$', auth_views.password_reset,
+                           {'post_reset_redirect': reverse_lazy(
+                               'password_reset_done')},
                            name='password_reset'),
-    url(r'^password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
+                       url(
+                           r'^password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
                            auth_views.password_reset_confirm,
                            name='password_reset_confirm'),
-    url(r'^password/reset/complete/$',
+                       url(r'^password/reset/complete/$',
                            auth_views.password_reset_complete,
-                           {'post_reset_redirect': reverse_lazy('password_reset_complete')},
+                           {'post_reset_redirect': reverse_lazy(
+                               'password_reset_complete')},
                            name='password_reset_complete'),
-    url(r'^password/reset/done/$',
+                       url(r'^password/reset/done/$',
                            auth_views.password_reset_done,
                            name='password_reset_done'),
-    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+                       url(r'^o/', include('oauth2_provider.urls',
+                                           namespace='oauth2_provider')),
 
-    url(r'^admin/', include(admin.site.urls)),
-    # Uncomment the admin/doc line below to enable admin documentation:
-    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-)
+                       url(r'^admin/', include(admin.site.urls)),
+                       # Uncomment the admin/doc line below to enable admin documentation:
+                       url(r'^admin/doc/',
+                           include('django.contrib.admindocs.urls')),
+                       )
 # DONE: Extend user model to enable organization
 # TODO: Organization Approval (Test - Automatic)
 # TODO: Organization Approval (Prod - Manual)
@@ -56,5 +70,3 @@ urlpatterns = patterns('',
 # TODO: Modify OAuth Model to extend for Organization
 # TODO: Integrate OAuthKey in to application key request
 # TODO: Implement Multi-factor Authentication (using email to text)
-
-

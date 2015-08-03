@@ -9,23 +9,30 @@
 {% block pagename %}Welcome{% endblock %}
 {% block content %}
 
-<div class="hero-unit">
+    <div class="hero-unit">
 
-    <h2>Uploader:{{ settings.APPLICATION_TITLE }}</h2>
+        <h2>Uploader:{{ settings.APPLICATION_TITLE }}</h2>
 
-    <div class="container-fluid">
-    	<div class="col-md-6"><p>Upload data to the FHIR Server</p>
-            {% if user.is_authenticated %}
-                <a href="{% url "accounts:manage_account" %}" class="btn btn-primary btn-large">Manage Your Account</a>
-            {%  else %}
-                    <a href="{% url "accounts:sms_code" %}?next=/"><input type="button" class="active btn btn-large btn-success" value="{% trans "login" %}" /></a>
-            {%  endif %}
+        <div class="container-fluid">
+            <div class="col-md-6"><p>Upload data to the FHIR Server</p>
+                {% if user.is_authenticated %}
+                    <a href="{% url "accounts:manage_account" %}"
+                       class="btn btn-primary btn-large">Manage Your
+                        Account</a>
+                {% else %}
+                    <a href="{% url "accounts:sms_code" %}?next=/"><input
+                            type="button"
+                            class="active btn btn-large btn-success"
+                            value="{% trans "login" %}"/></a>
+                {% endif %}
+            </div>
+
+            <div class="col-md-6"><img
+                    src="{% static 'img/layout/blue-button.png' %}"
+                    style="height:300px"></div>
+
         </div>
-
-  	    <div class="col-md-6"><img src="{% static 'img/layout/blue-button.png' %}" style="height:300px"></div>
-
     </div>
-</div>
 
 
 {% endblock %}

@@ -9,9 +9,10 @@ Remember to add new classes to accounts.forms.__init__.py
 """
 __author__ = 'Mark Scrimshire:@ekivemark'
 from django import forms
-from accounts.models import User
 from django.conf import settings
-from django.contrib import messages
+
+from accounts.models import User
+
 
 class AuthenticationForm(forms.Form):
     """
@@ -19,10 +20,10 @@ class AuthenticationForm(forms.Form):
     """
     email = forms.EmailField(widget=forms.widgets.TextInput)
     password = forms.CharField(widget=forms.widgets.PasswordInput)
-    sms_code  = forms.CharField(widget=forms.PasswordInput,
-                                max_length=5,
-                                label="SMS Code",
-                                required=False)
+    sms_code = forms.CharField(widget=forms.PasswordInput,
+                               max_length=5,
+                               label="SMS Code",
+                               required=False)
 
     class Meta:
         fields = ['email', 'password', 'sms_code']
@@ -34,20 +35,21 @@ class SMSCodeForm(forms.Form):
                              help_text="Your email address is used as the username for your account. "
                                        "We will ask for your password in the next step.")
 
+
 class AuthenticationSMSForm(forms.Form):
     """
     Login form
     """
     email = forms.EmailField(widget=forms.widgets.TextInput)
     password = forms.CharField(widget=forms.widgets.PasswordInput)
-    sms_code  = forms.CharField(widget=forms.PasswordInput,
-                                max_length=5,
-                                label="SMS Code",
-                                required=False)
+    sms_code = forms.CharField(widget=forms.PasswordInput,
+                               max_length=5,
+                               label="SMS Code",
+                               required=False)
     send_pin = forms.BooleanField(required=False, widget=forms.HiddenInput
                                   )
 
-    #class Meta:
+    # class Meta:
     #    fields = ['email', 'password', 'sms_code']
 
     def clean(self):
@@ -62,4 +64,3 @@ class AuthenticationSMSForm(forms.Form):
             raise forms.ValidationError("Pin Code is required")
 
         return self.cleaned_data
-

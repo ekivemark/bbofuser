@@ -7,11 +7,12 @@ Created: 7/20/15 9:51 PM
 """
 from collections import OrderedDict
 from datetime import datetime
+from datetime import datetime
+
 from django.conf import settings
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.loader import render_to_string
-from datetime import datetime
 
 __author__ = 'Mark Scrimshire:@ekivemark'
 import fileinput
@@ -27,61 +28,96 @@ from collections import OrderedDict
 
 # DONE: Add fmt field for date and num types
 PT_D_XTRCT = OrderedDict()
-PT_D_XTRCT[0]  = {'len': 40, 'type': "str",  'field': 'claim_cntl_num',}
-PT_D_XTRCT[1]  = {'len': 20, 'type': "str",  'field': 'hicn',}
-PT_D_XTRCT[2]  = {'len': 20, 'type': "str",  'field': 'cardholder_id',}
-PT_D_XTRCT[3]  = {'len': 8,  'type': "date", 'field': 'patient_dob', 'fmt': "%Y%m%d",}
-PT_D_XTRCT[4]  = {'len': 1,  'type': "str",  'field': 'gender_code',}
-PT_D_XTRCT[5]  = {'len': 8,  'type': "date", 'field': 'date_of_service', 'fmt': "%Y%m%d",}
-PT_D_XTRCT[6]  = {'len': 8,  'type': "date", 'field': 'paid_date', 'fmt': "%Y%m%d",}
-PT_D_XTRCT[7]  = {'len': 12, 'type': "num",  'field': 'claim_ln_svc_ref_num', 'fmt': "{:12.0f}"}
-PT_D_XTRCT[8]  = {'len': 19, 'type': 'str',  'field': 'product_svc_id',}
-PT_D_XTRCT[9]  = {'len': 2,  'type': "str",  'field': 'provider_id_qualifier',}
-PT_D_XTRCT[10] = {'len': 15, 'type': "str",  'field': 'svc_provider_id',}
-PT_D_XTRCT[11] = {'len': 2,  'type': 'num',  'field': 'line_rx_fill_num', 'fmt': "{:2.0f}"}
-PT_D_XTRCT[12] = {'len': 1,  'type': "str",  'field': 'dispensing_status',}
-PT_D_XTRCT[13] = {'len': 1,  'type': "num",  'field': 'compound_code', 'fmt': "{:1.0f}"}
-PT_D_XTRCT[14] = {'len': 1 , 'type': "str",  'field': 'product_selection_code',}
-PT_D_XTRCT[15] = {'len': 10, 'type': "num",  'field': 'qty_dispensed','fmt': "{:7.3f}",}
-PT_D_XTRCT[16] = {'len': 3,  'type': "num",  'field': 'days_supply', 'fmt': "{:3.0f}"}
-PT_D_XTRCT[17] = {'len': 2,  'type': "str",  'field': 'prescriber_id_qualifier',}
-PT_D_XTRCT[18] = {'len': 15, 'type': "str",  'field': 'prescriber_id',}
-PT_D_XTRCT[19] = {'len': 1,  'type': "str",  'field': 'drug_coverage_status_code',}
-PT_D_XTRCT[20] = {'len': 1,  'type': "str",  'field': 'adjustment_del_code',}
-PT_D_XTRCT[21] = {'len': 1,  'type': "str",  'field': 'non_std_format_code',}
-PT_D_XTRCT[22] = {'len': 1,  'type': "str",  'field': 'pricing_exception_code',}
-PT_D_XTRCT[23] = {'len': 1,  'type': "str",  'field': 'catastrophic_coverage_ind_code',}
-PT_D_XTRCT[24] = {'len': 8,  'type': "num",  'field': 'ingredient_cost_amount','fmt': "{:6.2f}",}
-PT_D_XTRCT[25] = {'len': 8,  'type': "num",  'field': 'line_svc_cost_amount','fmt': "{:6.2f}",}
-PT_D_XTRCT[26] = {'len': 8,  'type': "num",  'field': 'line_sales_tax_amount','fmt': "{:6.2f}",}
-PT_D_XTRCT[27] = {'len': 8,  'type': "num",  'field': 'line_grs_below_threshold_amount','fmt': "{:6.2f}",}
-PT_D_XTRCT[28] = {'len': 8,  'type': "num",  'field': 'line_grs_above_threshold_amount','fmt': "{:6.2f}",}
-PT_D_XTRCT[29] = {'len': 8,  'type': "num",  'field': 'line_bene_payment_amount','fmt': "{:6.2f}",}
-PT_D_XTRCT[30] = {'len': 8,  'type': "num",  'field': 'line_other_tp_paid_amount','fmt': "{:6.2f}",}
-PT_D_XTRCT[31] = {'len': 8,  'type': "num",  'field': 'line_lis_amount','fmt': "{:6.2f}",}
-PT_D_XTRCT[32] = {'len': 8,  'type': "num",  'field': 'line_plro_amount', 'fmt': "{:6.2f}",}
-PT_D_XTRCT[33] = {'len': 8,  'type': "num",  'field': 'line_covered_paid_amount','fmt': "{:6.2f}",}
-PT_D_XTRCT[34] = {'len': 8,  'type': "num",  'field': 'line_non_covered_paid_amount', 'fmt': "{:6.2f}",}
-PT_D_XTRCT[35] = {'len': 5,  'type': "str",  'field': 'line_contract_number',}
-PT_D_XTRCT[36] = {'len': 3,  'type': "str",  'field': 'pbp_id',}
-PT_D_XTRCT[37] = {'len': 9,  'type': "num",  'field': 'package_id', 'fmt': "{:9.0f}",}
-PT_D_XTRCT[38] = {'len': 102,'type': "str",  'field': 'filler',}
+PT_D_XTRCT[0] = {'len': 40, 'type': "str", 'field': 'claim_cntl_num', }
+PT_D_XTRCT[1] = {'len': 20, 'type': "str", 'field': 'hicn', }
+PT_D_XTRCT[2] = {'len': 20, 'type': "str", 'field': 'cardholder_id', }
+PT_D_XTRCT[3] = {'len': 8, 'type': "date", 'field': 'patient_dob',
+                 'fmt': "%Y%m%d", }
+PT_D_XTRCT[4] = {'len': 1, 'type': "str", 'field': 'gender_code', }
+PT_D_XTRCT[5] = {'len': 8, 'type': "date", 'field': 'date_of_service',
+                 'fmt': "%Y%m%d", }
+PT_D_XTRCT[6] = {'len': 8, 'type': "date", 'field': 'paid_date',
+                 'fmt': "%Y%m%d", }
+PT_D_XTRCT[7] = {'len': 12, 'type': "num", 'field': 'claim_ln_svc_ref_num',
+                 'fmt': "{:12.0f}"}
+PT_D_XTRCT[8] = {'len': 19, 'type': 'str', 'field': 'product_svc_id', }
+PT_D_XTRCT[9] = {'len': 2, 'type': "str",
+                 'field': 'provider_id_qualifier', }
+PT_D_XTRCT[10] = {'len': 15, 'type': "str", 'field': 'svc_provider_id', }
+PT_D_XTRCT[11] = {'len': 2, 'type': 'num', 'field': 'line_rx_fill_num',
+                  'fmt': "{:2.0f}"}
+PT_D_XTRCT[12] = {'len': 1, 'type': "str", 'field': 'dispensing_status', }
+PT_D_XTRCT[13] = {'len': 1, 'type': "num", 'field': 'compound_code',
+                  'fmt': "{:1.0f}"}
+PT_D_XTRCT[14] = {'len': 1, 'type': "str",
+                  'field': 'product_selection_code', }
+PT_D_XTRCT[15] = {'len': 10, 'type': "num", 'field': 'qty_dispensed',
+                  'fmt': "{:7.3f}", }
+PT_D_XTRCT[16] = {'len': 3, 'type': "num", 'field': 'days_supply',
+                  'fmt': "{:3.0f}"}
+PT_D_XTRCT[17] = {'len': 2, 'type': "str",
+                  'field': 'prescriber_id_qualifier', }
+PT_D_XTRCT[18] = {'len': 15, 'type': "str", 'field': 'prescriber_id', }
+PT_D_XTRCT[19] = {'len': 1, 'type': "str",
+                  'field': 'drug_coverage_status_code', }
+PT_D_XTRCT[20] = {'len': 1, 'type': "str",
+                  'field': 'adjustment_del_code', }
+PT_D_XTRCT[21] = {'len': 1, 'type': "str",
+                  'field': 'non_std_format_code', }
+PT_D_XTRCT[22] = {'len': 1, 'type': "str",
+                  'field': 'pricing_exception_code', }
+PT_D_XTRCT[23] = {'len': 1, 'type': "str",
+                  'field': 'catastrophic_coverage_ind_code', }
+PT_D_XTRCT[24] = {'len': 8, 'type': "num",
+                  'field': 'ingredient_cost_amount', 'fmt': "{:6.2f}", }
+PT_D_XTRCT[25] = {'len': 8, 'type': "num", 'field': 'line_svc_cost_amount',
+                  'fmt': "{:6.2f}", }
+PT_D_XTRCT[26] = {'len': 8, 'type': "num",
+                  'field': 'line_sales_tax_amount', 'fmt': "{:6.2f}", }
+PT_D_XTRCT[27] = {'len': 8, 'type': "num",
+                  'field': 'line_grs_below_threshold_amount',
+                  'fmt': "{:6.2f}", }
+PT_D_XTRCT[28] = {'len': 8, 'type': "num",
+                  'field': 'line_grs_above_threshold_amount',
+                  'fmt': "{:6.2f}", }
+PT_D_XTRCT[29] = {'len': 8, 'type': "num",
+                  'field': 'line_bene_payment_amount', 'fmt': "{:6.2f}", }
+PT_D_XTRCT[30] = {'len': 8, 'type': "num",
+                  'field': 'line_other_tp_paid_amount', 'fmt': "{:6.2f}", }
+PT_D_XTRCT[31] = {'len': 8, 'type': "num", 'field': 'line_lis_amount',
+                  'fmt': "{:6.2f}", }
+PT_D_XTRCT[32] = {'len': 8, 'type': "num", 'field': 'line_plro_amount',
+                  'fmt': "{:6.2f}", }
+PT_D_XTRCT[33] = {'len': 8, 'type': "num",
+                  'field': 'line_covered_paid_amount', 'fmt': "{:6.2f}", }
+PT_D_XTRCT[34] = {'len': 8, 'type': "num",
+                  'field': 'line_non_covered_paid_amount',
+                  'fmt': "{:6.2f}", }
+PT_D_XTRCT[35] = {'len': 5, 'type': "str",
+                  'field': 'line_contract_number', }
+PT_D_XTRCT[36] = {'len': 3, 'type': "str", 'field': 'pbp_id', }
+PT_D_XTRCT[37] = {'len': 9, 'type': "num", 'field': 'package_id',
+                  'fmt': "{:9.0f}", }
+PT_D_XTRCT[38] = {'len': 102, 'type': "str", 'field': 'filler', }
 
-#if settings.DEBUG:
+# if settings.DEBUG:
 #    print("Part D Extract Definition")
 #    print(PT_D_XTRCT)
 
 
 PT_D_DRUG_XTRCT = OrderedDict()
-PT_D_DRUG_XTRCT[0] = {'len': 11,  'type': "str", 'field': 'ndc_code',}
-PT_D_DRUG_XTRCT[1] = {'len': 100, 'type': "str", 'field': 'product_name',}
-PT_D_DRUG_XTRCT[2] = {'len': 30,  'type': "str", 'field': 'brand_name',}
-PT_D_DRUG_XTRCT[3] = {'len': 10,  'type': "str", 'field': 'drug_obsolete_dt',}
-PT_D_DRUG_XTRCT[4] = {'len': 40,  'type': "str", 'field': 'ahfs_desc',}
-PT_D_DRUG_XTRCT[5] = {'len': 1,   'type': "str", 'field': 'drug_form_code',}
-PT_D_DRUG_XTRCT[6] = {'len': 1,   'type': "str", 'field': 'brand_name_code',}
-PT_D_DRUG_XTRCT[7] = {'len': 12,  'type': "num", 'field': 'package_size_amount', 'fmt': "{:9.3f}",}
-PT_D_DRUG_XTRCT[8] = {'len': 195, 'type': "str", 'field': 'filler',}
+PT_D_DRUG_XTRCT[0] = {'len': 11, 'type': "str", 'field': 'ndc_code', }
+PT_D_DRUG_XTRCT[1] = {'len': 100, 'type': "str", 'field': 'product_name', }
+PT_D_DRUG_XTRCT[2] = {'len': 30, 'type': "str", 'field': 'brand_name', }
+PT_D_DRUG_XTRCT[3] = {'len': 10, 'type': "str",
+                      'field': 'drug_obsolete_dt', }
+PT_D_DRUG_XTRCT[4] = {'len': 40, 'type': "str", 'field': 'ahfs_desc', }
+PT_D_DRUG_XTRCT[5] = {'len': 1, 'type': "str", 'field': 'drug_form_code', }
+PT_D_DRUG_XTRCT[6] = {'len': 1, 'type': "str",
+                      'field': 'brand_name_code', }
+PT_D_DRUG_XTRCT[7] = {'len': 12, 'type': "num",
+                      'field': 'package_size_amount', 'fmt': "{:9.3f}", }
+PT_D_DRUG_XTRCT[8] = {'len': 195, 'type': "str", 'field': 'filler', }
 
 """
 # PROD_NDC_CD	X(11).
@@ -95,8 +131,8 @@ PT_D_DRUG_XTRCT[8] = {'len': 195, 'type': "str", 'field': 'filler',}
 # FILLER	X(195).
 """
 
-def home_index(request):
 
+def home_index(request):
     # Show UploaderHome Page
 
 
@@ -104,7 +140,8 @@ def home_index(request):
         print(settings.APPLICATION_TITLE, "in uploader.views.home_index")
 
     context = {}
-    return render_to_response('upload.html', RequestContext(request, context,))
+    return render_to_response('upload.html',
+                              RequestContext(request, context, ))
 
 
 def str_to_num(strn, fmt):
@@ -117,10 +154,10 @@ def str_to_num(strn, fmt):
 
     num_fmt = fmt[2:-2]
 
-    digits      = int(float(num_fmt))
-    decimals    = int((float(num_fmt) - digits)*10)
+    digits = int(float(num_fmt))
+    decimals = int((float(num_fmt) - digits) * 10)
     if settings.DEBUG:
-        print("Format", fmt, "[", num_fmt,"]")
+        print("Format", fmt, "[", num_fmt, "]")
         print("digits:", digits)
         print("decimals:", decimals)
 
@@ -130,13 +167,15 @@ def str_to_num(strn, fmt):
         ss = ss + s
         if ctr == digits:
             ss = ss + "."
-        ctr +=1
+        ctr += 1
 
     result = float(ss)
     return result
 
 
-def upload_part_d_weekly(request, file_name="/Users/mark/PycharmProjects/bbofu/bbofuser/sitestatic/week_extract.txt", chunkSize=400):
+def upload_part_d_weekly(request,
+                         file_name="/Users/mark/PycharmProjects/bbofu/bbofuser/sitestatic/week_extract.txt",
+                         chunkSize=400):
     """
     receive file_name as reference
     Open file
@@ -155,8 +194,7 @@ def upload_part_d_weekly(request, file_name="/Users/mark/PycharmProjects/bbofu/b
 
     if settings.DEBUG:
         print("Processing Part D Weekly Extract")
-        print("file:",file_name)
-
+        print("file:", file_name)
 
     for line in fileinput.input([file_name]):
         process_line(line, PT_D_XTRCT)
@@ -167,7 +205,9 @@ def upload_part_d_weekly(request, file_name="/Users/mark/PycharmProjects/bbofu/b
     return
 
 
-def upload_drug_extract(request, file_name="/Users/mark/PycharmProjects/bbofu/bbofuser/sitestatic/week_drug_extract.txt", chunkSize=400):
+def upload_drug_extract(request,
+                        file_name="/Users/mark/PycharmProjects/bbofu/bbofuser/sitestatic/week_drug_extract.txt",
+                        chunkSize=400):
     """
     receive file_name as reference
     Open file
@@ -189,7 +229,7 @@ def upload_drug_extract(request, file_name="/Users/mark/PycharmProjects/bbofu/bb
 
     if settings.DEBUG:
         print("Processing Drug Extract")
-        print("file:",file_name)
+        print("file:", file_name)
 
     for line in fileinput.input([file_name]):
         m = process_line(line, PT_D_DRUG_XTRCT)
@@ -200,13 +240,11 @@ def upload_drug_extract(request, file_name="/Users/mark/PycharmProjects/bbofu/bb
             is_brand = "false"
 
         context = {'m': m,
-               'is_brand': is_brand}
+                   'is_brand': is_brand}
 
         # DONE: Create template and merge data for line item
-        xml_upload = render_to_string('uploader/medication.format.xml', context)
-
-
-
+        xml_upload = render_to_string('uploader/medication.format.xml',
+                                      context)
 
     if settings.DEBUG:
         print(xml_upload)
@@ -236,7 +274,7 @@ def process_line(file_line, format_dict):
         else:
             offset_end = offset_start + 1
 
-        print(k,":", v['field'], "type:", v['type'], " ", end="")
+        print(k, ":", v['field'], "type:", v['type'], " ", end="")
         s = str(file_line)[offset_start:offset_end]
 
         if v['type'].lower() == "date":
@@ -245,7 +283,7 @@ def process_line(file_line, format_dict):
                 fmt = v['fmt']
             else:
                 fmt = "%Y %m %d"
-            #dt = to_datetime(year=int(s[0:4]), month=int(s[4:6]), day=int(s[6:8]))
+            # dt = to_datetime(year=int(s[0:4]), month=int(s[4:6]), day=int(s[6:8]))
             dt = ""
             dt = datetime.strptime(s, fmt)
             print(dt)
@@ -259,9 +297,9 @@ def process_line(file_line, format_dict):
                 fmt = "{:%s.0f}" % len(s)
 
             num = str_to_num(s, fmt)
-            print ("Number", num)
+            print("Number", num)
 
-            result[v['field']] =  num
+            result[v['field']] = num
 
         else:
             print(s)
@@ -276,12 +314,8 @@ def process_line(file_line, format_dict):
             offset_start = offset_start + 1
             offset_end = offset_start
 
-        # DONE: Build dictionary to return
+            # DONE: Build dictionary to return
 
     print(result)
 
     return result
-
-
-
-

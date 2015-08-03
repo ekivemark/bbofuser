@@ -4,17 +4,22 @@
 {% block title %}{% trans "Log in" %}{% endblock %}
 {% block pagename %}Log in{% endblock %}
 {% block content %}
-<form method="post" action="">
-    {% csrf_token %}
-    {{ form.as_p }}
-     <input type="submit" class="active btn btn-lg btn-success" name="login" value="{% trans 'Login' %}" />
-    <input type="submit" class="active btn btn-lg btn-fail" name="login" value="{% trans 'Resend Code' %}" />
+    <form method="post" action="">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" class="active btn btn-lg btn-success"
+               name="login" value="{% trans 'Login' %}"/>
+        <input type="submit" class="active btn btn-lg btn-fail"
+               name="login" value="{% trans 'Resend Code' %}"/>
 
-    <input type="hidden" name="next" value="{{ next }}" />
-</form>
+        <input type="hidden" name="next" value="{{ next }}"/>
+    </form>
 
-<p>{% trans "Forgot your password?" %} <a href="{% url 'password_reset' %}">{% trans "Reset it" %}</a>.</p>
-<p>{% trans "Not a member?" %} <a href="{% url 'register' %}">{% trans "Register" %}</a>.</p>
+    <p>{% trans "Forgot your password?" %} <a
+            href="{% url 'password_reset' %}">{% trans "Reset it" %}</a>.
+    </p>
+    <p>{% trans "Not a member?" %} <a
+            href="{% url 'register' %}">{% trans "Register" %}</a>.</p>
 {% endblock %}
 
 

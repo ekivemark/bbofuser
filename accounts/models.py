@@ -17,26 +17,22 @@ Models for bbonfhir Users
 
 """
 import random
+from datetime import datetime, timedelta
+from uuid import uuid4
+
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.auth.models import (
     User, BaseUserManager, AbstractBaseUser)
-
 from django.contrib.auth.signals import user_logged_out
-from datetime import date, datetime, timedelta
 from django.utils import timezone
-from django.utils.timezone import make_aware
-from stdnum.us.itin import is_valid
-
-from django.contrib import auth
 from django.contrib.auth.models import AbstractBaseUser
-from accounts.utils import strip_url, CARRIER_EMAIL_GATEWAY, CARRIER_SELECTION, \
-    cell_email, send_sms_pin
 from phonenumber_field.modelfields import PhoneNumberField
 
-from uuid import uuid4
+from accounts.utils import CARRIER_SELECTION, \
+    cell_email, send_sms_pin
+
 
 # Extending Application with OAuth Toolkit
 from oauth2_provider.models import AbstractApplication
@@ -48,15 +44,16 @@ from oauth2_provider.models import AbstractApplication
 # TODO: Remove Organization
 # TODO: Remove Application until we work out beneficiary application link
 
-USERTYPE_CHOICES =(('owner','Account Owner'))
+USERTYPE_CHOICES = (('owner', 'Account Owner'))
 
-USER_ROLE_CHOICES = (('primary','Account Owner'),
+USER_ROLE_CHOICES = (('primary', 'Account Owner'),
                      ('backup', 'Backup Owner'),
                      ('none', 'NONE'),
                      )
 
-#class Application(models.Model):
-#@login_required()
+
+# class Application(models.Model):
+# @login_required()
 class Application(AbstractApplication):
     # Application keys
     # owner = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -118,7 +115,6 @@ class UserManager(BaseUserManager):
         user.is_staff = True
         user.save(using=self._db)
         if settings.DEBUG == True:
-
             print("%s, active=%s,admin=%s, %s" % (user.email,
                                                   user.is_active,
                                                   user.is_admin,
@@ -160,7 +156,7 @@ class User(AbstractBaseUser):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name',]
+    REQUIRED_FIELDS = ['first_name', 'last_name', ]
 
     def get_full_name(self):
         # The user is identified by their email address
@@ -170,7 +166,7 @@ class User(AbstractBaseUser):
         # The user is identified by their email address
         return self.email
 
-    #def __str__(self):              # __unicode__ on Python 2
+    # def __str__(self):              # __unicode__ on Python 2
     #    return self.email
 
     def has_perm(self, perm, obj=None):
@@ -189,8 +185,8 @@ class User(AbstractBaseUser):
     #     # Simplest possible answer: All admins are staff
     #     return self.is_admin
 
-    def __str__(self):                      # __unicode__ on Python 2
-       #return "%s %s (%s)" % (self.first_name,
+    def __str__(self):  # __unicode__ on Python 2
+        # return "%s %s (%s)" % (self.first_name,
         #                       self.last_name,
         #                       self.email)
         return str(self.email)
@@ -201,17 +197,17 @@ class User(AbstractBaseUser):
 
 
 def alertme(sender, user, request, **kwargs):
-    print("USER LOGGED OUT!") #or more sophisticated logging
+    print("USER LOGGED OUT!")  # or more sophisticated logging
+
 
 user_logged_out.connect(alertme)
 
 
 class ValidSMSCode(models.Model):
-    user               = models.ForeignKey(settings.AUTH_USER_MODEL)
-    sms_code           = models.CharField(max_length=4, blank=True)
-    expires            = models.DateTimeField(default=datetime.now)
-    send_outcome       = models.CharField(max_length=250, blank=True)
-
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    sms_code = models.CharField(max_length=4, blank=True)
+    expires = models.DateTimeField(default=datetime.now)
+    send_outcome = models.CharField(max_length=250, blank=True)
 
     def __str__(self):
         return '%s for user %s expires at %s' % (self.sms_code,
@@ -219,8 +215,8 @@ class ValidSMSCode(models.Model):
                                                  self.expires)
 
     def save(self, **kwargs):
-        up=self.user
-        rand_code=random.randint(1000,9999)
+        up = self.user
+        rand_code = random.randint(1000, 9999)
         if not self.sms_code:
             if up.mobile != '+19999999999':
                 self.sms_code = rand_code
@@ -235,10 +231,10 @@ class ValidSMSCode(models.Model):
 
         if up.mfa:
             new_number = cell_email(up.mobile, up.carrier)
-            #send an sms code
+            # send an sms code
             self.send_outcome = send_sms_pin(up.mobile,
                                              new_number,
-                                             self.sms_code )
+                                             self.sms_code)
         else:
             self.send_outcome = ''
         super(ValidSMSCode, self).save(**kwargs)
@@ -252,9 +248,9 @@ class Crosswalk(models.Model):
 
     """
 
-    user         = models.ForeignKey(settings.AUTH_USER_MODEL)
-    guid         = models.CharField(max_length=40)
-    hicn         = models.CharField(max_length=40)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    guid = models.CharField(max_length=40)
+    hicn = models.CharField(max_length=40)
     date_created = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
@@ -271,7 +267,6 @@ class Crosswalk(models.Model):
             self.guid = uid
 
         super(Crosswalk, self).save(*args, **kwargs)
-
 
     def __str__(self):
         return "%s %s[%s]" % (self.user.first_name,

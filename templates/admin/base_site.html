@@ -3,32 +3,39 @@
 {% load url from future %}
 {% load i18n %}
 ]
-{% block title %}{{ APPLICATION_TITLE }} | {{ title }} | {% trans 'Django site admin' %}{% endblock %}
+{% block title %}{{ APPLICATION_TITLE }} | {{ title }} |
+    {% trans 'Django site admin' %}{% endblock %}
 {% block extrahead %}
     <meta charset="utf-8">
-       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ APPLICATION_TITLE }}</title>
     <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="{%  static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'bootstrap/css/bootstrap.min.css' %}">
 
 
-    <link href="fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet" type="text/css" />
-    <link href="netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link href="fonts.googleapis.com/css?family=Open+Sans:300,400,600"
+          rel="stylesheet" type="text/css"/>
+    <link href="netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css"
+          rel="stylesheet">
 
-    <link rel="shortcut icon" href="{% static 'img/layout/favicon.png' %}" type="image/x-icon">
+    <link rel="shortcut icon" href="{% static 'img/layout/favicon.png' %}"
+          type="image/x-icon">
 
 {% endblock %}
-{% block content_title%}
-HELLO World
-    <a href="{% url 'home' %}"><img src="{% static 'img/layout/favicon.png' %}" width="60">{{ APPLICATION_TITLE }}</a>
+{% block content_title %}
+    HELLO World
+    <a href="{% url 'home' %}"><img
+            src="{% static 'img/layout/favicon.png' %}"
+            width="60">{{ APPLICATION_TITLE }}</a>
     <a href="{% url 'admin:index' %}">{% trans 'Site Administration' %}site</a>
 
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
-    <!-- Add scripts at end of page for faster loading -->
+<!-- Add scripts at end of page for faster loading -->
 
-    <!-- Optional: Include the jQuery library -->
-    <script src="{% static 'js/jquery-1.8.1.min.js' %}"></script>
-    <!-- Optional: Incorporate the Bootstrap JavaScript plugins -->
-    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+<!-- Optional: Include the jQuery library -->
+<script src="{% static 'js/jquery-1.8.1.min.js' %}"></script>
+<!-- Optional: Incorporate the Bootstrap JavaScript plugins -->
+<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>

@@ -12,8 +12,8 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.template import RequestContext
-from django.db.models import Q
-from accounts.models import User, Application
+
+from accounts.models import Application
 from accounts.forms.application import Application_EditForm
 
 __author__ = 'Mark Scrimshire:@ekivemark'
@@ -21,18 +21,16 @@ __author__ = 'Mark Scrimshire:@ekivemark'
 
 @login_required()
 def application_edit(request, pk):
-
     if settings.DEBUG:
         print(request.user)
         print("Entering Application Edit with:%s" % pk)
 
-
     a = Application.objects.get(pk=pk)
 
     if settings.DEBUG:
-        print("Application:",a)
+        print("Application:", a)
 
-    form = Application_EditForm(data = request.POST or None, instance=a)
+    form = Application_EditForm(data=request.POST or None, instance=a)
 
     if request.POST:
         form = Application_EditForm(request.POST)
@@ -45,7 +43,8 @@ def application_edit(request, pk):
 
             a.redirect_uris = form.cleaned_data['redirect_uris']
             a.client_type = form.cleaned_data['client_type']
-            a.authorization_grant_type = form.cleaned_data['authorization_grant_type']
+            a.authorization_grant_type = form.cleaned_data[
+                'authorization_grant_type']
             a.skip_authorization = form.cleaned_data['skip_authorization']
 
             # Update Fields above
@@ -62,20 +61,19 @@ def application_edit(request, pk):
 
             messages.error(request, "There was an input problem.")
             return render(request, 'accounts/application_edit.html',
-                          {'form':form,'application': a.name,})
+                          {'form': form, 'application': a.name, })
 
     else:
         a = Application.objects.get(pk=pk)
 
         if settings.DEBUG:
-            print("in the get with Organization:",a.name," ", a.name,)
+            print("in the get with Organization:", a.name, " ", a.name, )
         form = Application_EditForm(initial={'client_type': a.client_type,
-                                                'authorization_grant_type': a.authorization_grant_type,
-                                                'redirect_uris':a.redirect_uris,
-                                                'skip_authorization': a.skip_authorization,})
+                                             'authorization_grant_type': a.authorization_grant_type,
+                                             'redirect_uris': a.redirect_uris,
+                                             'skip_authorization': a.skip_authorization, })
         if settings.DEBUG:
             print("Not in the post in the get")
         return render(request, 'accounts/application_edit.html',
-                                                 {'form': form,
-                                                  'application': a.name})
-
+                      {'form': form,
+                       'application': a.name})

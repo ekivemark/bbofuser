@@ -1,49 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
- <head>
-        <title>
-        {% block pretitle %}{%  endblock %}
+<head>
+    <title>
+        {% block pretitle %}{% endblock %}
         {% block title %} {{ APPLICATION_TITLE }} {% endblock %}
-        </title>
-	
+    </title>
+
     {% block head %}
         {% include "include/head.html" %}
     {% endblock %}
 
     {% block extra_head %}
     {% endblock %}
-    
-  </head>
-  <body>
-        {% include "include/top-nav.html" %}
 
-        {% comment %}<div class="alert alert-danger">
+</head>
+<body>
+{% include "include/top-nav.html" %}
+
+{% comment %}<div class="alert alert-danger">
             <strong>Upcoming Downtime</strong> CMS's BlueButton APIs will be inaccessible Saturday, August 9th from 8AM - 9AM ET.
             We apologize for the inconvenience. <a href="mailto:support@bbonfhir.com">Contact us</a> with any questions.
         </div>{% endcomment %}
 
-         <div id="messages">
-      {% if messages %}
+<div class="container">
+    <div id="messages">
+    {% if messages %}
         {% for message in messages %}
-          <div class="alert alert-{{message.tags}}">
-            <a class="close" data-dismiss="alert">×</a>
-            {{message}}
-          </div>
+            <div class="alert alert-{{ message.tags }}">
+                <a class="close" data-dismiss="alert">×</a>
+                {{ message }}
+            </div>
         {% endfor %}
-      {% endif %}
+    {% endif %}
     </div>
-       
-        <div class="container">
-      <h2>{% block pagename %}{% endblock %}</h2>
-      {% block content %}
+</div>
+<div class="container">
+    <h1>{% block pagename %}{% endblock %}</h1>
+    {% block content %}
 
         {% if template %}{% include template %}{% endif %}
         {{ content|safe }}
-      {% endblock %}
-    </div>
-                        
-        {% include "include/footer.html" %}
+    {% endblock %}
+</div>
 
-  </body>
+{% include "include/footer.html" %}
+
+</body>
 
 </html>
