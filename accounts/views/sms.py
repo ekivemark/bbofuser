@@ -68,13 +68,13 @@ def validate_ldap_user(request, email):
         if settings.DEBUG:
             print("LDAP Server", settings.AUTH_LDAP_SERVER_URI, "is Down")
         messages.error(request,
-                       "MyMedicare.gov is unable to Log you in at this time. Please try later.")
+                       "We are unable to unable to confirm your email address at this time. Please try again later.")
         result = "ERROR"
     except ldap.LDAPError:
         if settings.DEBUG:
             print("LDAP Server error:", settings.AUTH_LDAP_SERVER_URI)
         messages.error(request,
-                       "We had a problem reaching MyMedicare.gov. Please try later.")
+                       "We had a problem reaching MyMedicare.gov. Please try again later.")
         result = "ERROR"
 
     return result
@@ -94,10 +94,23 @@ def validate_user(request, email):
     if settings.DEBUG:
         print("ldap email:", result)
     # step 2 is to look up email in accounts.User
-    if result.lower() == email.lower():
-        email_match = True
-    else:
+
+    if result == "ERROR":
+        # There was a problem with reaching the LDAP Server
+        if settings.DEBUG:
+            print("ldap email returned error")
         email_match = False
+    else:
+        print("LDAP Returned:", result)
+        # We got something back from LDAP so we check it for a match
+        if result.lower() == email.lower():
+            email_match = True
+        else:
+            email_match = False
+            # Set an error message
+            messages.error(request,
+                        "Your email address was not recognized. Do you need to register?")
+
     if settings.DEBUG:
         print("Match?:", email_match)
 
@@ -260,8 +273,8 @@ def sms_code(request):
         if form.is_valid():
             if not validate_user(request, form.cleaned_data['email']):
                 request.session['email'] = ""
-                messages.error(request,
-                               "Email address not recognized. Do you need to register?")
+                # WE had a problem
+                # Message error was set in validate_user function
                 status = "Email UnRecognized"
                 return HttpResponseRedirect(reverse('accounts:sms_code'))
             else:
@@ -334,7 +347,7 @@ def sms_code(request):
                 print("invalid form")
             form.email = email
 
-            return render_to_response('accounts/login.html',
+            return render_to_response('accounts/smscode.html',
                                       RequestContext(request,
                                                      {'form': form}))
     else:

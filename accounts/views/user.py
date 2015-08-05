@@ -19,7 +19,57 @@ from django.views.generic.edit import *
 from django.core.urlresolvers import *
 from django.shortcuts import (render)
 
-from accounts.forms.user import User_EditForm
+from accounts.forms.user import (User_EditForm, Verify_Mobile)
+from accounts.views.sms import ValidSMSCode
+from accounts.models import ValidSMSCode
+
+@login_required()
+def verify_phone(request):
+    # Verify Mobile Phone for Multi-Factor Authentication
+
+    status = ""
+
+    u = User.objects.get(email=request.user.email)
+    form = Verify_Mobile()
+    if settings.DEBUG:
+        print("In accounts.views.user.verify_phone")
+        print("User:", u)
+
+    if request.POST:
+        form = Verify_Mobile(request.POST)
+        if form.is_valid():
+            vc = ValidSMSCode.objects.get(user=u, sms_code=form.cleaned_data['verify_code'])
+            if settings.DEBUG:
+                print("compare codes",
+                      vc.sms_code,"|",
+                      form.cleaned_data['verify_code'],
+                      )
+            if form.cleaned_data['verify_code'] == vc.sms_code:
+                if settings.DEBUG:
+                    print("Codes Match:", vc)
+                u.verified_mobile = True
+                u.save()
+                return HttpResponseRedirect(reverse('accounts:manage_account'),
+                                        RequestContext(request))
+
+    else:
+        form = Verify_Mobile()
+        trigger = ValidSMSCode.objects.create(user=u)
+        if str(trigger.send_outcome).lower() != "fail":
+            messages.success(request,
+                         "A Verification message was sent to your mobile phone.")
+            status = "Text Message Sent"
+        else:
+            messages.error(request,
+                       "There was a problem sending your pin code. Please try again.")
+            status = "Send Error"
+
+        if settings.DEBUG:
+            print("Trigger in the GET:", trigger)
+
+    return render(request, 'accounts/verify_code.html',
+                      {'form': form,
+                       'email': u.email})
 
 
 @login_required()
@@ -46,7 +96,12 @@ def user_edit(request):
             u.last_name = form.cleaned_data['last_name']
             u.mobile = form.cleaned_data['mobile']
             u.carrier = form.cleaned_data['carrier']
-            u.mfa = form.cleaned_data['mfa']
+            if u.verified_mobile == True:
+                # Only set MFA is verified_mobile is True
+                # verified_mobile is set in verify_phone()
+                u.mfa = form.cleaned_data['mfa']
+            else:
+                u.mfa = False
             if settings.DEBUG:
                 print("Updated to:", u)
             u.save()

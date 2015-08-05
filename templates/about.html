@@ -5,10 +5,17 @@
  {% block extra_head %} {% endblock %}
  {% block pagename %}About{% endblock %}
  {% block content %}
+     <div class="container">
+        <ul class="breadcrumb">
+            <li><a href="{% url 'home' %}">Home</a></li>
+
+            <li class="active">About BlueButton</li>
+        </ul>
+    </div>
 
      <div class="row">
          <div class="col-md-12">
-             <h1 contenteditable="true">Put Your Medicare Claims Information to Work For You</h1>
+             <h2 contenteditable="true">Put Your Medicare Claims Information to Work For You</h2>
          </div>
      </div>
 <div class="section">

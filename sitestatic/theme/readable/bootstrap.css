@@ -22,6 +22,10 @@ body {
   /* Adding padding to allow for top-navbar
      We don't want to overwrite the top of the page */
   padding-top: 70px;
+  /* Adding padding to allow for fixed navbar-bottom
+     We don't want to overwrite the bottom of the page */
+
+  padding-bottom: 70px;
 }
 article,
 aside,
@@ -5152,6 +5156,19 @@ a.thumbnail.active {
 .alert-danger .alert-link {
   color: #e6e6e6;
 }
+/* Added alert-error to allow error tags to work in message framework */
+.alert-error {
+  background-color: #d9534f;
+  border-color: #d9534f;
+  color: #ffffff;
+}
+.alert-error hr {
+  border-top-color: #d43f3a;
+}
+.alert-error .alert-link {
+  color: #e6e6e6;
+}
+/* End of alert-error format for message framework */
 @-webkit-keyframes progress-bar-stripes {
   from {
     background-position: 40px 0;
@@ -6915,4 +6932,21 @@ legend {
 }
 .modal .close {
   color: #333333;
+}
+
+.hover-container {
+    position: relative;
+}
+
+
+/* Experiment with Hover equivalent of tooltip*/
+.hover-content {
+    position: absolute;
+    bottom: -10px;
+    right: 10px;
+    display: none;
+}
+
+.hover-container:hover .hover-content {
+    display: block;
 }

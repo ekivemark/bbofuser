@@ -8,6 +8,10 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from accounts.models import (User, ValidSMSCode, Application)
 
 
+# TODO: Fix Admin Panels - Bootstrap Layout is not fully functional
+# TODO: Add Admin Breadcrumbs?
+# TODO: Allow record to be added to empty database
+
 # Account
 
 class UserCreationForm(forms.ModelForm):

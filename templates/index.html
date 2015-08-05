@@ -9,6 +9,11 @@
 {% block pagename %}Welcome{% endblock %}
 {% block content %}
 
+    <div class="container">
+        <ul class="breadcrumb">
+            <li class="active">Home</li>
+        </ul>
+    </div>
     <div class="hero-unit">
 
         <h2>{{ settings.APPLICATION_TITLE }}</h2>
@@ -17,13 +22,13 @@
                 <p>
                  {% if user.is_authenticated %}
                     <a href="{% url 'accounts:manage_account' %}"
-                       class="btn btn-primary btn-large">Manage Your
-                        Account</a>
+                       class="btn btn-primary btn-large">
+                        <i class="fa fa-lock fa-2x"></i>  Manage Your Account</a>
                 {% else %}
-                    <a href="{% url "accounts:sms_code" %}?next=/"><input
+                    <a href="{% url "accounts:sms_code" %}?next=/"><i class="fa fa-unlock fa-3x" style="color:green"></i><input
                             type="button"
                             class="active btn btn-large btn-success"
-                            value="{% trans "login" %}"/></a>
+                            value="{% trans " login " %}"/></a>
                 {% endif %}
                 </p>
             <div class="col-md-8">

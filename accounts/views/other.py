@@ -30,6 +30,8 @@ from accounts.forms.register import RegistrationForm
 from accounts.forms.application import (ApplicationCheckForm)
 from accounts.admin import UserCreationForm
 from accounts.utils import cell_email
+from apps.device.models import Device
+from apps.secretqa.models import QA
 
 
 def login(request):
@@ -160,10 +162,26 @@ def manage_account(request):
     user = request.user
     mfa_address = cell_email(user.mobile, user.carrier)
 
-    app_list = list(Application.objects.filter(user=user))
+    dev_list = list(Device.objects.filter(user_id=request.user))
+
+    try:
+        secretqa = QA.objects.get(user=request.user)
+    except QA.DoesNotExist:
+        secretqa = None
+    if settings.DEBUG:
+        print("secretqa-QA",secretqa)
+
+    if secretqa == None:
+        security_mode = "add"
+    else:
+        security_mode = "edit"
+
+    security_list = secretqa
     context = {"user": user,
                "mfa_address": mfa_address,
-               "applications": app_list}
+               "devices": dev_list,
+               'security_mode': security_mode,
+               "security": security_list}
 
     return render_to_response('accounts/manage_account.html',
                               RequestContext(request, context, ))

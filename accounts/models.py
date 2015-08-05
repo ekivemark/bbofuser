@@ -30,8 +30,9 @@ from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser
 from phonenumber_field.modelfields import PhoneNumberField
 
-from accounts.utils import CARRIER_SELECTION, \
-    cell_email, send_sms_pin
+from accounts.utils import (CARRIER_SELECTION,
+                            cell_email,
+                            send_sms_pin)
 
 
 # Extending Application with OAuth Toolkit
@@ -40,9 +41,6 @@ from oauth2_provider.models import AbstractApplication
 # Create models here.
 
 # Pre-defined Values
-
-# TODO: Remove Organization
-# TODO: Remove Application until we work out beneficiary application link
 
 USERTYPE_CHOICES = (('owner', 'Account Owner'))
 
@@ -152,6 +150,7 @@ class User(AbstractBaseUser):
                                )
     # DONE: Add switch for Multi-factor Authentication via mobile
     mfa = models.BooleanField(default=False)
+    verified_mobile = models.BooleanField(default=False)
 
     objects = UserManager()
 
@@ -229,14 +228,14 @@ class ValidSMSCode(models.Model):
         expires = now + timedelta(minutes=settings.SMS_LOGIN_TIMEOUT_MIN)
         self.expires = expires
 
-        if up.mfa:
-            new_number = cell_email(up.mobile, up.carrier)
-            # send an sms code
-            self.send_outcome = send_sms_pin(up.mobile,
-                                             new_number,
-                                             self.sms_code)
-        else:
-            self.send_outcome = ''
+        # Removing mfa check.
+        # Only call ValidSMSCode is user.MFA is true or Verifying phone
+        new_number = cell_email(up.mobile, up.carrier)
+        # send an sms code
+        self.send_outcome = send_sms_pin(up.mobile,
+                                         new_number,
+                                         self.sms_code)
+
         super(ValidSMSCode, self).save(**kwargs)
 
 

@@ -233,7 +233,7 @@ def send_sms_pin(phone, email, pin):
     """
 
     subject = ""
-    msg = "%s login pin:%s" % (settings.APPLICATION_TITLE, pin)
+    msg = "%s pin:%s" % (settings.APPLICATION_TITLE, pin)
     from_email = settings.EMAIL_HOST_USER
     send_to = []
     send_to.append(email)

@@ -1,10 +1,15 @@
 """
- Developer Framework top level
+ BBofUser: Account Framework top level
+
 """
 from django.conf.urls import (patterns,
                               include,
                               url)
 from django.contrib import admin
+
+from accounts.views.user import (verify_phone, user_edit)
+from accounts.views.other import (manage_account, logout, login)
+from accounts.views.sms import (sms_code, sms_login)
 
 admin.autodiscover()
 
@@ -18,6 +23,8 @@ urlpatterns = patterns('',
                            name='logout'),
                        url(r'^$', 'accounts.views.home_index',
                            name='home'),
+                       url(r'verify_phone', 'accounts.views.user.verify_phone',
+                           name='verify_phone'),
                        url(r'^manage_account$',
                            'accounts.views.other.manage_account',
                            name='manage_account'),

@@ -300,7 +300,12 @@ a:focus {
 .navbar-static-top .container,
 .navbar-fixed-top .container,
 .navbar-fixed-bottom .container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     width: 940px;
+    height: 2em;
 }
 
 .span12 {

@@ -7,27 +7,41 @@
 
 {% block pagename %}Edit Profile ({{ email }}){% endblock %}
 {% block content %}
+       <div class="container">
+        <ul class="breadcrumb">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'accounts:manage_account' %}">My Dashboard</a></li>
+            <li class="active">Edit Profile</li>
+        </ul>
+    </div>
+
     <div class="section">
         <div class="container">
             <div class="row">
-                <form method="post" action=""
+                <form class="form-horizontal" method="post" action=""
                       xmlns="http://www.w3.org/1999/html">
+                    <fieldset>
+                        <div class="form-group">
+                            <div class="col-lg-6">
                     {% csrf_token %}
-                    <table>
-                        <tr>
-                            <td>
 
-                                {{ form.as_p }}
-
-                                <a href="{% url "accounts:manage_account" %}"><input
-                                        type="button" class="btn-danger"
-                                        value="Cancel"/></a>
-
-                                <input class="btn-success" type="submit"
-                                       value="Save"/>
-                            </td>
-                        </tr>
-                    </table>
+                                <table class="table table-hover table-striped">
+                                {{ form.as_table }}
+                                </table>
+                                <div class="row">
+                                    <div class="col-lg-10">
+                                        <input class="btn-success btn-lg" type="submit"
+                                            value="Save"/>
+                                    </div>
+                                    <div class="col-lg-2 right">
+                                        <a href="{% url "accounts:manage_account" %}"><input
+                                            type="button" class="btn-danger"
+                                            value="Cancel"/></a>
+                                    </div>
+                                </div>
+                             </div>
+                        </div>
+                    </fieldset>
                 </form>
 
             </div>
@@ -36,20 +50,6 @@
 
 
 
-    <div class="row clearfix">
-
-        <div class="col-md-12 column">
-            <!--- Template is in bbonfhiruser/templates/developer --->
-            <p>Close and Delete Account. All your application keys will be
-                deleted if you close your account.
-            </p>
-            {#  TODO: Link to Delete Account process  #}
-            <p> Apply for access to the CMS Live BlueButton API Platform.
-            </p>
-            {#  TODO: Link to Production Platform Access approval  #}
-            {#  DONE: Link to Manage Application Keys  #}
-        </div>
-    </div>
 
 
 {% endblock %}

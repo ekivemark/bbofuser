@@ -165,13 +165,14 @@ THIRD_PARTY_APPS = (
     'django_auth_ldap',
     'debug_toolbar',
     'ldap',
-
 )
 
 LOCAL_APPS = (
     # Add custom apps here
     'accounts',
     'apps.uploader',
+    'apps.device',
+    'apps.secretqa',
 )
 
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -381,13 +382,35 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 # SETTINGS EXPORT for django-settings-export context processor
 # Explicitly define settings to Export for use in {{ Template Values }}
+
+# GEt a file name that stores words we will use to create fake accounts
+WORD_LIST = parser.get('global', 'word_dictionary').strip()
+
+DEFAULT_VALID_DAYS = 365
+
+SECURITY_QUESTION_CHOICES = (
+    ('1', 'What is the name of your best friend?'),
+    ('2', 'What is the name of your first pet?'),
+    ('3', 'What was the color of your favorite car?'),
+    ('4', 'How did you go to the prom with?'),
+    ('5', 'What is the name of your favorite vacation spot?'),
+    ('6', 'What is your favorite magazine?'),
+    ('7', 'Who is your favorite Superhero?'),
+    ('8', 'Which is your favorite holiday season?'),
+    ('9', 'What is your favorite sport?'),
+    ('10','Who is your favorite sports star?'),
+)
+
 SETTINGS_EXPORT = [
     'DEBUG',
     'APPLICATION_TITLE',
     'EMAIL_HOST_USER',
+    'SECURITY_QUESTION_CHOICES',
 ]
 
+
 if DEBUG_SETTINGS:
+    print("WORD_LIST:%s" % WORD_LIST)
     print("SECRET_KEY:%s" % SECRET_KEY)
     print(
         "================================================================")

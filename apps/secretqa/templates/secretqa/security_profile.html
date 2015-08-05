@@ -1,0 +1,76 @@
+{% load i18n %}
+{% if user.is_authenticated %}
+    <div class="container-fluid">
+        <div class="row-fluid">
+            <div class="col-lg-10">
+                 <h2>Security Questions</h2>
+            </div>
+             <div class="col-lg-2 align-right">
+                    {#  security_mode = add or edit #}
+                    <a href="/security/{{ security_mode }}"
+                   class="btn btn-success">
+                    <i class="fa fa-pencil-square-o fa-1x"></i> {{ security_mode|capfirst }}</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+
+            <div class="list-group">
+
+                <a href="#" class="list-group-item">
+                    <h4 class="hover-container list-group-item-heading">Question 1: <i class="fa fa-eye fa-lg"></i>
+                        <div class="hover-content" style="font-style:italic">
+                                {{ security.answer_1 }}</div></h4>
+                    <p class="list-group-item-text">
+                        {{ security.get_question_1_display }}
+                    </p>
+                </a>
+
+                <a href="#" class="list-group-item">
+                    <h4 class="hover-container list-group-item-heading">Question 2:
+                        <i class="fa fa-eye fa-lg"></i>
+                        <div class="hover-content" style="font-style:italic">
+                                {{ security.answer_2 }}</div></h4>
+                    <p class="list-group-item-text">
+                        {{ security.get_question_2_display }}
+                    </p>
+                </a>
+                <a href="#" class="list-group-item">
+                    <h4 class="hover-container list-group-item-heading">Question 3:
+                        <i class="fa fa-eye fa-lg"></i>
+                        <div class="hover-content" style="font-style:italic">
+                                {{ security.answer_3 }}</div></h4>
+                    <p class="list-group-item-text">{% if security.question_3 %}
+                        {{ security.question_3 }}{% else %}[Not set]{% endif %}
+                    </p>
+                </a>
+                <a href="#" class="list-group-item">
+                    <h4 class="hover-container list-group-item-heading">Question 4:
+                        <i class="fa fa-eye fa-lg"></i>
+                        <div class="hover-content" style="font-style:italic">
+                                {{ security.answer_4 }}</div></h4>
+                    <p class="list-group-item-text">{% if security.question_4 %}
+                        {{ security.question_4 }}{% else %}[Not set]{% endif %}
+                    </p>
+                </a>
+                <a href="#" class="list-group-item">
+                    <h4 class="hover-container list-group-item-heading">Question 5:
+                        <i class="fa fa-eye fa-lg"></i>
+                        <div class="hover-content" style="font-style:italic">
+                                {{ security.answer_5 }}</div></h4>
+                    <p class="list-group-item-text">{% if security.question_5 %}
+                        {{ security.question_5 }}{% else %}[Not set]{% endif %}
+                    </p>
+                </a>
+
+             </div>
+
+    </div>
+
+    {%  include 'secretqa_answer.html' %}
+
+{% else %}
+
+{% endif %}
+

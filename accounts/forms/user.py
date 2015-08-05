@@ -20,3 +20,13 @@ class User_EditForm(forms.ModelForm):
                   'mobile',
                   'carrier',
                   'mfa', ]
+
+
+class Verify_Mobile(forms.Form):
+    # Mobile Verification Form
+
+    verify_code = forms.CharField(max_length=10)
+
+
+
+
