@@ -2,9 +2,7 @@
 {% load i18n %}
 
 {% block title %}{% trans "Log in - step 1" %}{% endblock %}
-{% block pagename %}Welcome{% endblock %}
-{% block content %}
-
+{% block breadcrumbs %}
     <div class="container">
         <ul class="breadcrumb">
             <li><a href="{% url 'home' %}">Home</a></li>
@@ -12,7 +10,9 @@
             <li class="active">Login</li>
         </ul>
     </div>
-
+{% endblock %}
+{% block pagename %}Welcome{% endblock %}
+{% block content %}
 
     <div class="login-box">
 

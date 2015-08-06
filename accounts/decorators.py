@@ -12,11 +12,14 @@ from functools import wraps
 
 from django.contrib.auth.decorators import (user_passes_test,
                                             PermissionDenied)
+from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 
+
+# USE THIS DECORATOR
 def session_master(func):
     # Is the account using the master profile or a device
     # request.session['auth_master'] only set on master account
@@ -29,6 +32,8 @@ def session_master(func):
 
             # print("Request session:", "NOT AUTH_MASTER")
             # No access from this account so send to a warning page
+            messages.error(request,"Access to this feature is not available \
+                                    from this account. Use Your Master Account")
             return HttpResponseRedirect(reverse('accounts:account_access'),
                                                 RequestContext(request,
                                                                *args,
@@ -37,6 +42,7 @@ def session_master(func):
 
 
 
+# Not working
 def session_master_required(function=None,
                             redirect_field_name=REDIRECT_FIELD_NAME, login_url=None):
     """

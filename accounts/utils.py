@@ -7,8 +7,8 @@ Created: 6/27/15 8:39 AM
 """
 __author__ = 'Mark Scrimshire:@ekivemark'
 
-from django.core.mail import send_mail
 from django.conf import settings
+from django.core.mail import send_mail
 
 # Carrier Selection shows carriers with their email address
 # All names must be unique

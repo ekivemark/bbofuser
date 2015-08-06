@@ -3,7 +3,6 @@ bbofuser:device
 FILE: views
 Created: 8/3/15 6:54 PM
 
-
 """
 __author__ = 'Mark Scrimshire:@ekivemark'
 
@@ -25,6 +24,9 @@ from django.shortcuts import (render,
                               redirect)
 from django.template import RequestContext
 
+from accounts.models import User
+from accounts.decorators import session_master
+
 from apps.device.models import Device
 from apps.device.forms import (Device_AuthenticationForm,
                                Device_EditForm,
@@ -36,9 +38,9 @@ from apps.device.utils import (get_phrase,
                                via_device,
                                Master_Account)
 
-from accounts.models import User
 
-
+@session_master
+@login_required
 def device_index(request):
     # Show Device Home Page
 
@@ -52,7 +54,8 @@ def device_index(request):
                               RequestContext(request, context, ))
 
 
-@login_required()
+@session_master
+@login_required
 def device_add(request):
 
     if settings.DEBUG:
@@ -104,7 +107,8 @@ def device_add(request):
                   )
 
 
-@login_required()
+@session_master
+@login_required
 def device_edit(request, pk):
     if settings.DEBUG:
         print(request.user)
@@ -170,7 +174,8 @@ def device_edit(request, pk):
                       {'form': form,
                        'device': d})
 
-
+@session_master
+@login_required
 def Device_Delete(request, pk):
     """
     We will not delete. Instead we will flag as deleted.
@@ -306,7 +311,3 @@ def Device_Login(request, *args, **kwargs):
 
     return render_to_response('device/device_login.html', {'form': form},
                               RequestContext(request))
-
-
-
-

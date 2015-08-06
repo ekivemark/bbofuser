@@ -13,29 +13,42 @@ from accounts.views.sms import (sms_code, sms_login)
 
 admin.autodiscover()
 
+# DONE: Identify Modules that require accounts.session_master decorator
 urlpatterns = patterns('',
                        # Examples:
-                       url(r'^login$', 'accounts.views.sms.sms_login',
+                       url(r'^login$',
+                           'accounts.views.sms.sms_login',
                            name='login'),
-                       url(r'smscode/', 'accounts.views.sms.sms_code',
+                       url(r'smscode/',
+                           'accounts.views.sms.sms_code',
                            name='sms_code'),
-                       url(r'^logout$', 'accounts.views.logout',
+                       url(r'^logout$',
+                           'accounts.views.logout',
                            name='logout'),
-                       url(r'^$', 'accounts.views.home_index',
+                       url(r'^$',
+                           'accounts.views.home_index',
                            name='home'),
-                       url(r'verify_phone', 'accounts.views.user.verify_phone',
+                       # DONE: apply session_master
+                       url(r'verify_phone',
+                           'accounts.views.user.verify_phone',
                            name='verify_phone'),
+                        # DONE: apply session_master
                        url(r'^manage_account$',
                            'accounts.views.other.manage_account',
                            name='manage_account'),
+                       # DONE: apply session_master
                        url(r'^connect_application$',
                            'accounts.views.connect_application',
                            name='connect_application'),
-                       url(r'^user/edit$', 'accounts.views.user.user_edit',
+                       # DONE: apply session_master
+                       url(r'^user/edit$',
+                           'accounts.views.user.user_edit',
                            name='user_edit'),
+                       # DONE: apply session_master
                        url(r'^user/account_access$',
                            'accounts.views.user.account_access',
                            name='account_access'),
+                       # DONE: apply session_master
                        url(r'^application/edit/(?P<pk>[-\w]+)/$',
                            'accounts.views.organization.application_edit',
                            name='application_edit'),

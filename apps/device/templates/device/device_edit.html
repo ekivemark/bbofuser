@@ -2,13 +2,8 @@
 {% load i18n %}
 {% block pretitle %}Edit A Device{% endblock %}
 {% block extra_head %}
-
-
 {% endblock %}
-
-{% block pagename %}Edit Device{% endblock %}
-{% block content %}
-
+{% block breadcrumbs %}
     <div class="container">
         <ul class="breadcrumb">
             <li><a href="{% url 'home' %}">Home</a></li>
@@ -16,8 +11,9 @@
             <li class="active">Edit Device</li>
         </ul>
     </div>
-
-
+{% endblock %}
+{% block pagename %}Edit Device{% endblock %}
+{% block content %}
 
     <div class="container col-lg-8 well">
         <form method="post" action="" xmlns="http://www.w3.org/1999/html">

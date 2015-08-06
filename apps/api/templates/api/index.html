@@ -1,20 +1,22 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load staticfiles %}
-{% block pretitle %}{% endblock %}
+{% block pretitle %}Welcome to the {% endblock %}
+{% block title %}{{ settings.APPLICATION_TITLE }} API{% endblock %}
 {% block extra_head %}
 {% endblock %}
-
-{% block pagename %}{{ settings.APPLICATION_TITLE }} | API{% endblock %}
-{% block content %}
-
+{% block breadcrumbs %}
     <div class="container">
         <ul class="breadcrumb">
             <li>Home</li>
-            <li><a hef="{% url 'api:home' %}">API</a></li>
+            <li><a href="{% url 'api:home' %}">API</a></li>
 
         </ul>
     </div>
+{% endblock %}
+{% block pagename %}{{ settings.APPLICATION_TITLE }} | API{% endblock %}
+{% block content %}
+
     <div class="hero-unit">
 
         <h2>{{ settings.APPLICATION_TITLE }} API</h2>

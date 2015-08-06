@@ -20,8 +20,11 @@ html {
 body {
   margin: 0;
   /* Adding padding to allow for top-navbar
-     We don't want to overwrite the top of the page */
-  padding-top: 70px;
+     We don't want to overwrite the top of the page
+
+     # DONE: Adding padding for breadcrumbs too
+      */
+  padding-top: 100px;
   /* Adding padding to allow for fixed navbar-bottom
      We don't want to overwrite the bottom of the page */
 

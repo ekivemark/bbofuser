@@ -2,18 +2,11 @@
  Developer views
  (c) 2015 - Mark Scrimshire - @ekivemark
 """
+__author__ = 'Mark Scrimshire:@ekivemark'
 
 # DONE Activate Account
-# TODO: Manage Account
-# TODO: Delete Account
-# TODO: Manage Organization
-# TODO: Request Application Credentials
-# TODO: Manage Application Credentials
-# TODO: Delete Application Credentials
 # DONE: accounts/profile Landing Page.
 
-# Work flow will use django-registration to enable Account sign up
-# After Activation
 from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, redirect
@@ -24,17 +17,19 @@ from django.contrib.auth import (login as django_login,
                                  logout as django_logout)
 from django.views.generic.detail import DetailView
 
-from accounts.models import Application
-from accounts.forms.authenticate import AuthenticationForm
-from accounts.forms.register import RegistrationForm
-from accounts.forms.application import (ApplicationCheckForm)
 from accounts.admin import UserCreationForm
-from accounts.utils import cell_email
-from apps.device.models import Device
-from apps.device.utils import Master_Account
-from apps.secretqa.models import QA
 from accounts.decorators import (session_master,
                                  session_master_required)
+from accounts.forms.application import (ApplicationCheckForm)
+from accounts.forms.authenticate import AuthenticationForm
+from accounts.forms.register import RegistrationForm
+from accounts.models import Application
+from accounts.utils import cell_email
+
+from apps.device.models import Device
+from apps.device.utils import Master_Account
+
+from apps.secretqa.models import QA
 
 
 def login(request):
@@ -200,7 +195,8 @@ def manage_account(request):
 # DONE: Add view to accounts/urls.py
 
 
-@login_required()
+@session_master
+@login_required
 def connect_application(request):
     """
     Connect application to Organization and User
@@ -256,6 +252,7 @@ def connect_application(request):
                               context,
                               context_instance=RequestContext(request))
 
-
+@session_master
+@login_required
 class Application_Detail(DetailView):
     model = Application

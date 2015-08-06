@@ -2,29 +2,27 @@
 {% load i18n %}
 {% load staticfiles %}
 {% load url from future %}
-{% block pretitle %}{% endblock %}
+{% block pretitle %}{{ settings.APPLICATION_TITLE }}:API - Access Issue{% endblock %}
 {% block extra_head %}
 {% endblock %}
-
-{% block pagename %}Welcome{% endblock %}
-{% block content %}
-
+{%  block breadcrumbs %}
     <div class="container">
         <ul class="breadcrumb">
             <li class="active">Home</li>
+            <li><a href="{% url 'api:home' %}">API</a></li>
+            <li class="active">Access Warning</li>
         </ul>
     </div>
+{%  endblock %}
+
+{% block pagename %}{{ settings.APPLICATION_TITLE }}:Access Issue{% endblock %}
+{% block content %}
+
+
     <div class="hero-unit">
 
-        <h2>{{ settings.APPLICATION_TITLE }}</h2>
-
         <div class="container-fluid">
-                <p>
-                    <a href="{% url "accounts:sms_code" %}?next=/"><i class="fa fa-unlock fa-3x" style="color:green"></i><input
-                            type="button"
-                            class="active btn btn-large btn-success"
-                            value="{% trans " login " %}"/></a>
-                </p>
+
             <div class="col-md-8">
                 <p>
                     You must login with your master account in order to
@@ -35,15 +33,19 @@
                 <p>
                     This restriction is applied as a security protection
                     for your account information.
-
-                    <p>
-                        You are currently using the following device account:
-                    </p>
+                </p>
+                <p>
+                    You are currently using the following device account:
+                </p>
                     <div class="jumbotron">
                         <h2>[ {{ request.session.auth_device }} ]</h2>
                     </div>
-
-                    </p>
+                <p>
+                    <a href="{% url "accounts:sms_code" %}?next=/"><i class="fa fa-unlock fa-3x" style="color:green"></i>
+                        <input  type="button"
+                                class="active btn btn-large btn-success"
+                                value="{% trans " Login with master account " %}"/></a>
+                </p>
             </div>
 
             <div class="col-md-4"><img

@@ -6,14 +6,17 @@
 {% block extra_head %}
 {% endblock %}
 
-{% block pagename %}Welcome{% endblock %}
-{% block content %}
-
-    <div class="container">
+{% block breadcrumbs %}
+       <div class="container">
         <ul class="breadcrumb">
             <li class="active">Home</li>
         </ul>
     </div>
+{% endblock %}
+{% block pagename %}Welcome{% endblock %}
+{% block content %}
+
+
     <div class="hero-unit">
 
         <h2>{{ settings.APPLICATION_TITLE }}</h2>

@@ -3,19 +3,21 @@
  {% load staticfiles %}
  {% block pretitle %}{% endblock %}
  {% block extra_head %} {% endblock %}
- {% block pagename %}About{% endblock %}
- {% block content %}
-     <div class="container">
+ {% block breadcrumbs %}
+         <div class="container">
         <ul class="breadcrumb">
             <li><a href="{% url 'home' %}">Home</a></li>
 
             <li class="active">About BlueButton</li>
         </ul>
     </div>
+ {%  endblock %}
+ {% block pagename %}About{% endblock %}
+ {% block content %}
 
      <div class="row">
          <div class="col-md-12">
-             <h2 contenteditable="true">Put Your Medicare Claims Information to Work For You</h2>
+             <h3 contenteditable="true">Put Your Medicare Claims Information to Work For You</h3>
          </div>
      </div>
 <div class="section">

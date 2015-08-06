@@ -4,9 +4,7 @@
 
 
 {% endblock %}
-
-{% block pagename %}Edit Profile ({{ email }}){% endblock %}
-{% block content %}
+{% block breadcrumbs %}
        <div class="container">
         <ul class="breadcrumb">
             <li><a href="{% url 'home' %}">Home</a></li>
@@ -14,6 +12,10 @@
             <li class="active">Edit Profile</li>
         </ul>
     </div>
+{% endblock %}
+
+{% block pagename %}Edit Profile ({{ email }}){% endblock %}
+{% block content %}
 
     <div class="section">
         <div class="container">

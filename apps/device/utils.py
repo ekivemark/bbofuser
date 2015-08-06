@@ -3,13 +3,15 @@ bbofuser:device
 FILE: utils
 Created: 8/3/15 6:00 PM
 
-
 """
 __author__ = 'Mark Scrimshire:@ekivemark'
 
 import random
+
 from django import forms
+
 from django.conf import settings
+
 
 def get_phrase(count=2):
     # Build a phrase

@@ -2,6 +2,15 @@
 {% load i18n %}
 
 {% block title %}{% trans "Register for an account" %}{% endblock %}
+{% block breadcrumbs %}
+    <div class="container">
+        <ul class="breadcrumb">
+            <li><a href="{% url 'home' %}">Home</a></li>
+
+            <li class="active">Register</li>
+        </ul>
+    </div>
+{% endblock %}
 {% block pagename %}Register{% endblock %}
 {% block content %}
 

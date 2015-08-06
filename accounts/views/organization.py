@@ -5,6 +5,8 @@ Created: 7/8/15 1:20 PM
 
 
 """
+__author__ = 'Mark Scrimshire:@ekivemark'
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -13,13 +15,13 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.template import RequestContext
 
-from accounts.models import Application
+from accounts.decorators import session_master
 from accounts.forms.application import Application_EditForm
+from accounts.models import Application
 
-__author__ = 'Mark Scrimshire:@ekivemark'
 
-
-@login_required()
+@session_master
+@login_required
 def application_edit(request, pk):
     if settings.DEBUG:
         print(request.user)

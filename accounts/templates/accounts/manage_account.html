@@ -1,20 +1,17 @@
 {% extends "base.html" %}
 {% block pretitle %}Manage Your Account{% endblock %}
 {% block extra_head %}
-
-
 {% endblock %}
-
-{% block pagename %}Dashboard{% endblock %}
-{% block content %}
-
-       <div class="container">
+{% block %}
+    <div class="container">
         <ul class="breadcrumb">
             <li><a href="{% url 'home' %}">Home</a></li>
             <li class="active">My Dashboard</li>
         </ul>
     </div>
-
+{% endblock %}
+{% block pagename %}Dashboard{% endblock %}
+{% block content %}
     <div class="section">
         <div class="container">
             <div class="row">

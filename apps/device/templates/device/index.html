@@ -4,10 +4,7 @@
 {% block pretitle %}{% endblock %}
 {% block extra_head %}
 {% endblock %}
-
-{% block pagename %}Welcome{% endblock %}
-{% block content %}
-
+{% block breadcrumbs %}
     <div class="container">
         <ul class="breadcrumb">
             <li><a hef="{% url 'home' %}">Home</a></li>
@@ -16,6 +13,10 @@
 
         </ul>
     </div>
+{% endblock %}
+{% block pagename %}Welcome{% endblock %}
+{% block content %}
+
     <div class="hero-unit">
 
         <h2>{{ settings.APPLICATION_TITLE }}</h2>

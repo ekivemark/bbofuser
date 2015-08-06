@@ -5,28 +5,28 @@ Created: 7/6/15 9:39 PM
 
 
 """
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-
 __author__ = 'Mark Scrimshire:@ekivemark'
 
-from django.template import RequestContext
-from accounts.models import (User,
-                             Crosswalk)
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import *
 
 from django.shortcuts import (render,
                               render_to_response,
                               redirect)
+from django.template import RequestContext
 from django.views.generic.edit import *
 
-
+from accounts.decorators import session_master
 from accounts.forms.user import (User_EditForm, Verify_Mobile)
+from accounts.models import (User,
+                             Crosswalk,
+                             ValidSMSCode)
 from accounts.views.sms import ValidSMSCode
-from accounts.models import ValidSMSCode
 
 
+@session_master
 @login_required()
 def verify_phone(request):
     # Verify Mobile Phone for Multi-Factor Authentication
@@ -75,7 +75,7 @@ def verify_phone(request):
                       {'form': form,
                        'email': u.email})
 
-
+@session_master
 @login_required()
 def user_edit(request):
     if settings.DEBUG:

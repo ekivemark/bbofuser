@@ -8,22 +8,26 @@ All SMS Related views
 """
 __author__ = 'Mark Scrimshire:@ekivemark'
 
-from django.core.urlresolvers import reverse
-from django.shortcuts import (render_to_response)
-from django.template import RequestContext
-from django.http import HttpResponseRedirect
+import ldap
+
 from django.conf import settings
-from django.utils import timezone
+from django.contrib import messages
 from django.contrib.auth import (login as django_login,
                                  authenticate)
-from django.contrib import messages
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 
-from accounts.models import (User, ValidSMSCode)
+from django.shortcuts import (render_to_response)
+from django.template import RequestContext
+from django.utils import timezone
+
 from accounts.forms.authenticate import (AuthenticationForm,
                                          SMSCodeForm)
-import ldap
+from accounts.models import (User, ValidSMSCode)
+
 from apps.device.utils import (session_device,
                                Master_Account)
+
 
 def validate_ldap_user(request, email):
     # Do the ldapSearch for user
