@@ -31,7 +31,10 @@ from accounts.forms.application import (ApplicationCheckForm)
 from accounts.admin import UserCreationForm
 from accounts.utils import cell_email
 from apps.device.models import Device
+from apps.device.utils import Master_Account
 from apps.secretqa.models import QA
+from accounts.decorators import (session_master,
+                                 session_master_required)
 
 
 def login(request):
@@ -147,22 +150,21 @@ def agree_to_terms(request):
     return render_to_response(reverse_lazy('accounts:register'),
                               RequestContext(request, context, ))
 
-
+@session_master
 @login_required
 def manage_account(request):
     # Manage Accounts entry page
 
     # DONE: Remove api.data.gov signup widget in manage_account.html
 
-    DEBUG = settings.DEBUG_SETTINGS
-
-    if DEBUG:
+    if settings.DEBUG:
         print(settings.APPLICATION_TITLE,
               "in accounts.views.manage_account")
     user = request.user
     mfa_address = cell_email(user.mobile, user.carrier)
 
-    dev_list = list(Device.objects.filter(user_id=request.user))
+    dev_list = list(Device.objects.filter(user_id=request.user,
+                                          deleted=False))
 
     try:
         secretqa = QA.objects.get(user=request.user)
@@ -211,9 +213,7 @@ def connect_application(request):
 
     context = {"user": user}
 
-    DEBUG = settings.DEBUG_SETTINGS
-
-    if DEBUG:
+    if settings.DEBUG:
         print(application_title, "in accounts.views.connect_application")
         print("request.method:")
         print(request.method)
@@ -223,7 +223,7 @@ def connect_application(request):
         form = ApplicationCheckForm(data=request.POST)
 
         if form.is_valid():
-            if DEBUG:
+            if settings.DEBUG:
                 print("form is valid")
                 print("form", form.cleaned_data)
 
@@ -238,7 +238,7 @@ def connect_application(request):
 
             app.save()
 
-            if DEBUG:
+            if settings.DEBUG:
                 print("user", user)
 
             return redirect(reverse_lazy('accounts:manage_account'))
@@ -249,7 +249,7 @@ def connect_application(request):
 
     context['form'] = form
 
-    if DEBUG:
+    if settings.DEBUG:
         print(context)
 
     return render_to_response('accounts/connect_application.html',

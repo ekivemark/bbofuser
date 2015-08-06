@@ -17,8 +17,10 @@
 
     <table class="table table-striped table-hover ">
         <thead>
+        {% comment %}#DONE: Add active status with icons{% endcomment %}
             <tr>
                 <th>Edit</th>
+                <th>Active</th>
                 <th>Device</th>
                 <th>Account</th>
                 <th>Password</th>
@@ -29,7 +31,11 @@
         {% for device in devices %}
             <tr>
                 <td>
-                    <a href="/device/edit/{{ device.id }}/"><i class="fa fa-pencil-square-o fa-2x"></i> Edit</a>
+                    <a href="/device/edit/{{ device.id }}/"><i class="fa fa-pencil-square-o fa-lg"></i> Edit</a>
+                </td>
+                <td style="text-align:center;">
+                    {% if device.active %}<i class="fa fa-check-square-o fa-lg" style="color:green"></i>
+                    {% else %}<i class="fa fa-square-o fa-lg" style="color:red"></i>{% endif %}
                 </td>
                 <td>
                     {{ device.device }}
@@ -44,7 +50,7 @@
                     {{ device.valid_until }}
                 </td>
                 <td>
-                    <a href="/device/delete/{{ device.id }}/" style="color:red"><i class="fa fa-trash-o fa-fw fa-2x"></i> Delete</a>
+                    <a href="/device/delete/{{ device.id }}/" style="color:red"><i class="fa fa-trash-o fa-fw fa-lg"></i> Delete</a>
                 </td>
 
             </tr>

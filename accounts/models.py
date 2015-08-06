@@ -149,7 +149,8 @@ class User(AbstractBaseUser):
                                choices=CARRIER_SELECTION,
                                )
     # DONE: Add switch for Multi-factor Authentication via mobile
-    mfa = models.BooleanField(default=False)
+    mfa = models.BooleanField(default=False,
+                              verbose_name='Send Login PIN Code?')
     verified_mobile = models.BooleanField(default=False)
 
     objects = UserManager()

@@ -20,7 +20,7 @@ parser = RawConfigParser()
 import os
 import sys
 from platform import python_version
-from .util import str2bool, str2int
+from bbonfhiruser.util import str2bool, str2int
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -173,6 +173,7 @@ LOCAL_APPS = (
     'apps.uploader',
     'apps.device',
     'apps.secretqa',
+    'apps.api',
 )
 
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS

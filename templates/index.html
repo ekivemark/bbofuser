@@ -20,16 +20,25 @@
 
         <div class="container-fluid">
                 <p>
-                 {% if user.is_authenticated %}
+                    {% if user.is_authenticated and request.session.auth_master %}
                     <a href="{% url 'accounts:manage_account' %}"
                        class="btn btn-primary btn-large">
-                        <i class="fa fa-lock fa-2x"></i>  Manage Your Account</a>
-                {% else %}
-                    <a href="{% url "accounts:sms_code" %}?next=/"><i class="fa fa-unlock fa-3x" style="color:green"></i><input
+                        <i class="fa fa-lock fa-lg"></i>  Manage Your Account</a>
+                    {% else %}
+                        {% if user.is_authenticated and not request.session.auth_master %}
+                    You are logged in via a device account:
+                        <a href="{%  url 'accounts:account_access' %}">
+                    [ {{ user.first_name }} {{ user.last_name }} via {{ request.session.auth_device }} ]</a>
+                    <p>
+                    You need to login with your master account.
+                    </p>
+                        {% endif %}
+                    <a href="{% url "accounts:sms_code" %}?next=/">
+                        <i class="fa fa-unlock fa-2x" style="color:green"></i><input
                             type="button"
                             class="active btn btn-large btn-success"
                             value="{% trans " login " %}"/></a>
-                {% endif %}
+                    {% endif %}
                 </p>
             <div class="col-md-8">
                 <p>

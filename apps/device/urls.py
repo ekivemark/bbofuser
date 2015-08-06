@@ -30,7 +30,10 @@ urlpatterns = patterns('',
                        #     'apps.device.views.device_edit',
                        #     name='device_edit'),
                        url(r'^delete/(?P<pk>[-\w]+)/$',
-                            Device_Delete.as_view(), name='device_delete'),
+                            'apps.device.views.Device_Delete', name='device_delete'),
+                       url(r'^login/$', 'apps.device.views.Device_Login',
+                           name='device_login'),
+
 
                        url(r'^admin/', include(admin.site.urls)),
 

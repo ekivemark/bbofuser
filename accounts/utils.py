@@ -6,6 +6,7 @@ Created: 6/27/15 8:39 AM
 
 """
 __author__ = 'Mark Scrimshire:@ekivemark'
+
 from django.core.mail import send_mail
 from django.conf import settings
 
@@ -252,3 +253,4 @@ def send_sms_pin(phone, email, pin):
         print("Send Result:", result)
 
     return result
+

@@ -79,30 +79,30 @@ class QA_EditForm(forms.ModelForm):
                   )
 
     def clean(self):
-        error_message = []
+        error_messages = []
         if self.cleaned_data.get('question_1') and not self.cleaned_data.get('answer_1'):
-            error_message.append(
+            error_messages.append(
                 "You didn't provide an Answer to Question 1"
             )
         if self.cleaned_data.get('question_2') and not self.cleaned_data.get('answer_2'):
-            error_message.append(
+            error_messages.append(
                 "You didn't provide an Answer to Question 2"
             )
         if self.cleaned_data.get('question_3') and not self.cleaned_data.get('answer_3'):
-            error_message.append(
+            error_messages.append(
                 "You didn't provide an Answer to Question 3"
             )
         if self.cleaned_data.get('question_4') and not self.cleaned_data.get('answer_4'):
-            error_message.append(
+            error_messages.append(
                 "You didn't provide an Answer to Question 4"
             )
         if self.cleaned_data.get('question_5') and not self.cleaned_data.get('answer_5'):
-            error_message.append(
+            error_messages.append(
                 "You didn't provide an Answer to Question 5"
             )
 
-        if len(error_message):
-            raise forms.ValidationError(' & '.join(error_message))
+        if len(error_messages):
+            raise forms.ValidationError(' & '.join(error_messages))
 
         return self.cleaned_data
 

@@ -1,11 +1,10 @@
 """
 bbofuser
-FILE: util
+FILE: utils
 Created: 6/16/15 12:11 AM
 Basic conversion tools
 """
 __author__ = 'Mark Scrimshire:@ekivemark'
-
 
 def str2int(inp):
     output = 0 + int(inp)

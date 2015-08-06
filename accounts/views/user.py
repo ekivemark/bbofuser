@@ -14,14 +14,18 @@ from django.template import RequestContext
 from accounts.models import (User,
                              Crosswalk)
 from django.conf import settings
-
-from django.views.generic.edit import *
 from django.core.urlresolvers import *
-from django.shortcuts import (render)
+
+from django.shortcuts import (render,
+                              render_to_response,
+                              redirect)
+from django.views.generic.edit import *
+
 
 from accounts.forms.user import (User_EditForm, Verify_Mobile)
 from accounts.views.sms import ValidSMSCode
 from accounts.models import ValidSMSCode
+
 
 @login_required()
 def verify_phone(request):
@@ -177,3 +181,19 @@ def Get_ID(Look_for="UUID", Find_with=""):
     if settings.DEBUG:
         print("lu returned:", lu)
     return lu
+
+
+def account_access(request):
+    """
+    Tell User they have to login with their master account to manage
+    their account
+    :param request:
+    :return:
+    """
+
+    if settings.DEBUG:
+        print(settings.APPLICATION_TITLE, "in accounts.views.user.account_access")
+
+    context = {}
+    return render_to_response('account_access.html',
+                              RequestContext(request, context, ))

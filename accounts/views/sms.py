@@ -22,7 +22,8 @@ from accounts.models import (User, ValidSMSCode)
 from accounts.forms.authenticate import (AuthenticationForm,
                                          SMSCodeForm)
 import ldap
-
+from apps.device.utils import (session_device,
+                               Master_Account)
 
 def validate_ldap_user(request, email):
     # Do the ldapSearch for user
@@ -198,7 +199,7 @@ def sms_login(request, *args, **kwargs):
             request.session['email'] = request.POST['email']
             return HttpResponseRedirect(reverse('accounts:sms_code'))
         if form.is_valid():
-            # print "Authenticate"
+            # print("Authenticate")
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             sms_code = form.cleaned_data['sms_code']
@@ -214,6 +215,13 @@ def sms_login(request, *args, **kwargs):
 
                 if user.is_active:
                     django_login(request, user)
+
+                    # DONE: Set a session variable to identify as master account and not a device
+
+                    session_device(request,
+                                   "True",
+                                   Session="auth_master")
+
                     return HttpResponseRedirect(reverse('home'))
                 else:
 

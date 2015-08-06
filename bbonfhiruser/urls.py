@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse_lazy
 from accounts.forms.other import RegistrationFormUserTOSAndEmail
 from apps.secretqa.views import *
 from apps.device.views import *
+from apps.api.views import *
 
 from django.contrib import admin
 admin.autodiscover()
@@ -28,6 +29,8 @@ urlpatterns = patterns('',
                            include('apps.secretqa.urls', namespace='security')),
                        url(r'^demo/',
                            include('apps.demo.urls', namespace='demo')),
+                       url(r'^api/',
+                           include('apps.api.urls', namespace='api')),
                        url(r'^registration/register/$',
                            RegistrationView.as_view(
                                form_class=RegistrationFormUserTOSAndEmail),

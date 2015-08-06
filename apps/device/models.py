@@ -12,7 +12,6 @@ from uuid import uuid4
 from datetime import datetime, timedelta
 from django.conf import settings
 from django.db import models
-from apps.device.utils import get_phrase
 
 class Device(models.Model):
     """
@@ -21,14 +20,15 @@ class Device(models.Model):
 
     """
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    device = models.CharField(max_length=40, blank=False)
-    account = models.CharField(max_length=250, blank=False)
-    password = models.CharField(max_length=40)
-    valid_until = models.DateTimeField(default=datetime.now()+timedelta(days=settings.DEFAULT_VALID_UNTIL))
+    user         = models.ForeignKey(settings.AUTH_USER_MODEL)
+    device       = models.CharField(max_length=40, blank=False)
+    account      = models.CharField(max_length=80, blank=False)
+    password     = models.CharField(max_length=40)
+    valid_until  = models.DateTimeField(default=datetime.now()+timedelta(days=settings.DEFAULT_VALID_UNTIL))
     date_created = models.DateTimeField(auto_now_add=True)
     connected_from = models.CharField(max_length=1000, blank=True)
-
+    active       = models.BooleanField(default=True)
+    deleted      = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         created = self.date_created is None
@@ -37,19 +37,20 @@ class Device(models.Model):
                 print("Overriding Device save")
 
             # Assign an account and password with the save
+            # DONE: Save as lower case Account and Password
+            # DONE: Strip spaces from end of Account and Password
             acc = self.account
+            if not acc.lower() == acc:
+                self.account = acc.strip().lower()
             pwd = self.password
-            # acc = get_phrase(count=2)
-            # pwd = str(uuid4().urn)[9:]
+            if not pwd.lower() == pwd:
+                self.password = pwd.strip().lower()
             if settings.DEBUG:
                 print("Account:", self.account, "|", acc)
                 print("Password:", self.password, "|", pwd)
             # uid4.urn returns string:
             # eg. 'urn:uuid:aec9931c-101b-4803-8666-f047c9159c0c'
             # str()[9:] strips leading "urn:uuid:"
-
-            #self.password = pwd
-            #self.account = acc
 
         super(Device, self).save(*args, **kwargs)
 
@@ -59,10 +60,32 @@ class Device(models.Model):
                               self.device)
 
     def get_device(self):
-        # return the device name
+        # DONE: return the device name
         return self.device
 
     def get_email(self):
         # Return the email/username
         return self.user_id
+
+    def get_account(self):
+        # Return the account
+        return self.account
+
+    def is_deleted(self):
+        # DONE: Get deleted state
+        # Return the Deleted State (Devices are marked deleted and not
+        # removed to ensure accounts are unique and not re-used by another
+        # user
+        return self.deleted
+
+    def is_active(self):
+        # DONE: Return the Active State
+        result = False
+        if not self.deleted:
+            if self.active:
+                result = True
+        else:
+            result = False
+
+        return result
 

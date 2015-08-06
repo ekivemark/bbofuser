@@ -4,16 +4,19 @@
 <div class="container-fluid">
     <div class="navbar navbar-default navbar-fixed-top">
         <ul class="nav navbar-nav">
+
             <li>
-                <a href="{% url 'home' %}" contenteditable="false"
+                <a href="{% if request.session.auth_device %}{% url 'api:home' %}
+                {% else %}{% url 'home' %}{% endif %}" contenteditable="false"
                    class="navbar-brand">
                     <img src="{% static 'img/layout/blue-button-trim.png' %}"
                      style="vertical-align:middle;display:inline-block;max-height:100%;max-width:100%"
                      alt="{{ APPLICATION_TITLE }}">
                 </a>
             </li>
+            {% if user.is_authenticated and request.session.auth_master %}
             <li>
-                <a class="navbar-brand" href="/"
+                <a class="navbar-brand" href="{% url 'home' %}"
                    contenteditable="false">{{ settings.APPLICATION_TITLE }}
                 </a></li>
 
@@ -22,7 +25,11 @@
                    contenteditable="false">Home
                 </a>
             </li>
-            {% if user.is_authenticated %}
+            <li>
+                <a href="{% url 'api:home' %}" class=""
+                   contenteditable="false">API
+                </a>
+            </li>
                 <li>
                     {# DONE: create /accounts/app_management - redirect to accounts:manage_account #}
                     <a href="{% url 'accounts:manage_account' %}">{% trans "My Dashboard" %}</a>
@@ -47,16 +54,16 @@
                         class="caret"></span></a>
                 <ul class="dropdown-menu" id="menu1" role="menu">
                     {# TODO: Create /accounts/documentation page  #}
-                    <li><a href="/developer/documentation" class="">Documentation</a>
+                    <li><a href="/api/documentation" class="">Documentation</a>
                     </li>
                     {# TODO: /accounts/support page  #}
-                    <li><a href="/developer/support" class="">Support</a>
+                    <li><a href="/api/support" class="">Support</a>
                     </li>
                     <li class="divider"></li>
                     <li><a href="{% url 'demo:demoapi' %}"
                            class="">Demo..</a></li>
                     {# DONE: /admin access page  #}
-                    {% if user.is_admin %}
+                    {% if user.is_admin and request.session.auth_master%}
                         <li class="divider"></li>
                         <li><a href="/admin" class="">Admin</a></li>
                     {% endif %}
@@ -65,10 +72,17 @@
         </ul>
         {%  if user.is_authenticated %}
         <ul class="nav navbar-nav navbar-right">
-            <li>
-                <a href="{%  url 'accounts:manage_account' %}">
-                    [ {{ user.first_name }} {{ user.last_name }} ]</a>
-            </li>
+            {% if request.session.auth_master %}
+                <li>
+                    <a href="{%  url 'accounts:manage_account' %}">
+                        [ {{ user.first_name }} {{ user.last_name }} ]</a>
+                </li>
+            {% else %}
+                <li>
+                    <a href="{%  url 'accounts:account_access' %}">
+                    [ {{ user.first_name }} {{ user.last_name }} via {{ request.session.auth_device }} ]</a>
+                </li>
+            {% endif %}
             <li>
                 <a href="{% url "accounts:logout" %}">
                     {% trans "Logout" %} &nbsp;&nbsp;&nbsp;</a>
