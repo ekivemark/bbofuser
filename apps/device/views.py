@@ -329,13 +329,13 @@ def Device_Login(request, *args, **kwargs):
                     django_login(request, user)
 
                     session_device(request, device.device)
-                    #DONE: Record Access in DeviceAccessLog
+                    # DONE: Record Access in DeviceAccessLog
 
                     dal_result = Post_Device_Access(request, device)
                     if settings.DEBUG:
                         print("Post to Device Access Log:", dal_result)
 
-                    #DONE: Update Used Field in Device
+                    # DONE: Update Used Field in Device
                     device.used = True
                     device.save()
 
