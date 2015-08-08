@@ -31,7 +31,8 @@
                         {% if user.is_authenticated and not request.session.auth_master %}
                     You are logged in via a device account:
                         <a href="{%  url 'accounts:account_access' %}">
-                    [ {{ user.first_name }} {{ user.last_name }} via {{ request.session.auth_device }} ]</a>
+                    [ {{ user.first_name }} {{ user.last_name }} {% if request.session.auth_device %}
+                            via {{ request.session.auth_device }} {% endif %}]</a>
                     <p>
                     You need to login with your master account.
                     </p>

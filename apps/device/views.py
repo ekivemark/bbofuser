@@ -27,7 +27,8 @@ from django.template import RequestContext
 from accounts.models import User
 from accounts.decorators import session_master
 
-from apps.device.models import Device
+from apps.device.models import (Device,
+                                DeviceAccessLog)
 from apps.device.forms import (Device_AuthenticationForm,
                                Device_EditForm,
                                Device_AddForm,
@@ -243,6 +244,46 @@ def device_authenticate(account, password):
     return result
 
 
+# DONE: Post Device Access Record
+def Post_Device_Access(request, device):
+    """
+
+    Add the record of a device access to the DeviceAccessLog
+
+    :param device:
+    :return:
+    """
+
+    # TODO: Query DAL for Device entries older than settings.DEVICE_ACCESS_LOG_DAYS
+    if not settings.DEVICE_ACCESS_LOG_DAYS:
+        oldest_days = 365
+    else:
+        oldest_days = settings.DEVICE_ACCESS_LOG_DAYS
+
+    if settings.DEBUG:
+        print("Device:", device)
+
+    DAL = DeviceAccessLog()
+
+    DAL.device  = device
+    DAL.account = device.account
+
+    if settings.DEBUG:
+        print(request.META.get('HTTP_USER_AGENT', ''))
+        print(len(request.META.get('HTTP_USER_AGENT', '')))
+
+    DAL.info    = request.META.get('HTTP_USER_AGENT', '')
+    DAL.source  = request.META.get('HTTP_X_FORWARDED_FOR’,''') or request.META.get('REMOTE_ADDR')
+
+    result = DAL.save()
+
+    # DONE: Update Device used field.
+    device.used = True
+    device.save()
+
+    return result
+
+
 def Device_Login(request, *args, **kwargs):
     """
     Device Login
@@ -285,6 +326,15 @@ def Device_Login(request, *args, **kwargs):
                     django_login(request, user)
 
                     session_device(request, device.device)
+                    #DONE: Record Access in DeviceAccessLog
+
+                    dal_result = Post_Device_Access(request, device)
+                    if settings.DEBUG:
+                        print("Post to Device Access Log:", dal_result)
+
+                    #DONE: Update Used Field in Device
+                    device.used = True
+                    device.save()
 
                     if settings.DEBUG:
                         print("User:", user)

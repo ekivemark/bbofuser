@@ -160,6 +160,8 @@ def manage_account(request):
 
     dev_list = list(Device.objects.filter(user_id=request.user,
                                           deleted=False))
+    # DONE: Get Device Used indicator
+    # Used Field is included in Device. It is set during login
 
     try:
         secretqa = QA.objects.get(user=request.user)

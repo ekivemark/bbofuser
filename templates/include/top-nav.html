@@ -60,8 +60,12 @@
                     <li><a href="/api/support" class="">Support</a>
                     </li>
                     <li class="divider"></li>
-                    <li><a href="{% url 'demo:demoapi' %}"
-                           class="">Demo..</a></li>
+                    <li>
+                        <a href="{% url 'api:home' %}" class=""
+                                contenteditable="false">API
+                        </a>
+                    <li class="divider"></li>
+                    </li>
                     {# DONE: /admin access page  #}
                     {% if user.is_admin and request.session.auth_master%}
                         <li class="divider"></li>
@@ -80,7 +84,8 @@
             {% else %}
                 <li>
                     <a href="{%  url 'accounts:account_access' %}">
-                    [ {{ user.first_name }} {{ user.last_name }} via {{ request.session.auth_device }} ]</a>
+                    [ {{ user.first_name }} {{ user.last_name }} {% if request.session.auth_device %}
+                        via {{ request.session.auth_device }} {% endif %}]</a>
                 </li>
             {% endif %}
             <li>

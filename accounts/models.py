@@ -247,6 +247,7 @@ class Crosswalk(models.Model):
     Linked to User Account
 
     """
+# TODO: Implement PyCrypto to encrypt HICN
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     guid = models.CharField(max_length=40)
@@ -257,7 +258,7 @@ class Crosswalk(models.Model):
         created = self.date_created is None
         if not self.pk or created is None:
             if settings.DEBUG:
-                print("Overrriding Crosswalk save")
+                print("Overriding Crosswalk save")
 
             # Assign a GUID with the save
             uid = str(uuid4().urn)[9:]

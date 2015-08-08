@@ -13,12 +13,7 @@ from django.shortcuts import (render,
 from django.template import RequestContext
 
 # DONE: Login_Required Decorator for Device Accounts
-# TODO: Setup DJANGO REST Framework
-# TODO: Apply user scope to FHIR Passthrough
-# TODO: Test Passthrough to FHIR Server
-# TODO: Create api namespace in urls.py
-# TODO: Detect url of accessing apps. Store in Connected_from of Device field
-# TODO: Extract site domain from querying url in Connected_From
+# DONE: Allow versioning of api (v1)
 # DONE: Create API Landing Page (Unauthenticated)
 
 def api_index(request):
@@ -32,6 +27,4 @@ def api_index(request):
     context = {}
     return render_to_response('api/index.html',
                               RequestContext(request, context, ))
-
-
 

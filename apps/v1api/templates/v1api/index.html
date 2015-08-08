@@ -2,35 +2,30 @@
 {% load i18n %}
 {% load staticfiles %}
 {% block pretitle %}Welcome to the {% endblock %}
-{% block title %}{{ settings.APPLICATION_TITLE }} API{% endblock %}
+{% block title %}{{ settings.APPLICATION_TITLE }} api/v1{% endblock %}
 {% block extra_head %}
 {% endblock %}
 {% block breadcrumbs %}
     <div class="container">
         <ul class="breadcrumb">
             <li>Home</li>
-            <li><a href="{% url 'api:home' %}">API</a></li>
+            <li><a href="{% url 'api:home' %}">api</a></li>
+            <li class="active">api/v1</li>
 
         </ul>
     </div>
 {% endblock %}
-{% block pagename %}{{ settings.APPLICATION_TITLE }} | API{% endblock %}
+{% block pagename %}{{ settings.APPLICATION_TITLE }} | api/v1/{% endblock %}
 {% block content %}
-
     <div class="hero-unit">
-        <div class="container-fluid">
+       <div class="container-fluid">
                 <p>
                  {% if user.is_authenticated %}
                    <div class="col-md-8">
 
                         <p>
-                         Explain the API here.
+                         Access the Test: <a href="{% url 'api:v1:test' '3' %}">test</a>.
                         </p>
-                       <div class="jumbotron">
-                            <p>Access the V1 API
-                                <a href="{% url 'api:v1:home' %}">here</a>
-                            </p>
-                       </div>
                     </div>
                 {% else %}
                     <a href="{% url "device:device_login" %}?next=/api"><input

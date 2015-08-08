@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+{% block pretitle %}Welcome to the {% endblock %}
+{% block title %}{{ settings.APPLICATION_TITLE }} api/v1/{{ name }}/{% endblock %}
+{% block extra_head %}
+{% endblock %}
+{% block breadcrumbs %}
+    <div class="container">
+        <ul class="breadcrumb">
+            <li class="active">Home</li>
+            <li><a href="{% url 'api:home' %}">api</a></li>
+            <li><a href="{% url 'api:v1:home' %}">vi</a></li>
+            <li class="active">{{ display }}</li>
+        </ul>
+    </div>
+{% endblock %}
+{% block pagename %}{{ settings.APPLICATION_TITLE }} | api/v1/{{ name }}{% endblock %}
+{% block content %}
+    <div class="hero-unit">
+       <div class="container-fluid">
+                <p>
+                 {% if user.is_authenticated %}
+                   <div class="col-md-8">
+                       <div class="col-md-12 well">
+                           {{ pass_to }}<br>
+                           {{ settings.DOMAIN }}{{ request.get_full_path }}
+                       </div>
+                       <p>Result:<br>
+                           {{ result|safe }}<br>
+                           [END]
+                       </p>
+
+                       <div class="col-md-12 well">
+                           Get: {{ '{' }}{{ get.QueryDict }}{{ '}' }}
+                           Args: {{ args }} | KWargs: {{ kwargs }}
+                       </div>
+
+                    </div>
+                {% else %}
+                    <a href="{% url "device:device_login" %}?next=/api"><input
+                            type="button"
+                            class="active btn btn-large btn-success"
+                            value="{% trans "login" %}"/>
+                    </a>
+                {% endif %}
+                </p>
+
+            <div class="col-md-4"><img
+                    src="{% static 'img/layout/blue-button.png' %}"
+                    style="height:300px"></div>
+
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% comment %}
+Txn =  {'name'  :"Patient",
+            'dsply':'Patient',
+            'server': settings.FHIR_SERVER,
+            'locn'  : "/baseDstu2/Patient/",
+            'tmplt' : 'v1api/patient.html',
+             }
+
+context = {'display': Txn['dsply'],
+               'name'   : Txn['name'],
+               'key'    : key,
+               'output' : "test output ",
+               'args'   : args,
+               'kwargs' : kwargs,
+               'get'    : request.GET,
+               'pass_to': pass_to,
+               'result' : convert,
+               }
+{% endcomment %}

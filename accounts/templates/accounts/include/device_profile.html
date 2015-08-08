@@ -21,6 +21,7 @@
             <tr>
                 <th>Edit</th>
                 <th>Active</th>
+                <th>Used</th>
                 <th>Device</th>
                 <th>Account</th>
                 <th>Password</th>
@@ -30,12 +31,17 @@
         </thead>
         {% for device in devices %}
             <tr>
-                <td>
-                    <a href="/device/edit/{{ device.id }}/"><i class="fa fa-pencil-square-o fa-lg"></i> Edit</a>
+                <td style="text-align:center;">
+                    <a href="/device/edit/{{ device.id }}/"><i class="fa fa-pencil-square-o fa-lg"></i></a>
                 </td>
                 <td style="text-align:center;">
                     {% if device.active %}<i class="fa fa-check-square-o fa-lg" style="color:green"></i>
                     {% else %}<i class="fa fa-square-o fa-lg" style="color:red"></i>{% endif %}
+                </td>
+                <td style="text-align:center">
+                    {% if device.used %}<i class="fa fa-toggle-on fa-lg" style="color:green"></i>
+                    {% else %}<i class="fa fa-toggle-off fa-lg" style="color:red"></i>{% endif %}
+{#  DONE: Add Active Indicator#}
                 </td>
                 <td>
                     {{ device.device }}
@@ -49,8 +55,8 @@
                 <td>
                     {{ device.valid_until }}
                 </td>
-                <td>
-                    <a href="/device/delete/{{ device.id }}/" style="color:red"><i class="fa fa-trash-o fa-fw fa-lg"></i> Delete</a>
+                <td style="text-align:center;">
+                    <a href="/device/delete/{{ device.id }}/" style="color:red"><i class="fa fa-trash-o fa-fw fa-lg"></i></a>
                 </td>
 
             </tr>

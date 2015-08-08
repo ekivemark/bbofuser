@@ -5,12 +5,9 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
 # Register your models here.
-from apps.device.models import Device
+from apps.device.models import Device, DeviceAccessLog
 
 # Device
-
-
-
 
 class DeviceAdmin(admin.ModelAdmin):
     """
@@ -25,5 +22,20 @@ class DeviceAdmin(admin.ModelAdmin):
                     )
 
 
-# admin.site.register(Account)
+# DONE: Admin Section for Device AccessLog
+class DeviceAccessLogAdmin(admin.ModelAdmin):
+    """
+    Tailor the Device page in admin module
+
+    """
+    # DONE: Admin View for Device Access Log
+    list_display = ('device',
+                    'account',
+                    'accessed',
+                    'info',
+                    'source',
+                    )
+
+
 admin.site.register(Device, DeviceAdmin)
+admin.site.register(DeviceAccessLog, DeviceAccessLogAdmin)

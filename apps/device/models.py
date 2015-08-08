@@ -19,9 +19,8 @@ class Device(models.Model):
     Create Per User/Per Device Credentials
 
     """
-
-    user         = models.ForeignKey(settings.AUTH_USER_MODEL)
     device       = models.CharField(max_length=40, blank=False)
+    user         = models.ForeignKey(settings.AUTH_USER_MODEL)
     account      = models.CharField(max_length=80, blank=False)
     password     = models.CharField(max_length=40)
     valid_until  = models.DateTimeField(default=datetime.now()+timedelta(days=settings.DEFAULT_VALID_UNTIL))
@@ -29,6 +28,7 @@ class Device(models.Model):
     connected_from = models.CharField(max_length=1000, blank=True)
     active       = models.BooleanField(default=True)
     deleted      = models.BooleanField(default=False)
+    used         = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         created = self.date_created is None
@@ -88,4 +88,32 @@ class Device(models.Model):
             result = False
 
         return result
+
+    def is_used(self):
+        # DONE: Return whether Device has been logged in
+        result = False
+        if self.used:
+           result = True
+        return result
+
+
+# DONE: Add DeviceAccessLog
+# DONE: Add IP Address of client
+class DeviceAccessLog(models.Model):
+    """
+    Add Entry for each Login by Device
+    Device Key
+    Record Date and Time
+
+    """
+    device      = models.ForeignKey(Device)
+    account     = models.CharField(max_length=80)
+    accessed    = models.DateTimeField(auto_now_add=True)
+    info        = models.CharField(max_length=200, blank=True)
+    source      = models.CharField(max_length=50, blank=True)
+
+    def __str__(self):
+        return "%s using %s" % (self.device,
+                                self.account)
+
 

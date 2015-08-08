@@ -13,6 +13,10 @@ from accounts.views.sms import (sms_code, sms_login)
 
 admin.autodiscover()
 
+# TODO: Implement Education Pages
+# TODO: Replace Register Page with Education Page
+# TODO: Add Link to Medicare Registration Page if User Not in LDAP
+
 # DONE: Identify Modules that require accounts.session_master decorator
 urlpatterns = patterns('',
                        # Examples:

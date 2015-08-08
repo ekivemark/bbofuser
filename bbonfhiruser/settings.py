@@ -165,6 +165,8 @@ THIRD_PARTY_APPS = (
     'django_auth_ldap',
     'debug_toolbar',
     'ldap',
+    'rest_framework',
+    'requests',
 )
 
 LOCAL_APPS = (
@@ -174,6 +176,7 @@ LOCAL_APPS = (
     'apps.device',
     'apps.secretqa',
     'apps.api',
+    'apps.v1api',
 )
 
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -242,6 +245,10 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Get the Server Domain Name. eg. dev.bbonfhir.com
+# ie the server name to address this app
+DOMAIN = parser.get('global', 'domain')
+
 if DEBUG_SETTINGS:
     print("Check the valid site id in the site table")
 # SITE_ID = 4 = prod - dev.bbonfhir.com
@@ -249,6 +256,7 @@ if DEBUG_SETTINGS:
 SITE_ID = 5
 if DEBUG_SETTINGS:
     print("SITE_ID: ", SITE_ID)
+    print("DOMAIN:  ", DOMAIN)
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
@@ -389,6 +397,12 @@ WORD_LIST = parser.get('global', 'word_dictionary').strip()
 
 DEFAULT_VALID_DAYS = 365
 
+# DONE: Define DEVICE_ACCESS_LOG_DAYS (365)_
+# Days to retain Device Access Log entries for a device
+DEVICE_ACCESS_LOG_DAYS = int(parser.get('global', 'device_access_log_days'))
+# DEVICE_ACCESS_LOG_DAYS = 365
+
+
 SECURITY_QUESTION_CHOICES = (
     ('1', 'What is the name of your best friend?'),
     ('2', 'What is the name of your first pet?'),
@@ -407,6 +421,7 @@ SETTINGS_EXPORT = [
     'APPLICATION_TITLE',
     'EMAIL_HOST_USER',
     'SECURITY_QUESTION_CHOICES',
+    'DOMAIN',
 ]
 
 
