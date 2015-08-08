@@ -254,11 +254,14 @@ def Post_Device_Access(request, device):
     :return:
     """
 
-    # TODO: Query DAL for Device entries older than settings.DEVICE_ACCESS_LOG_DAYS
+    # DONE: Get Device Access Log Aging limit
+    # TODO: Query DAL for entries older than settings.DEVICE_ACCESS_LOG_DAYS
     if not settings.DEVICE_ACCESS_LOG_DAYS:
         oldest_days = 365
     else:
         oldest_days = settings.DEVICE_ACCESS_LOG_DAYS
+    # TODO: Delete entries older than CurrentTime = DEVICE_ACCESS_LOG_DAYS
+
 
     if settings.DEBUG:
         print("Device:", device)
