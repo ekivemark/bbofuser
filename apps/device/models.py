@@ -12,6 +12,10 @@ from uuid import uuid4
 from datetime import datetime, timedelta
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
+
+DAL_ACTION_CHOICES = (('ACCESS', 'Access'),
+                      ('PERMISSION','Permission'))
 
 class Device(models.Model):
     """
@@ -29,6 +33,7 @@ class Device(models.Model):
     active       = models.BooleanField(default=True)
     deleted      = models.BooleanField(default=False)
     used         = models.BooleanField(default=False)
+    permitted    = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         created = self.date_created is None
@@ -93,7 +98,45 @@ class Device(models.Model):
         # DONE: Return whether Device has been logged in
         result = False
         if self.used:
-           result = True
+            result = True
+        return result
+
+    def is_permitted(self):
+        # DONE: Add check for Device is permitted to access
+        result = False
+        if self.permitted:
+            result = True
+        return result
+
+    def is_authorized(self):
+        # Check all controls for allowed access
+        result = {'result': False,
+                  'message': ""}
+        if self.deleted:
+            result['result'] = False
+            result['message'] = "Failed - DELETED DEVICE"
+            if settings.DEBUG:
+                print(result)
+            return result
+        if not self.active:
+            result['result'] = False
+            result['message'] = "Failed - INACTIVE DEVICE"
+            if settings.DEBUG:
+                print(result)
+            return result
+        if self.valid_until <= timezone.now():
+            result['result'] = False
+            result['message'] = "Failed - VALID UNTIL PERIOD ENDED"
+            if settings.DEBUG:
+                print(result)
+            return result
+        if not self.permitted:
+            result['result'] = False
+            result['message'] = "Failed - NOT PERMITTED"
+            if settings.DEBUG:
+                print(result)
+            return result
+        result = {}
         return result
 
 
@@ -108,12 +151,13 @@ class DeviceAccessLog(models.Model):
     """
     device      = models.ForeignKey(Device)
     account     = models.CharField(max_length=80)
+    action      = models.CharField(max_length=10,
+                                   choices=DAL_ACTION_CHOICES,
+                                   default="ACCESS")
     accessed    = models.DateTimeField(auto_now_add=True)
-    info        = models.CharField(max_length=200, blank=True)
+    info        = models.CharField(max_length=200, blank=True, )
     source      = models.CharField(max_length=50, blank=True)
 
     def __str__(self):
         return "%s using %s" % (self.device,
                                 self.account)
-
-

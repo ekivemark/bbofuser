@@ -400,7 +400,7 @@ DEFAULT_VALID_DAYS = 365
 # DONE: Define DEVICE_ACCESS_LOG_DAYS (365)_
 # Days to retain Device Access Log entries for a device
 DEVICE_ACCESS_LOG_DAYS = int(parser.get('global', 'device_access_log_days'))
-# DEVICE_ACCESS_LOG_DAYS = 365
+#DEVICE_ACCESS_LOG_DAYS = 365
 
 
 SECURITY_QUESTION_CHOICES = (

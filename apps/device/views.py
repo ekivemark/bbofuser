@@ -23,6 +23,7 @@ from django.shortcuts import (render,
                               render_to_response,
                               redirect)
 from django.template import RequestContext
+from django.utils import timezone
 
 from accounts.models import User
 from accounts.decorators import session_master
@@ -236,6 +237,7 @@ def device_authenticate(account, password):
         result = D
     except Device.DoesNotExist:
         if settings.DEBUG:
+            print("account", account, " Password:", password)
             print("device_authenticate: Device.DoesNotExist")
         result = None
 
@@ -244,8 +246,21 @@ def device_authenticate(account, password):
     return result
 
 
+# TODO: View for Device Permission from User
+# TODO: Get Secret Question test against answer
+def Ask_User_For_Permission(request, user, device):
+    """
+
+    :param request:
+    :param user:
+    :param device:
+    :return:
+    """
+    # TODO: Create Ask User For Permission
+    return True
+
 # DONE: Post Device Access Record
-def Post_Device_Access(request, device):
+def Post_Device_Access(request, device, action="ACCESS"):
     """
 
     Add the record of a device access to the DeviceAccessLog
@@ -255,21 +270,31 @@ def Post_Device_Access(request, device):
     """
 
     # DONE: Get Device Access Log Aging limit
-    # TODO: Query DAL for entries older than settings.DEVICE_ACCESS_LOG_DAYS
+    # DONE: Query DAL for entries older than settings.DEVICE_ACCESS_LOG_DAYS
     if not settings.DEVICE_ACCESS_LOG_DAYS:
         oldest_days = 365
     else:
         oldest_days = settings.DEVICE_ACCESS_LOG_DAYS
-    # TODO: Delete entries older than CurrentTime = DEVICE_ACCESS_LOG_DAYS
+    # DONE: Delete entries older than CurrentTime = DEVICE_ACCESS_LOG_DAYS
+    to_be_deleted_date = timezone.now() - timedelta(days=oldest_days)
+    print("date to delete before:", to_be_deleted_date)
+    log = DeviceAccessLog.objects.filter(device=device,accessed__lte=to_be_deleted_date)
+    if settings.DEBUG:
+        print("Device:", device)
+        print("Records Deleted from Log:", log.count())
 
+    if log.count()>0:
+        log.delete()
 
     if settings.DEBUG:
         print("Device:", device)
+        print("Records Deleted from Log:", log.count())
 
     DAL = DeviceAccessLog()
 
     DAL.device  = device
     DAL.account = device.account
+    DAL.action  = action
 
     if settings.DEBUG:
         print(request.META.get('HTTP_USER_AGENT', ''))
@@ -282,9 +307,44 @@ def Post_Device_Access(request, device):
 
     # DONE: Update Device used field.
     device.used = True
+    device.connected_from = DAL.source
     device.save()
 
     return result
+
+
+# TODO: Give Device Permission
+def Give_Device_Permission(request, user, device,):
+    """
+    Ask for Device Permission
+    Ask a Security Question
+    Check Security Answer
+    If Passed security then ask for permission
+
+    If permission is denied then set Device.active to false
+        Return False
+    :param device:
+    :return:
+    """
+    result = False
+
+    check = device.is_authorized()
+    # is active, is not deleted, is permitted. is valid_until.
+    if not (device.used and device.permitted):
+        # Device has not been used and we need to check permission
+        # TODO check permission if device is not used before
+        # TODO: Create Form and View to get permission
+        # TODO: Add view to urls.py
+        pass
+
+    if 'result' in check:
+        print("Authorized Result", check['result'],":", check['message'])
+        # Failed authorization checks
+        # So check if permitted
+
+    else:
+        print("Check:", check)
+    return True
 
 
 def Device_Login(request, *args, **kwargs):
@@ -308,9 +368,9 @@ def Device_Login(request, *args, **kwargs):
 
             device = device_authenticate(account=account,
                                          password=Dpassword,)
+
             if settings.DEBUG:
-                print("device:", device, "\nAccount:", device.account )
-                print("password:", device.password)
+                print("device:", device,)
 
             if device is not None:
 
@@ -319,6 +379,7 @@ def Device_Login(request, *args, **kwargs):
                         print("Active Device:", device.is_active())
                         print("Request.user:", request.user)
                         print("Device.user:", device.user)
+                        print("Device used:", device.is_used())
                     # Now get the User Account
                     User_Model = get_user_model()
                     user = User_Model.objects.get(email=device.user)
@@ -326,6 +387,10 @@ def Device_Login(request, *args, **kwargs):
                     user.backend = 'django.contrib.auth.backends.ModelBackend'
                     auth_rslt = django_authenticate(username=user.email,
                                                     password=user.password)
+                    # TODO: Check for not device.used
+                    if Give_Device_Permission(request, user, device):
+                        print("Giving Permission!!!")
+                    # TODO: Call function to get permission
                     django_login(request, user)
 
                     session_device(request, device.device)
@@ -335,9 +400,6 @@ def Device_Login(request, *args, **kwargs):
                     if settings.DEBUG:
                         print("Post to Device Access Log:", dal_result)
 
-                    # DONE: Update Used Field in Device
-                    device.used = True
-                    device.save()
 
                     if settings.DEBUG:
                         print("User:", user)

@@ -22,7 +22,12 @@
             We apologize for the inconvenience. <a href="mailto:support@bbonfhir.com">Contact us</a> with any questions.
         </div>{% endcomment %}
 
-{% block breadcrumbs %}
+
+    <div class="col-lg-12">
+        {% block breadcrumbs %}
+        {% endblock %}
+    </div>
+{% block messages %}
 {% endblock %}
 <div class="container">
     <h1>{% block pagename %}{% endblock %}</h1>

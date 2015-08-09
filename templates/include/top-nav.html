@@ -89,7 +89,7 @@
                 </li>
             {% endif %}
             <li>
-                <a href="{% url "accounts:logout" %}">
+                <a href="{% url "accounts:logout" %}?next=/{% if request.session.auth_device %}api/{% endif %}">
                     {% trans "Logout" %} &nbsp;&nbsp;&nbsp;</a>
             </li>
 

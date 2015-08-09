@@ -31,6 +31,7 @@ class DeviceAccessLogAdmin(admin.ModelAdmin):
     # DONE: Admin View for Device Access Log
     list_display = ('device',
                     'account',
+                    'action',
                     'accessed',
                     'info',
                     'source',

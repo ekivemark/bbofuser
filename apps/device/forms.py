@@ -12,7 +12,7 @@ from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.forms import (HiddenInput, Textarea)
 
-from apps.device.models import Device
+from apps.device.models import (Device, DeviceAccessLog)
 from apps.device.utils import LowerCaseCharField
 # Form Field that converts to lower case
 
@@ -128,5 +128,29 @@ class Device_AuthenticationForm(forms.Form):
     class Meta:
         fields = ['account',
                   'password', ]
+
+
+
+class DeviceAccessLog_Form(forms.ModelForm):
+    """
+    Form for Device Access Log
+    """
+
+    account     = forms.CharField(max_length=80)
+    action      = forms.CharField(max_length=10)
+    info        = forms.CharField(max_length=200, required=False )
+    source      = forms.CharField(max_length=50, required=False)
+
+    class Meta:
+        model = DeviceAccessLog
+        fields = (
+            'device',
+            'account',
+            'action',
+            'info',
+            'source'
+        )
+
+
 
 
