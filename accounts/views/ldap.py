@@ -8,7 +8,7 @@ LDAP Utilities for Account
 """
 __author__ = 'Mark Scrimshire:@ekivemark'
 
-import ldap
+# import ldap
 
 from django.conf import settings
 from django.contrib import messages
