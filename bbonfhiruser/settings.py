@@ -165,7 +165,7 @@ THIRD_PARTY_APPS = (
     #'django_auth_ldap',
     'django_python3_ldap',
     'debug_toolbar',
-    'ldap',
+    #'ldap',
     'rest_framework',
     'requests',
 )
