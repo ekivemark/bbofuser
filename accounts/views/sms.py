@@ -23,66 +23,12 @@ from django.utils import timezone
 
 from accounts.forms.authenticate import (AuthenticationForm,
                                          SMSCodeForm)
-from accounts.models import (User, ValidSMSCode)
+from accounts.views.ldap import validate_ldap_user
+from accounts.models import (User,
+                             ValidSMSCode)
 
 from apps.device.utils import (session_device,
                                Master_Account)
-
-
-def validate_ldap_user(request, email):
-    # Do the ldapSearch for user
-    result = {}
-    if email == "":
-        return result
-
-    l = ldap.initialize(settings.AUTH_LDAP_SERVER_URI)
-    try:
-        l.simple_bind_s("", "")
-        # We only want LDAP to return information for the specific email user
-        user_scope = "cn=" + email + "," + settings.AUTH_LDAP_SCOPE
-
-        if settings.DEBUG:
-            print("user_scope:", user_scope)
-        try:
-            ldap_result = l.search_s(user_scope,
-                                     ldap.SCOPE_SUBTREE, "objectclass=*")
-        except:
-            ldap_result = []
-        if settings.DEBUG:
-            print("ldap returned:", ldap_result)
-
-        # ldap returned:
-        # ('cn=mark@ekivemark.com,ou=people,dc=bbonfhir,dc=com',
-        # {'sn': [b'Scrimshire'], 'givenName': [b'Mark'],
-        # 'cn': [b'mark@ekivemark.com'],
-        # 'mail': [b'mark@ekivemark.com'],
-        # 'objectClass': [b'inetOrgPerson'],
-        # 'displayName': [b'Mark Scrimshire']}
-        # )
-
-        if ldap_result == []:
-            result = ""
-        else:
-            result_subset = ldap_result[0][1]
-            result_mail = result_subset['mail']
-            result = result_mail[0].decode("utf-8")
-            if settings.DEBUG:
-                print("email:", result)
-
-    except ldap.SERVER_DOWN:
-        if settings.DEBUG:
-            print("LDAP Server", settings.AUTH_LDAP_SERVER_URI, "is Down")
-        messages.error(request,
-                       "We are unable to unable to confirm your email address at this time. Please try again later.")
-        result = "ERROR"
-    except ldap.LDAPError:
-        if settings.DEBUG:
-            print("LDAP Server error:", settings.AUTH_LDAP_SERVER_URI)
-        messages.error(request,
-                       "We had a problem reaching MyMedicare.gov. Please try again later.")
-        result = "ERROR"
-
-    return result
 
 
 def validate_user(request, email):
@@ -97,7 +43,7 @@ def validate_user(request, email):
 
 
     if settings.DEBUG:
-        print("ldap email:", result)
+        print("ldap email check:", result)
     # step 2 is to look up email in accounts.User
 
     if result == "ERROR":
@@ -114,7 +60,7 @@ def validate_user(request, email):
             email_match = False
             # Set an error message
             messages.error(request,
-                        "Your email address was not recognized. Do you need to register?")
+                            "Your email was not recognized. Do you need to register?")
 
     if settings.DEBUG:
         print("Match?:", email_match)
@@ -155,7 +101,7 @@ def validate_sms(username, smscode):
         mfa_on = u.mfa
         vc = ValidSMSCode.objects.get(user=u, sms_code=smscode)
         if settings.DEBUG:
-            print("vc: %s - %s" % (vc, mfa_on))
+            print("vc: %s - %s" % (vc[:30], mfa_on))
         now = timezone.now()
         if vc.expires < now:
             vc.delete()
@@ -174,7 +120,7 @@ def validate_sms(username, smscode):
                 print("ValidSMS does not exist")
             return False
     if settings.DEBUG:
-        print("Success! Deleting %s" % vc)
+        print("Success! Deleting %s" % vc[:14])
     vc.delete()
     return True
 
@@ -249,7 +195,8 @@ def sms_login(request, *args, **kwargs):
             print("in sms_login. Setting up Form [", email, "]")
         form = AuthenticationForm(initial={'email': email, })
     if settings.DEBUG:
-        print(form)
+        # print(form)
+        print("Dropping to render_to_response in sms_login")
     return render_to_response('accounts/login.html', {'form': form},
                               RequestContext(request))
 
@@ -375,9 +322,11 @@ def sms_code(request):
         form = SMSCodeForm(initial={'email': email, })
         form.email = email
         if settings.DEBUG:
-            print("form email", form.email)
+            # print("form email", form.email)
+            print("In the sms_code.get")
 
     if settings.DEBUG:
-        print(form)
+        #print(form)
+        print("Dropping to render_to_response in sms_code")
     return render_to_response('accounts/smscode.html', {'form': form},
                               RequestContext(request))

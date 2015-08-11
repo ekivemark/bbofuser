@@ -162,7 +162,8 @@ THIRD_PARTY_APPS = (
     'registration',
     'oauth2_provider',
     'corsheaders',
-    'django_auth_ldap',
+    #'django_auth_ldap',
+    'django_python3_ldap',
     'debug_toolbar',
     'ldap',
     'rest_framework',
@@ -185,7 +186,8 @@ AUTH_USER_MODEL = "accounts.User"
 USERNAME_FIELD = "email"
 # AUTHENTICATION_BACKENDS = ['accounts.backends.EmailAuthBackend',]
 AUTHENTICATION_BACKENDS = (
-    'django_auth_ldap.backend.LDAPBackend',
+    'django_python3_ldap.auth.LDAPBackend',
+    #'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -433,7 +435,10 @@ if DEBUG_SETTINGS:
 # SECURITY WARNING: keep the secret key used in production secret!
 
 # django-auth-ldap
-AUTH_LDAP_SERVER_URI = "ldap://dev.bbonfhir.com"
+AUTH_LDAP_SERVER_URI = "ldap://dev.bbonfhir.com:389"
+LDAP_AUTH_URL = AUTH_LDAP_SERVER_URI
+LDAP_AUTH_USE_TLS = False
+
 AUTH_LDAP_BIND_DN = "cn=django-agent,dc=bbonfhir,dc=com"
 
 #import ldap
@@ -448,6 +453,19 @@ AUTH_LDAP_SCOPE = parser.get('global', 'auth_ldap_scope').strip()
 AUTH_LDAP_SCOPE = AUTH_LDAP_SCOPE.replace('"', '')
 if AUTH_LDAP_SCOPE == "":
     AUTH_LDAP_SCOPE = "ou=people,dc=bbonfhir,dc=com"
+LDAP_AUTH_SEARCH_BASE = AUTH_LDAP_SCOPE
+LDAP_AUTH_OBJECT_CLASS = "inetOrgPerson"
+LDAP_AUTH_CONNECTION_USERNAME = None
+LDAP_AUTH_CONNECTION_PASSWORD = None
+LDAP_AUTH_USER_FIELDS = {
+    "username": "uid",
+    "first_name": "givenName",
+    "last_name": "sn",
+    "email": "mail",
+}
+LDAP_AUTH_USER_LOOKUP_FIELDS = ("username",)
+
+#LDAP_AUTH_CLEAN_USER_DATA = django_python3_ldap.utils.clean_user_data
 
 # ##############
 # from ldap3 import Server, Connection, SUBTREE
