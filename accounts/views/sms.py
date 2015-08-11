@@ -100,7 +100,7 @@ def validate_sms(username, smscode):
         mfa_on = u.mfa
         vc = ValidSMSCode.objects.get(user=u, sms_code=smscode)
         if settings.DEBUG:
-            print("vc: %s - %s" % (vc[:30], mfa_on))
+            print("vc: %s - %s" % (vc, mfa_on))
         now = timezone.now()
         if vc.expires < now:
             vc.delete()
@@ -119,7 +119,7 @@ def validate_sms(username, smscode):
                 print("ValidSMS does not exist")
             return False
     if settings.DEBUG:
-        print("Success! Deleting %s" % vc[:14])
+        print("Success! Deleting %s" % vc)
     vc.delete()
     return True
 
