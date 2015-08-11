@@ -59,6 +59,7 @@ def register(request):
     """
     User registration view.
     """
+
     if request.method == 'POST':
         form = RegistrationForm(data=request.POST)
         if form.is_valid():
@@ -66,16 +67,26 @@ def register(request):
             return redirect(reverse_lazy('home'))
     else:
         form = RegistrationForm()
-    return render_to_response(reverse_lazy('accounts:register'), {
-        'form': form,
-    }, context_instance=RequestContext(request))
+    context = {'form': form}
+
+    return render_to_response('register.html',
+                              context_instance=RequestContext(request,
+                                                              context,))
 
 
 def logout(request):
     """
     Log out view
     """
+    # DONE: Change redirection based on whether device or user
+    if 'auth_device' in request.session:
+        mode = "device"
+    else:
+        mode = "user"
+
     django_logout(request)
+    if mode == "device":
+        return redirect(reverse_lazy('api:home'))
     return redirect(reverse_lazy('home'))
 
 

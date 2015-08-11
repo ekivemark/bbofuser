@@ -7,6 +7,9 @@ Created: 8/3/15 6:54 PM
 """
 __author__ = 'Mark Scrimshire:@ekivemark'
 
+import random
+from collections import OrderedDict
+
 from uuid import uuid4
 from django.conf import settings
 from django.views.generic.edit import DeleteView
@@ -206,3 +209,123 @@ def pop_answer(request, qa):
                    'a': a})
 
 
+def Get_Question(request, user):
+    """
+    Pick a question
+    :param user:
+    :return: string with question
+    """
+
+    if settings.DEBUG:
+        print("Entering apps.secretqa.views.Get_Question")
+    # Use user to find QA entry
+    qa = QA.objects.get(user=user)
+
+    if settings.DEBUG:
+        print("Questions:", qa)
+
+    # setup dict
+    a = []
+    q = []
+
+    # mdl = qa._meta.get_all_field_names()
+    # print("QA Model:", mdl)
+
+    # Cycle through questions in record
+    # If Answer then add to OrderedDict()
+    for x in range(1, 6):
+        q_var = "question_" + str(x)
+        a_var = "answer_" + str(x)
+        if settings.DEBUG:
+            print("Q",str(x),"|",
+                  q_var,
+                  ":",
+                  getattr(qa, q_var),
+                  "|",
+                  a_var,
+                  ":",
+                  getattr(qa, a_var))
+
+        if getattr(qa, a_var):
+            a.append([a_var,getattr(qa, a_var)])
+            if x > 2:
+                q.append([q_var, getattr(qa, q_var)])
+                if settings.DEBUG:
+                    print("Question:", getattr(qa, q_var))
+            else:
+                q_text = dict(settings.SECURITY_QUESTION_CHOICES).get(getattr(qa, q_var))
+                if settings.DEBUG:
+                    print("Question(lookup):", q_text)
+                q.append([q_var, q_text])
+
+    n = random.randint(0, len(q)-1)
+    # Pick a Random Question from the list with answers
+    if settings.DEBUG:
+        print("Answered Questions:", q)
+        print("With Answers:", a)
+        print("Choosing:", n)
+        print("q:",len(q))
+
+    picked_q = q[n]
+    picked_a = a[n]
+
+    if settings.DEBUG:
+        print("Picked Q:", picked_q)
+        print("Answer:", picked_a)
+
+    return picked_q
+
+def Check_Answer(user, question, answer):
+    """
+    Check the User Answer for the Question against the Answer.
+    Push both Answer and response to lower()
+    :param user:
+    :param question:
+    :param answer:
+    :return:
+    """
+
+    Sec_Qn_result = False
+    qa =     qa = QA.objects.get(user=user)
+
+    # setup dict
+    a = []
+    q = []
+
+    for x in range(1, 6):
+        q_var = "question_" + str(x)
+        a_var = "answer_" + str(x)
+
+        if getattr(qa, a_var):
+            if x < 3:
+                q_text = dict(settings.SECURITY_QUESTION_CHOICES).get(getattr(qa, q_var))
+            else:
+                q_text = getattr(qa, q_var)
+            if settings.DEBUG:
+                print("Checking", q_text,
+                      " against/nQuestion asked:", question )
+            q.append([q_var, q_text])
+            if q_text == question:
+                # Check the Answer
+                a_text = getattr(qa, a_var).lower()
+                if answer.lower() == a_text:
+                    Sec_Qn_result = True
+                    if settings.DEBUG:
+                        print("RIGHT Answer/n",
+                              answer.lower(),
+                              " = ",
+                              a_text)
+                    return Sec_Qn_result
+                else:
+                    Sec_Qn_result = False
+                    if settings.DEBUG:
+                        print("Wrong Answer/n",
+                              answer.lower(),
+                              " != ",
+                              a_text)
+                    return Sec_Qn_result
+
+    if settings.DEBUG:
+        print("No match on question:", question,
+              "/nin", q )
+    return Sec_Qn_result

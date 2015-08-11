@@ -130,7 +130,6 @@ class Device_AuthenticationForm(forms.Form):
                   'password', ]
 
 
-
 class DeviceAccessLog_Form(forms.ModelForm):
     """
     Form for Device Access Log
@@ -152,5 +151,9 @@ class DeviceAccessLog_Form(forms.ModelForm):
         )
 
 
-
-
+class Question_Form(forms.Form):
+    """
+    Ask Secret Question
+    """
+    answer = forms.CharField(max_length=80, )
+    question = forms.CharField(max_length=80, widget=forms.HiddenInput())

@@ -92,3 +92,15 @@ def Master_Account(request):
             return False
 
     return True
+
+def Device_Set_To_Permitted(device):
+    """
+    Set Device to Permitted
+    :param device:
+    :return:
+    """
+
+    device.permitted = True
+    device.save()
+
+    return device.permitted

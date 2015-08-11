@@ -33,6 +33,9 @@ urlpatterns = patterns('',
                             'apps.device.views.Device_Delete', name='device_delete'),
                        url(r'^login/$', 'apps.device.views.Device_Login',
                            name='device_login'),
+                       url(r'^get_permission/$', 'apps.device.views.ask_user_for_permission',
+                           name='ask_permission'),
+
 
 
                        url(r'^admin/', include(admin.site.urls)),

@@ -4,7 +4,6 @@
 <div class="container-fluid">
     <div class="navbar navbar-default navbar-fixed-top">
         <ul class="nav navbar-nav">
-
             <li>
                 <a href="{% if request.session.auth_device %}{% url 'api:home' %}
                 {% else %}{% url 'home' %}{% endif %}" contenteditable="false"
@@ -16,43 +15,49 @@
             </li>
             {% if user.is_authenticated and request.session.auth_master %}
             <li>
-                <a class="navbar-brand" href="{% url 'home' %}"
-                   contenteditable="false">{{ settings.APPLICATION_TITLE }}
-                </a></li>
-
-            <li class="active">
-                <a href="{% url 'home' %}" class=""
-                   contenteditable="false">Home
+                <a class="" href="{% url 'home' %}"
+                   contenteditable="false">{{ settings.APPLICATION_TITLE }}<br>Home
                 </a>
             </li>
             <li>
                 <a href="{% url 'api:home' %}" class=""
-                   contenteditable="false">API
+                   contenteditable="false"><i class="fa fa-bolt"></i> API
                 </a>
             </li>
-                <li>
-                    {# DONE: create /accounts/app_management - redirect to accounts:manage_account #}
-                    <a href="{% url 'accounts:manage_account' %}">{% trans "My Dashboard" %}</a>
-                </li>
+            {% comment %}<li>
+                {# DONE: create /accounts/app_management - redirect to accounts:manage_account #}
+                <a href="{% url 'accounts:manage_account' %}">
+                    <i class="fa fa-cogs"></i>{% trans " My Dashboard" %}</a>
+            </li>{% endcomment %}
             {% else %}
                 <li>
                     <a href="{% url 'accounts:sms_code' %}?next=/">{% trans "Login" %}</a>
                 </li>
                 <li>
-                    <a href="https://mymedicare.gov/registration.aspx">{% trans "Register" %}</a>
+                    <a href="{% url 'accounts:register' %}">{% trans "Register" %}</a>
                 </li>
             {% endif %}
-            <li>
-                <a href="{% url 'about' %}">{% trans "About" %}</a>
-            </li>
-
-            <li class="divider-vertical"></li>
-
-            <li class="dropdown" id="menu1">
-                <a href="#" class="btn dropdown-toggle"
-                   data-toggle="dropdown">More options...<span
+                <li class="dropdown" id="menu1">
+                    <a href="#" class="btn dropdown-toggle"
+                   data-toggle="dropdown"><i class="fa fa-info-circle"></i> Learn More<span
                         class="caret"></span></a>
-                <ul class="dropdown-menu" id="menu1" role="menu">
+                    <ul class="dropdown-menu" id="menu1" role="menu">
+                        <li>
+                            <a href="{% url 'accounts:learn_0' %}">{% trans "Learn More" %}</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'about' %}">{% trans "About" %}</a>
+                        </li>
+                    </ul>
+                </li>
+
+{#            <li class="divider-vertical"></li>#}
+
+            <li class="dropdown" id="menu2">
+                <a href="#" class="btn dropdown-toggle"
+                   data-toggle="dropdown"><i class="fa fa-question-circle"></i> Help<span
+                        class="caret"></span></a>
+                <ul class="dropdown-menu" id="menu2" role="menu">
                     {# TODO: Create /accounts/documentation page  #}
                     <li><a href="/api/documentation" class="">Documentation</a>
                     </li>
@@ -64,7 +69,7 @@
                         <a href="{% url 'api:home' %}" class=""
                                 contenteditable="false">API
                         </a>
-                    <li class="divider"></li>
+
                     </li>
                     {# DONE: /admin access page  #}
                     {% if user.is_admin and request.session.auth_master%}
@@ -79,18 +84,18 @@
             {% if request.session.auth_master %}
                 <li>
                     <a href="{%  url 'accounts:manage_account' %}">
-                        [ {{ user.first_name }} {{ user.last_name }} ]</a>
+                        [<i class="fa fa-cogs"></i> {{ user.first_name }} {{ user.last_name }} ]</a>
                 </li>
             {% else %}
                 <li>
                     <a href="{%  url 'accounts:account_access' %}">
-                    [ {{ user.first_name }} {{ user.last_name }} {% if request.session.auth_device %}
+                    [<i class="fa fa-cogs"></i> {{ user.first_name }} {{ user.last_name }} {% if request.session.auth_device %}
                         via {{ request.session.auth_device }} {% endif %}]</a>
                 </li>
             {% endif %}
             <li>
                 <a href="{% url "accounts:logout" %}?next=/{% if request.session.auth_device %}api/{% endif %}">
-                    {% trans "Logout" %} &nbsp;&nbsp;&nbsp;</a>
+                    {% trans "Logout" %} <i class="fa fa-sign-out"></i>&nbsp;&nbsp;&nbsp;</a>
             </li>
 
         </ul>

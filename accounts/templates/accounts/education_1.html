@@ -1,20 +1,22 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+{% block extrahead %}
+    <script src="{% static 'js/switch_content.js' %}"></script>
+{% endblock %}
+{% block title %}{% trans "Register for an account" %}{% endblock %}
+{% block breadcrumbs %}
+    <div class="container">
+        <ul class="breadcrumb">
+            <li><a href="{% url 'home' %}">Home</a></li>
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script type="text/javascript"
-            src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-    <script type="text/javascript"
-            src="http://netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css"
-          rel="stylesheet" type="text/css">
-    <link href="http://pingendo.github.io/pingendo-bootstrap/themes/default/bootstrap.css"
-          rel="stylesheet" type="text/css">
-</head>
+            <li class="active">Learn</li>
+        </ul>
+    </div>
+{% endblock %}
+{% block pagename %}Register{% endblock %}
+{% block content %}
 
-<body>
 <div class="section">
     <div class="container">
         <div class="row">
@@ -34,7 +36,7 @@
                     do. Before you connect
                     an application to your MyMedicare information make sure
                     that you trust
-                    that applicztion to take good care of your information.&nbsp;
+                    that application to take good care of your information.&nbsp;
                     <br>
                     <br>Don't worry. If you change your mind you can come
                     back to your account
@@ -50,10 +52,7 @@
                     <br>
                 </p>
             </div>
-            <div class="col-md-6">
-                <img src="http://pingendo.github.io/pingendo-bootstrap/assets/placeholder.png"
-                     class="img-responsive">
-            </div>
+
         </div>
     </div>
 </div>
@@ -63,51 +62,23 @@
             <div class="col-md-12">
                 <ul class="pagination pagination-lg">
                     <li>
-                        <a href="#">Prev</a>
+                        <a href="{% url 'accounts:learn_0' %}">Prev</a>
                     </li>
                     <li>
-                        <a href="#">1</a>
+                        <a href="{% url 'accounts:learn_0' %}">1</a>
                     </li>
                     <li>
-                        <a href="#">2</a>
+                        <a href="{% url 'accounts:learn_1' %}">2</a>
                     </li>
                     <li>
-                        <a href="#">3</a>
+                        <a href="{% url 'accounts:learn_2' %}">3</a>
                     </li>
                     <li>
-                        <a href="#">Next</a>
+                        <a href="{% url 'accounts:learn_2' %}">Next</a>
                     </li>
                 </ul>
             </div>
         </div>
     </div>
 </div>
-<div class="section">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="section">
-                    <div class="container">
-                        <div class="row text-center">
-                            <div class="col-xs-3 text-center">
-                                <a><i class="fa fa-5x fa-fw fa-instagram"></i></a>
-                            </div>
-                            <div class="col-xs-3">
-                                <a><i class="fa fa-5x fa-fw fa-twitter"></i></a>
-                            </div>
-                            <div class="col-xs-3">
-                                <a><i class="fa fa-5x fa-fw fa-facebook"></i></a>
-                            </div>
-                            <div class="col-xs-3 text-center">
-                                <a><i class="fa fa-5x fa-fw fa-github"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-</body>
-
-</html>
+{%  endblock %}

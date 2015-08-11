@@ -15,7 +15,11 @@ from django.db import models
 from django.utils import timezone
 
 DAL_ACTION_CHOICES = (('ACCESS', 'Access'),
-                      ('PERMISSION','Permission'))
+                      ('PERMISSION','Permission'),
+                      ('BLOCKED','No Permission'),
+                      ('INACTIVE', 'Inactive'),
+                      ('WRONG', 'Wrong Answer Given')
+                      )
 
 class Device(models.Model):
     """

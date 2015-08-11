@@ -19,31 +19,52 @@
 
     <div class="hero-unit">
         <div class="container-fluid">
-                <p>
-                 {% if user.is_authenticated %}
-                   <div class="col-md-8">
-
-                        <p>
-                         Explain the API here.
-                        </p>
-                       <div class="jumbotron">
-                            <p>Access the V1 API
+                <div class="row">
+                    <div class="col-md-8">
+                        {% if user.is_authenticated %}
+                        <div class="jumbotron">
+                            <H4>Access the V1 API
                                 <a href="{% url 'api:v1:home' %}">here</a>
-                            </p>
+                            </H4>
                        </div>
-                    </div>
                 {% else %}
-                    <a href="{% url "device:device_login" %}?next=/api"><input
-                            type="button"
-                            class="active btn btn-large btn-success"
-                            value="{% trans "login" %}"/>
-                    </a>
+                            <div class="jumbotron">
+                                <i class="fa fa-unlock fa-2x" style="color:green"></i><a href="{% url "device:device_login" %}?next=/api"><input
+                                        type="button"
+                                        class="active btn btn-large btn-success"
+                                        value="{% trans "Device Login" %}"/>
+                                </a>
+                            </div>
                 {% endif %}
-                </p>
 
-            <div class="col-md-4"><img
-                    src="{% static 'img/layout/blue-button.png' %}"
-                    style="height:300px"></div>
+                       <p>
+                         The BlueButton API enables you to select the data you are interested and
+                            retrieve it in a format you can use.
+                       </p>
+                       <p>
+                       We use two formats:
+                           <li>JSON</li>
+                            <li>XML</li>
+                       </p>
+                       <p>
+                           These are information formats that are used by popular applications across the Internet.
+                           This makes it easier for you to extract your data and put it to use for your health.
+                       </p>
+                    </div>
+
+                    <div class="col-md-4"><img
+                                src="{% static 'img/layout/blue-button.png' %}"
+                                style="height:300px">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-8">
+
+
+                    </div>
+                </div>
+
 
         </div>
     </div>
