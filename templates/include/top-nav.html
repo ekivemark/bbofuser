@@ -10,8 +10,12 @@
                    class="navbar-brand">
                     <img src="{% static 'img/layout/blue-button-trim.png' %}"
                      style="vertical-align:middle;display:inline-block;max-height:100%;max-width:100%"
-                     alt="{{ APPLICATION_TITLE }}">
+                     alt="{{ settings.APPLICATION_TITLE }}">
                 </a>
+            </li>
+            <li>
+                <a class="" href="{% url 'home' %}"
+                   contenteditable="false"><i class="fa fa-home fa-lg"></i></a>
             </li>
             {% if user.is_authenticated and request.session.auth_master %}
             <li>
@@ -31,10 +35,10 @@
             </li>{% endcomment %}
             {% else %}
                 <li>
-                    <a href="{% url 'accounts:sms_code' %}?next=/">{% trans "Login" %}</a>
+                    <a href="{% url 'accounts:sms_code' %}?next=/"><i class="fa fa-sign-in"></i> {% trans "Login" %}</a>
                 </li>
                 <li>
-                    <a href="{% url 'accounts:register' %}">{% trans "Register" %}</a>
+                    <a href="{% url 'register' %}"><i class="fa fa-check-square-o"></i> {% trans "Register" %}</a>
                 </li>
             {% endif %}
                 <li class="dropdown" id="menu1">
@@ -47,6 +51,9 @@
                         </li>
                         <li>
                             <a href="{% url 'about' %}">{% trans "About" %}</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'whatsnew' %}">{% trans "What's New" %}</a>
                         </li>
                     </ul>
                 </li>

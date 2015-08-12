@@ -3,6 +3,13 @@
 
 {% block title %}{% trans "Log in" %}{% endblock %}
 {% block pagename %}Log in{% endblock %}
+{% block breadcrumbs %}
+       <div class="container">
+        <ul class="breadcrumb">
+            <li class="active">Home</li>
+        </ul>
+    </div>
+{% endblock %}
 {% block content %}
     <form method="post" action="">
         {% csrf_token %}

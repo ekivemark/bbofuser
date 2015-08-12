@@ -17,6 +17,7 @@ from accounts.models import User
 
 class Email(forms.EmailField):
     def clean(self, value):
+        value = value.lower()
         super(Email, self).clean(value)
         try:
             User.objects.get(email=value)
@@ -33,10 +34,13 @@ class UserRegistrationForm(forms.ModelForm):
     """
     # email will be become username
     email = Email()
+
     password1 = forms.CharField(widget=forms.PasswordInput(),
                                 label="Password")
     password2 = forms.CharField(widget=forms.PasswordInput(),
                                 label="Repeat your password")
+
+    fields = ['email', 'password1', 'password2' ]
 
     def clean_password(self):
         if self.data['password1'] != self.data['password2']:
@@ -46,11 +50,14 @@ class UserRegistrationForm(forms.ModelForm):
 
 class RegistrationFormUserTOSAndEmail(UserRegistrationForm,
                                       RegistrationFormUniqueEmail,
-                                      RegistrationFormTermsOfService):
+                                      RegistrationFormTermsOfService,
+                                      ):
     pass
 
 
 class RegistrationFormTOSAndEmail(
     RegistrationFormUniqueEmail,
-    RegistrationFormTermsOfService):
+    RegistrationFormTermsOfService,
+    ):
+
     pass

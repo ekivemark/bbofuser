@@ -43,3 +43,13 @@ def learn_2(request):
     context = {}
     return render_to_response('accounts/education_2.html',
                               RequestContext(request, context, ))
+
+def what_is_new(request):
+    # Show What New Features are launched  (or coming up)
+
+    if settings.DEBUG:
+        print("In accounts.views.learn.what_is_new")
+
+    context = {}
+    return render_to_response('whatsnew.html',
+                              RequestContext(request, context, ))

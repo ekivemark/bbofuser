@@ -8,6 +8,7 @@ All SMS Related views
 """
 __author__ = 'Mark Scrimshire:@ekivemark'
 
+import ldap3
 
 from django.conf import settings
 from django.contrib import messages
@@ -19,6 +20,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import (render_to_response)
 from django.template import RequestContext
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 
 from accounts.forms.authenticate import (AuthenticationForm,
                                          SMSCodeForm)
@@ -83,11 +85,13 @@ def make_local_user(request, email):
     return user
 
     """
+    messages.error(request,mark_safe("You are registered on MyMedicare.gov. "
+                           "\nBut not registered for BlueButton."
+                           " \nPlease complete the <a href='/registration/register/'>BlueButton Registration</a>"))
 
-    User = form.save(commit=False)
-    # Get info from LDAP
+    result = HttpResponseRedirect("/registration/register/", request)
 
-    return User
+    return result
 
 
 def validate_sms(username, smscode):
@@ -149,16 +153,28 @@ def sms_login(request, *args, **kwargs):
             return HttpResponseRedirect(reverse('accounts:sms_code'))
         if form.is_valid():
             # print("Authenticate")
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
+            email = form.cleaned_data['email'].lower()
+            password = form.cleaned_data['password'].lower()
             sms_code = form.cleaned_data['sms_code']
             if not validate_sms(username=email, smscode=sms_code):
                 messages.error(request, "Invalid Access Code.")
                 return render_to_response('accounts/login.html',
                                           {'form': AuthenticationForm()},
                                           RequestContext(request))
+            # DONE: Trying to handle LDAP Errors. eg. Not available
+            try:
+                user = authenticate(username=email, password=password)
+            except (ldap3.LDAPBindError,
+                    ldap3.LDAPSASLPrepError,
+                    ldap3.LDAPSocketOpenError):
+                print("We got an LDAP Error - Bind:",dir(ldap3.LDAPBindError),
+                    "\nSASL Prep:", ldap3.LDAPSASLPrepError,
+                    "\nSocketOpenError:",ldap3.LDAPSocketOpenError)
+                messages.error(request, "We had a problem reaching the Directory Server")
+                return render_to_response('accounts/login.html',
+                                      RequestContext(request))
 
-            user = authenticate(username=email, password=password)
+            #######
 
             if user is not None:
 
@@ -214,22 +230,22 @@ def sms_code(request):
 
     if request.method == 'POST':
         if request.POST.__contains__('email'):
-            email = request.POST['email']
+            email = request.POST['email'].lower()
             print("POST email on entry:[%s]" % (email))
         else:
             if 'email' in request.session:
                 if request.session['email'] != "":
-                    email = request.session['email']
+                    email = request.session['email'].lower()
             else:
                 email = ""
         if settings.DEBUG:
-            print("request.POST:%s" % request.POST)
+            #print("request.POST:%s" % request.POST)
             print("email:%s" % email)
 
         form = SMSCodeForm(request.POST)
 
         if form.is_valid():
-            if not validate_user(request, form.cleaned_data['email']):
+            if not validate_user(request, form.cleaned_data['email'].lower()):
                 request.session['email'] = ""
                 # WE had a problem
                 # Message error was set in validate_user function
@@ -270,23 +286,31 @@ def sms_code(request):
                     else:
                         request.session['email'] = ""
                         messages.error(request,
-                                       "Your account is inactive.")
+                                       mark_safe("Your account is inactive. If you recently registered to use BlueButton"
+                                       "\nplease check your email for an activation link."))
                         status = "Inactive Account"
                         return HttpResponseRedirect(
                             reverse('accounts:sms_code'))
                 except(User.DoesNotExist):
                     # User is in LDAP but not in User Table
-                    u = make_local_user(request,
-                                        email=form.cleaned_data['email'])
-                    # TODO: Create User Account using LDAP info
-                    # TODO: Import data from LDAP
+                    #u = make_local_user(request,
+                    #                    email=form.cleaned_data['email'].lower())
+                    # DONE: Point to Registration Page
                     # TODO: Redirect user to educate, acknowledge, validate step
+                    messages.error(request,mark_safe("You are registered on MyMedicare.gov. "
+                                                     "\nBut not registered for BlueButton."
+                                                     " \nPlease complete the <a href='/registration/register/'>BlueButton Registration</a>"))
+
+                    args = {}
+                    args['email'] = form.cleaned_data['email'].lower()
+                    return HttpResponseRedirect("/accounts/learn/0/", email)
+                    print("Result",result)
 
                     request.session['email'] = ""
-                    messages.error(request, "You are not recognized.")
-                    status = "User UnRecognized"
-                    return HttpResponseRedirect(
-                        reverse('accounts:sms_code'))
+                    # messages.error(request, "You are not recognized.")
+                    # status = "User UnRecognized"
+                    #return HttpResponseRedirect(
+                    #    reverse('accounts:sms_code'))
                     # except(UserProfile.DoesNotExist):
                     #     messages.error(request, "You do not have a user profile.")
                     #     return HttpResponseRedirect(reverse('sms_code'))

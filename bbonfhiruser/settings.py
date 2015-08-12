@@ -187,7 +187,7 @@ AUTH_USER_MODEL = "accounts.User"
 USERNAME_FIELD = "email"
 # AUTHENTICATION_BACKENDS = ['accounts.backends.EmailAuthBackend',]
 AUTHENTICATION_BACKENDS = (
-    'django_python3_ldap.auth.LDAPBackend',
+    #'django_python3_ldap.auth.LDAPBackend',
     #'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
 )

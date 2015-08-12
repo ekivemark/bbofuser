@@ -10,9 +10,9 @@ __author__ = 'Mark Scrimshire:@ekivemark'
 
 # import ldap
 
-
 from django.conf import settings
 from django.contrib import messages
+
 
 def validate_ldap_user(request, email):
     # Do the ldapSearch for user
@@ -21,7 +21,7 @@ def validate_ldap_user(request, email):
         return result
 
     # Patch
-    return email
+    return email.lower()
     # Patch
 
     l = ldap.initialize(settings.AUTH_LDAP_SERVER_URI)
@@ -70,8 +70,6 @@ def validate_ldap_user(request, email):
         messages.error(request,
                        "We had a problem reaching MyMedicare.gov. Please try again later.")
         result = "ERROR"
-
-
 
     return result
 

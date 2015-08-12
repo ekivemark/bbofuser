@@ -4,6 +4,14 @@
 
 {% block title %}{% trans "Account Activated" %}{% endblock %}
 {% block pagename %}Account Activated{% endblock %}
+{% block breadcrumbs %}
+       <div class="container">
+        <ul class="breadcrumb">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li class="active">Account Activation</li>
+        </ul>
+    </div>
+{% endblock %}
 {% block content %}
     <p>
         {% trans "Your account is now activated." %}

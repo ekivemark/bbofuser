@@ -17,15 +17,23 @@ class RegistrationForm(forms.ModelForm):
     """
     Form for registering a new account.
     """
-    email = forms.EmailField(widget=forms.TextInput, label="Email")
+    email = forms.EmailField(widget=forms.EmailInput, label="Email")
     password1 = forms.CharField(widget=forms.PasswordInput,
                                 label="Password")
     password2 = forms.CharField(widget=forms.PasswordInput,
                                 label="Password (again)")
+    first_name = forms.CharField(max_length=50,
+                                 widget=forms.TextInput,
+                                 label="First name")
+    last_name = forms.CharField(max_length=50,
+                                widget=forms.TextInput,
+                                label="Last name")
 
     class Meta:
         model = User
-        fields = ['email', 'password1', 'password2']
+        fields = ['email',
+                  'password1', 'password2',
+                  'first_name', 'last_name']
 
     def clean(self):
         """
