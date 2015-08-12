@@ -400,6 +400,16 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 # GEt a file name that stores words we will use to create fake accounts
 WORD_LIST = parser.get('global', 'word_dictionary').strip()
 
+if DEBUG_SETTINGS:
+    print("===================================")
+    print("Testing for Word List:", WORD_LIST)
+    fwl = open(WORD_LIST)
+    x = 80
+    for y in range(2):
+        line = fwl.readline(x)
+        print(y,":", line[:-1])
+    print("=============================")
+
 DEFAULT_VALID_DAYS = 365
 
 # DONE: Define DEVICE_ACCESS_LOG_DAYS (365)_
@@ -431,7 +441,6 @@ SETTINGS_EXPORT = [
 
 
 if DEBUG_SETTINGS:
-    print("WORD_LIST:%s" % WORD_LIST)
     print("SECRET_KEY:%s" % SECRET_KEY)
     print(
         "================================================================")
@@ -479,20 +488,20 @@ LDAP_AUTH_USER_FIELDS = {
 LDAP_AUTH_GET_FIELDS =["cn", "uid", "givenName",
                        "sn","mail"]
 
+if REMOTE_LDAP_CHECK:
+    server = Server(AUTH_LDAP_SERVER_URI, get_info=ALL)
+    try:
+        c = Connection(server, auto_bind=True, raise_exceptions=False)
+        bound = c.bind()
+        print("Connect:",c)
+    except LDAPSocketOpenError:
+        c = {}
+        print("Server is not reachable")
+        print("Connection Exception:",dir(LDAPOperationResult))
+#       if hasattr(e, "response"):
+#           print("Response:",e.response[0])
 
-server = Server(AUTH_LDAP_SERVER_URI, get_info=ALL)
-try:
-    c = Connection(server, auto_bind=True, raise_exceptions=False)
-    bound = c.bind()
-    print("Connect:",c)
-except LDAPSocketOpenError:
-    c = {}
-    print("Server is not reachable")
-    print("Connection Exception:",dir(LDAPOperationResult))
-#    if hasattr(e, "response"):
-#        print("Response:",e.response[0])
-
-print("Server_Info:", server.info)
+    print("Server_Info:", server.info)
 
 FHIR_SERVER = parser.get('global', 'fhir_server')
 if FHIR_SERVER == '':
@@ -501,29 +510,22 @@ if FHIR_SERVER == '':
 
 if DEBUG_SETTINGS:
     print("FHIR_SERVER:", FHIR_SERVER)
+    print("AUTH_LDAP_SERVER_URI:",AUTH_LDAP_SERVER_URI)
     print("AUTH_LDAP_SCOPE:", AUTH_LDAP_SCOPE)
-    l = server
-    if c:
-        ldap_result = c.search(search_base=AUTH_LDAP_SCOPE,
-                               search_filter="(objectClass=inetOrgPerson)",
-                               search_scope=SUBTREE,
-                               attributes = LDAP_AUTH_GET_FIELDS
-                               )
-        print("=========================================")
-        print("LDAP Access Test:")
-        # print("Response:",c.response)
-        print("Result:", c.result)
-        for r in c.response:
-            print(r['dn'],r['attributes'] )
+    print("REMOTE_LDAP_CHECK:", REMOTE_LDAP_CHECK)
+    if REMOTE_LDAP_CHECK:
+        l = server
+        if c:
+            ldap_result = c.search(search_base=AUTH_LDAP_SCOPE,
+                                   search_filter="(objectClass=inetOrgPerson)",
+                                   search_scope=SUBTREE,
+                                   attributes = LDAP_AUTH_GET_FIELDS
+                                   )
+            print("=========================================")
+            print("LDAP Access Test:")
+            #   print("Response:",c.response)
+            print("Result:", c.result)
+            for r in c.response:
+                print(r['dn'],r['attributes'] )
 
     print("=========================================")
-#
-#     if c.SERVER_DOWN:
-#         print("ERROR! LDAP Server:", AUTH_LDAP_SERVER_URI,
-#               "is not accessible")
-# #
-#     if c.LDAPError:
-#         print("LDAP Error:")
-
-##################################
-##################################
