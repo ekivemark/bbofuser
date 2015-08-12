@@ -8,68 +8,88 @@ LDAP Utilities for Account
 """
 __author__ = 'Mark Scrimshire:@ekivemark'
 
-# import ldap
+from ldap3 import (Server, Connection,
+                   ALL, SUBTREE, ANONYMOUS,
+                   SIMPLE, SYNC, ASYNC,
+                   LDAPExceptionError, LDAPException, LDAPSocketOpenError,
+                   LDAPOperationResult,
+                   )
 
 from django.conf import settings
 from django.contrib import messages
 
 
 def validate_ldap_user(request, email):
-    # Do the ldapSearch for user
+    """ Search LDAP for user
+        return email if there is a match
+    """
+    if settings.DEBUG:
+        print("in accounts.views.ldap.validate_ldap_user with email:", email)
     result = {}
     if email == "":
         return result
 
-    # Patch
-    return email.lower()
-    # Patch
+    if not settings.REMOTE_LDAP_CHECK:
+        if settings.DEBUG:
+            print("LDAP Remote Checking is set to:", settings.REMOTE_LDAP_CHECK)
+        return email.lower()
 
-    l = ldap.initialize(settings.AUTH_LDAP_SERVER_URI)
+    ##############
+    # REMOTE_LDAP_CHECK is True
+    # So we need to we need to reach out to the LDAP Server
+
+    server = Server(settings.AUTH_LDAP_SERVER_URI, get_info=ALL)
     try:
-        l.simple_bind_s("", "")
-        # We only want LDAP to return information for the specific email user
-        user_scope = "cn=" + email + "," + settings.AUTH_LDAP_SCOPE
-
+        c = Connection(server, auto_bind=True, raise_exceptions=False)
+        bound = c.bind()
         if settings.DEBUG:
-            print("user_scope:", user_scope)
-        try:
-            ldap_result = l.search_s(user_scope,
-                                     ldap.SCOPE_SUBTREE, "objectclass=*")
-        except:
-            ldap_result = []
+            print("Connect:",c)
+            print("Bind:", bound)
+            pass
+    except LDAPSocketOpenError:
+        c = {}
         if settings.DEBUG:
-            print("ldap returned:", ldap_result)
-
-        # ldap returned:
-        # ('cn=mark@ekivemark.com,ou=people,dc=bbonfhir,dc=com',
-        # {'sn': [b'Scrimshire'], 'givenName': [b'Mark'],
-        # 'cn': [b'mark@ekivemark.com'],
-        # 'mail': [b'mark@ekivemark.com'],
-        # 'objectClass': [b'inetOrgPerson'],
-        # 'displayName': [b'Mark Scrimshire']}
-        # )
-
-        if ldap_result == []:
-            result = ""
-        else:
-            result_subset = ldap_result[0][1]
-            result_mail = result_subset['mail']
-            result = result_mail[0].decode("utf-8")
-            if settings.DEBUG:
-                print("email:", result)
-
-    except ldap.SERVER_DOWN:
-        if settings.DEBUG:
-            print("LDAP Server", settings.AUTH_LDAP_SERVER_URI, "is Down")
+            print("Server is not reachable")
+            print("Connection Exception:",LDAPOperationResult.__str__)
         messages.error(request,
-                       "We are unable to unable to confirm your email address at this time. Please try again later.")
-        result = "ERROR"
-    except ldap.LDAPError:
-        if settings.DEBUG:
-            print("LDAP Server error:", settings.AUTH_LDAP_SERVER_URI)
-        messages.error(request,
-                       "We had a problem reaching MyMedicare.gov. Please try again later.")
-        result = "ERROR"
+                       "We are having problems reaching the MyMedicare.gov server"
+                       " to check your email address. Try again later.")
+        result = "ERROR" + str(LDAPExceptionError) + str(LDAPSocketOpenError)
+        return result
+    if settings.DEBUG:
+        #print("Server_Info:", server.info)
+        pass
 
-    return result
+    # ldap_result = c.search(search_base=settings.AUTH_LDAP_SCOPE,
+    #                         search_filter="(objectClass=inetOrgPerson)",
+    #                        search_scope=SUBTREE,
+    #                        attributes = settings.LDAP_AUTH_GET_FIELDS
+    #                        )
+
+    # if settings.DEBUG:
+    #     print("LDAP_RESULT for ",settings.AUTH_LDAP_SCOPE)
+    #     print("response:",c.response)
+
+    user_scope = "cn=" + email.strip() + "," + settings.AUTH_LDAP_SCOPE
+
+    ldap_email_check = c.search(search_base=user_scope,
+                                search_filter="(objectClass=inetOrgPerson)",
+                                search_scope=SUBTREE,
+                                attributes = settings.LDAP_AUTH_GET_FIELDS
+                                )
+    if settings.DEBUG:
+        # print("LDAP_Result for ",user_scope)
+        # print("Response:", c.response)
+        pass
+
+    ldap_email = ""
+    for r in c.response:
+        print(r['dn'],r['attributes'])
+        ldap_email = r['attributes']['mail']
+
+        print("LDAP_EMAIL:", ldap_email[0] )
+    # Patch
+    return ldap_email[0].lower()
+    # Patch
+
 

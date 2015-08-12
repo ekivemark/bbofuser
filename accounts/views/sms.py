@@ -33,8 +33,13 @@ from apps.device.utils import (session_device,
 
 
 def validate_user(request, email):
-    # We will lookup the email address in LDAP and then find in
-    # accounts.user
+    """
+
+    :param request:
+    :param email:
+    :return:
+    We will lookup the email address in LDAP and then find in accounts.user
+    """
 
     # step 1 is to look up email in LDAP
 
@@ -42,16 +47,16 @@ def validate_user(request, email):
     # Check the result for the mail field
     # Compare to the email received
 
-
     if settings.DEBUG:
         print("ldap email check:", result)
     # step 2 is to look up email in accounts.User
 
-    if result == "ERROR":
+    if result[:5] == "ERROR" and not "@" in result :
         # There was a problem with reaching the LDAP Server
         if settings.DEBUG:
             print("ldap email returned error")
         email_match = False
+
     else:
         print("LDAP Returned:", result)
         # We got something back from LDAP so we check it for a match
@@ -61,7 +66,8 @@ def validate_user(request, email):
             email_match = False
             # Set an error message
             messages.error(request,
-                            "Your email was not recognized. Do you need to register?")
+                            mark_safe("Your email was not recognized. Do you need to "
+                                      "<a href='/registration/register/'>register</a>?"))
 
     if settings.DEBUG:
         print("Match?:", email_match)
@@ -256,10 +262,10 @@ def sms_code(request):
                     print("Valid form with a valid email")
                 # True if email found in LDAP
                 try:
-                    u = User.objects.get(email=form.cleaned_data['email'])
+                    u = User.objects.get(email=form.cleaned_data['email'].lower())
                     if settings.DEBUG:
                         print("returned u:", u)
-                    # u=User.objects.get(email=form.cleaned_data['email'])
+                    # u=User.objects.get(email=form.cleaned_data['email'].lower())
                     mfa_required = u.mfa
                     email = u.email
                     if settings.DEBUG:
@@ -301,12 +307,11 @@ def sms_code(request):
                                                      "\nBut not registered for BlueButton."
                                                      " \nPlease complete the <a href='/registration/register/'>BlueButton Registration</a>"))
 
+                    request.session['email'] = ""
                     args = {}
                     args['email'] = form.cleaned_data['email'].lower()
                     return HttpResponseRedirect("/accounts/learn/0/", email)
-                    print("Result",result)
 
-                    request.session['email'] = ""
                     # messages.error(request, "You are not recognized.")
                     # status = "User UnRecognized"
                     #return HttpResponseRedirect(

@@ -440,8 +440,15 @@ if DEBUG_SETTINGS:
 #######################################
 #######################################
 # django-auth-ldap
+
+####
+# Remote LDAP Check in accounts.views.ldap.validate_ldap_user
+# True or False
+####
+REMOTE_LDAP_CHECK = False
+
 AUTH_LDAP_SERVER_URI = "ldap://dev.bbonfhir.com:389"
-LDAP_AUTH_URL = AUTH_LDAP_SERVER_URI
+# LDAP_AUTH_URL = AUTH_LDAP_SERVER_URI
 LDAP_AUTH_USE_TLS = False
 
 AUTH_LDAP_BIND_DN = "cn=django-agent,dc=bbonfhir,dc=com"
