@@ -166,6 +166,7 @@ THIRD_PARTY_APPS = (
     'django_python3_ldap',
     'debug_toolbar',
     #'ldap',
+    'ldap3',
     'rest_framework',
     'requests',
 )
@@ -259,6 +260,8 @@ SITE_ID = 5
 if DEBUG_SETTINGS:
     print("SITE_ID: ", SITE_ID)
     print("DOMAIN:  ", DOMAIN)
+
+#TODO: Pre-load sites
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
@@ -434,6 +437,8 @@ if DEBUG_SETTINGS:
         "================================================================")
 # SECURITY WARNING: keep the secret key used in production secret!
 
+#######################################
+#######################################
 # django-auth-ldap
 AUTH_LDAP_SERVER_URI = "ldap://dev.bbonfhir.com:389"
 LDAP_AUTH_URL = AUTH_LDAP_SERVER_URI
@@ -441,13 +446,13 @@ LDAP_AUTH_USE_TLS = False
 
 AUTH_LDAP_BIND_DN = "cn=django-agent,dc=bbonfhir,dc=com"
 
-#import ldap
-#from django_auth_ldap.config import LDAPSearch
+from ldap3 import (Server, Connection,
+                   ALL, SUBTREE, ANONYMOUS,
+                   SIMPLE, SYNC, ASYNC,
+                   LDAPExceptionError, LDAPException, LDAPSocketOpenError,
+                   LDAPOperationResult,
+                   )
 
-############## LDAP SEARCH Test
-#AUTH_LDAP_USER_SEARCH = LDAPSearch("ou=people,dc=bbonfhir,dc=com",
-#                                   ldap.SCOPE_SUBTREE, "(uid=%(user)s)")
-##############
 # Pull from local.ini and remove surrounding double quotes
 AUTH_LDAP_SCOPE = parser.get('global', 'auth_ldap_scope').strip()
 AUTH_LDAP_SCOPE = AUTH_LDAP_SCOPE.replace('"', '')
@@ -463,40 +468,24 @@ LDAP_AUTH_USER_FIELDS = {
     "last_name": "sn",
     "email": "mail",
 }
-LDAP_AUTH_USER_LOOKUP_FIELDS = ("username",)
+LDAP_AUTH_USER_LOOKUP_FIELDS = ("username")
+LDAP_AUTH_GET_FIELDS =["cn", "uid", "givenName",
+                       "sn","mail"]
 
-#LDAP_AUTH_CLEAN_USER_DATA = django_python3_ldap.utils.clean_user_data
 
-# ##############
-# from ldap3 import Server, Connection, SUBTREE
-# total_entries = 0
-# server = Server(AUTH_LDAP_SERVER_URI)
-# c = Connection(server, user='username', password='password')
-# c.search(search_base = 'o=test',
-#          search_filter = '(objectClass=inetOrgPerson)',
-#          search_scope = SUBTREE,
-#          attributes = ['cn', 'givenName'],
-#          paged_size = 5)
-# total_entries += len(c.response)
-# for entry in c.response:
-#     print(entry['dn'], entry['attributes'])
-#
-# cookie = c.result['controls']['1.2.840.113556.1.4.319']['value']['cookie']
-# while cookie:
-#     c.search(search_base = 'o=test',
-#              search_filter = '(object_class=inetOrgPerson)',
-#              search_scope = SUBTREE,
-#              attributes = ['cn', 'givenName'],
-#              paged_size = 5,
-#              paged_cookie = cookie)
-#     total_entries += len(c.response)
-#     cookie = c.result['controls']['1.2.840.113556.1.4.319']['value']['cookie']
-#     for entry in c.response:
-#         print(entry['dn'], entry['attributes'])
-# print('Total entries retrieved:', total_entries)
-#
-#
-# ##############
+server = Server(AUTH_LDAP_SERVER_URI, get_info=ALL)
+try:
+    c = Connection(server, auto_bind=True, raise_exceptions=False)
+    bound = c.bind()
+    print("Connect:",c)
+except LDAPSocketOpenError:
+    c = {}
+    print("Server is not reachable")
+    print("Connection Exception:",dir(LDAPOperationResult))
+#    if hasattr(e, "response"):
+#        print("Response:",e.response[0])
+
+print("Server_Info:", server.info)
 
 FHIR_SERVER = parser.get('global', 'fhir_server')
 if FHIR_SERVER == '':
@@ -506,21 +495,28 @@ if FHIR_SERVER == '':
 if DEBUG_SETTINGS:
     print("FHIR_SERVER:", FHIR_SERVER)
     print("AUTH_LDAP_SCOPE:", AUTH_LDAP_SCOPE)
-#    l = ldap.initialize(AUTH_LDAP_SERVER_URI)
-#    try:
-#        l.simple_bind_s("", "")
-#        ldap_result = l.search_s(AUTH_LDAP_SCOPE,
-#                                 ldap.SCOPE_SUBTREE,
-#                                 "objectclass=*")
-#        print("=========================================")
-#        print("LDAP Access Test:")
-#        for key, value in ldap_result:
-#            print("key:", key, ": ", value)
-#        print("=========================================")
+    l = server
+    if c:
+        ldap_result = c.search(search_base=AUTH_LDAP_SCOPE,
+                               search_filter="(objectClass=inetOrgPerson)",
+                               search_scope=SUBTREE,
+                               attributes = LDAP_AUTH_GET_FIELDS
+                               )
+        print("=========================================")
+        print("LDAP Access Test:")
+        # print("Response:",c.response)
+        print("Result:", c.result)
+        for r in c.response:
+            print(r['dn'],r['attributes'] )
+
+    print("=========================================")
 #
-#    except ldap.SERVER_DOWN:
-#        print("ERROR! LDAP Server:", AUTH_LDAP_SERVER_URI,
-#              "is not accessible")
-#
-#    except ldap.LDAPError:
-#        print("LDAP Error:")
+#     if c.SERVER_DOWN:
+#         print("ERROR! LDAP Server:", AUTH_LDAP_SERVER_URI,
+#               "is not accessible")
+# #
+#     if c.LDAPError:
+#         print("LDAP Error:")
+
+##################################
+##################################

@@ -10,8 +10,8 @@ __author__ = 'Mark Scrimshire:@ekivemark'
 from django.shortcuts import render, get_object_or_404
 from django import forms
 from django.conf import settings
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit
+#from crispy_forms.helper import FormHelper
+#from crispy_forms.layout import Submit
 
 from accounts.models import Application
 

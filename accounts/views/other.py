@@ -259,7 +259,7 @@ def connect_application(request):
     context['form'] = form
 
     if settings.DEBUG:
-        print(context)
+        print("Loading Render toResponse in accounts.views.other.connect_application")
 
     return render_to_response('accounts/connect_application.html',
                               context,
