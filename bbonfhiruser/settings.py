@@ -468,7 +468,7 @@ LDAP_AUTH_USER_FIELDS = {
     "last_name": "sn",
     "email": "mail",
 }
-LDAP_AUTH_USER_LOOKUP_FIELDS = ("username")
+#LDAP_AUTH_USER_LOOKUP_FIELDS = ("cn" )
 LDAP_AUTH_GET_FIELDS =["cn", "uid", "givenName",
                        "sn","mail"]
 
