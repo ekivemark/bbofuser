@@ -5,10 +5,16 @@ Created: 6/27/15 8:39 AM
 
 
 """
+
 __author__ = 'Mark Scrimshire:@ekivemark'
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.sites.models import Site
 from django.core.mail import send_mail
+from django.template import RequestContext
+from django.template.loader import render_to_string
+
 
 # Carrier Selection shows carriers with their email address
 # All names must be unique
@@ -225,10 +231,10 @@ def cell_email(phone, carrier):
     return email
 
 
-def send_sms_pin(phone, email, pin):
+def send_sms_pin(email, pin):
     """
     Send a text with an SMS code
-    :param phone:
+
     :param email:
     :return:
     """
@@ -251,6 +257,64 @@ def send_sms_pin(phone, email, pin):
 
     if settings.DEBUG:
         print("Send Result:", result)
+
+    return result
+
+
+def send_activity_message(request, email, subject="", msg="" ):
+    """
+    Send an email
+    :param email:
+    :param subject:
+    :param msg:
+    :return:
+    """
+
+    from_email = settings.EMAIL_HOST_USER
+    send_to= []
+    send_to.append(email)
+
+    if subject=="":
+        subject = settings.APPLICATION_TITLE + " Account Activity for " + email
+
+    ctx_dict = {}
+    if request is not None:
+        ctx_dict = RequestContext(request, ctx_dict)
+
+    User_Model = get_user_model()
+    usermodel = User_Model.objects.get(email=email)
+    ctx_dict.update({
+        'email': email,
+        'user': usermodel,
+        'site': Site.objects.get_current(),
+        })
+    # Remove any newlines from subject
+    subject = ''.join(subject.splitlines())
+
+    from_email = getattr(settings, 'REGISTRATION_DEFAULT_FROM_EMAIL',
+                         settings.DEFAULT_FROM_EMAIL)
+
+    if msg == "":
+        message_txt = render_to_string('accounts/messages/account_activity_email.txt',
+                                       ctx_dict)
+    else:
+        message_txt = msg
+
+    if settings.DEBUG:
+        print("Sending:", send_to)
+        print("Subject:", subject)
+        print("Message:", message_txt)
+
+
+    try:
+        result = send_mail(subject, message_txt, from_email, send_to,
+                           fail_silently=False)
+        if settings.DEBUG:
+            print("Result of Send:", result)
+    except:
+        result = "FAIL"
+        if settings.DEBUG:
+            print("Send Failed with:", result)
 
     return result
 

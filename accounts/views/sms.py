@@ -22,6 +22,8 @@ from django.template import RequestContext
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
+from accounts.utils import (send_activity_message,
+                            cell_email)
 from accounts.forms.authenticate import (AuthenticationForm,
                                          SMSCodeForm)
 from accounts.views.ldap import validate_ldap_user
@@ -143,9 +145,9 @@ def sms_login(request, *args, **kwargs):
     else:
         email = ""
     if settings.DEBUG:
-        print(request.GET)
+        # print(request.GET)
         print("SMS_LOGIN.GET:email:[%s]" % (email))
-        print(request.POST)
+        # print(request.POST)
         print(args)
 
     if request.method == 'POST':
@@ -187,12 +189,20 @@ def sms_login(request, *args, **kwargs):
                 if user.is_active:
                     django_login(request, user)
 
-                    # DONE: Set a session variable to identify as master account and not a device
+                    # DONE: Set a session variable to identify as
+                    # master account and not a device
 
                     session_device(request,
                                    "True",
                                    Session="auth_master")
-
+                    # DONE: Send a message on login
+                    if user.notify_activity == "T":
+                        send_activity_message(request,
+                                              cell_email(user.phone,
+                                                         user.carrier))
+                    elif user.notify_activity == "E":
+                        send_activity_message(request, user.email)
+                    # Otherwise don't send a message
                     return HttpResponseRedirect(reverse('home'))
                 else:
 
@@ -253,7 +263,7 @@ def sms_code(request):
         if form.is_valid():
             if not validate_user(request, form.cleaned_data['email'].lower()):
                 request.session['email'] = ""
-                # WE had a problem
+                # We had a problem
                 # Message error was set in validate_user function
                 status = "Email UnRecognized"
                 return HttpResponseRedirect(reverse('accounts:sms_code'))
@@ -302,7 +312,7 @@ def sms_code(request):
                     #u = make_local_user(request,
                     #                    email=form.cleaned_data['email'].lower())
                     # DONE: Point to Registration Page
-                    # TODO: Redirect user to educate, acknowledge, validate step
+                    # DONE: Redirect user to educate, acknowledge, validate step
                     messages.error(request,mark_safe("You are registered on MyMedicare.gov. "
                                                      "\nBut not registered for BlueButton."
                                                      " \nPlease complete the <a href='/registration/register/'>BlueButton Registration</a>"))

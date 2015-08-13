@@ -25,9 +25,10 @@ from django.shortcuts import (render,
 from django.template import RequestContext
 from django.utils import timezone
 
-from accounts.models import User
 from accounts.decorators import session_master
-
+from accounts.models import User
+from accounts.utils import (send_activity_message,
+                            cell_email)
 from apps.device.models import (Device,
                                 DeviceAccessLog)
 from apps.device.forms import (Device_AuthenticationForm,
@@ -44,6 +45,15 @@ from apps.device.utils import (get_phrase,
 from apps.secretqa.views import (Get_Question,
                                  Check_Answer)
 from apps.device.forms import Question_Form
+
+PERM_MSG0 = "This is a courtesy message from " + settings.APPLICATION_TITLE
+PERM_MSG0 = PERM_MSG0 + " to inform you that your account with the email address ("
+PERM_MSG1 = ") just connected to our service and gave permission for one of your device accounts ("
+PERM_MSG2 = ") to connect.\n"
+PERM_MSG2 = PERM_MSG2 + "\nIf it is not you giving permission you may want to "
+PERM_MSG2 = PERM_MSG2 + "log in and review your account at " +settings.DOMAIN +" ."
+PERM_MSG2 = PERM_MSG2 + "\n\n\nRegards \nYour Support Team at\n" + settings.APPLICATION_TITLE
+
 
 @session_master
 @login_required
@@ -274,7 +284,7 @@ def ask_user_for_permission(request):
     else:
         if settings.DEBUG:
             print("Not passed from Device Login correctly")
-        messages.ERROR(request, "Unable to Check Permission")
+        messages.error(request, "Unable to Check Permission")
         return render_to_response(reverse('api:home'))
 
     # Now to Ask for Permission
@@ -311,6 +321,21 @@ def ask_user_for_permission(request):
                     print("User_Model:", User_Model)
                     print("user:", user)
 
+                # DONE: Add Email Notification of Permission Given
+                if user.notify_activity in "ET":
+                    msg = PERM_MSG0 + user.email + PERM_MSG1 + device.device + PERM_MSG2
+                    subject = "Device Connected to " + settings.APPLICATION_TITLE
+                    if user.notify_activity == "T":
+                        send_activity_message(request, cell_email(user.phone,
+                                                         user.carrier),
+                                              subject,
+                                              msg)
+                    elif user.notify_activity == "E":
+                        send_activity_message(request, user.email,
+                                              subject,
+                                              msg)
+                # Otherwise don't send a message
+
                 django_login(request, user)
                 session_set = session_device(request, device.device)
                 # DONE: Record Access in DeviceAccessLog
@@ -328,12 +353,12 @@ def ask_user_for_permission(request):
                 return HttpResponseRedirect(reverse("api:home"))
             else:
                 # Failed - Go back to Login
-                messages.ERROR(request, "Sorry - that was the wrong answer")
+                messages.error(request, "Sorry - that was the wrong answer")
                 Post_Device_Access(request, device.device, action="WRONG")
                 # DONE: Record Access in DeviceAccessLog
                 return HttpResponseRedirect(reverse('device:device_login'))
         else:
-            messages.ERROR(request,"I am sorry = there was a problem")
+            messages.error(request,"I am sorry = there was a problem")
             render(request,
                   'device/device_permission.html',
                    {'form': form,
@@ -545,7 +570,7 @@ def Device_Login(request, *args, **kwargs):
                                 # Failed authorization checks
                                 # So check if permitted
                             permission_check = False
-                            messages.ERROR(request, "You are not permitted access with this account")
+                            messages.error(request, "You are not permitted access with this account")
                             Post_Device_Access(request, device.device, action="NOTPERMITD")
                             # DONE: Record Access in DeviceAccessLog
 
@@ -558,13 +583,13 @@ def Device_Login(request, *args, **kwargs):
                             permission_check = True
                 else:
                     permission_check = False
-                    messages.ERROR(request,"Inactive device/account.")
+                    messages.error(request,"Inactive device/account.")
                     Post_Device_Access(request, device.device, action="INACTIVE")
                     # DONE: Record Access in DeviceAccessLog
                     return HttpResponseRedirect(reverse('api:home'))
 
                 # End of Insert
-                # TODO: Call function to get permission
+                # DONE: Call function to get permission
 
                 if permission_check:
                     # We passed the checks so finish the login

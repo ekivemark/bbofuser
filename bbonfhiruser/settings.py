@@ -251,6 +251,11 @@ USE_TZ = True
 # Get the Server Domain Name. eg. dev.bbonfhir.com
 # ie the server name to address this app
 DOMAIN = parser.get('global', 'domain')
+SSL = str2bool(parser.get('global', 'ssl'))
+if SSL:
+    URL_PRE = "https://"
+else:
+    URL_PRE = "http://"
 
 if DEBUG_SETTINGS:
     print("Check the valid site id in the site table")
@@ -437,6 +442,8 @@ SETTINGS_EXPORT = [
     'EMAIL_HOST_USER',
     'SECURITY_QUESTION_CHOICES',
     'DOMAIN',
+    'SSL',
+    'URL_PRE',
 ]
 
 

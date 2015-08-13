@@ -100,11 +100,15 @@ def user_edit(request):
             u.last_name = form.cleaned_data['last_name']
             u.mobile = form.cleaned_data['mobile']
             u.carrier = form.cleaned_data['carrier']
+            u.notify_activity = form.cleaned_data['notify_activity']
             if u.verified_mobile == True:
                 # Only set MFA is verified_mobile is True
                 # verified_mobile is set in verify_phone()
                 u.mfa = form.cleaned_data['mfa']
             else:
+                if u.notify_activity == "T":
+                    # Unset to "E" because phone is not verified
+                    u.notify_activity = "E"
                 u.mfa = False
             if settings.DEBUG:
                 print("Updated to:", u)
@@ -126,9 +130,12 @@ def user_edit(request):
             print("in the get with User:", u.first_name, " ", u.last_name,
                   " ", u.mobile)
         form = User_EditForm(
-            initial={'first_name': u.first_name, 'last_name': u.last_name,
-                     'mobile': u.mobile, 'carrier': u.carrier,
-                     'mfa': u.mfa})
+            initial={'first_name': u.first_name,
+                     'last_name': u.last_name,
+                     'mobile': u.mobile,
+                     'carrier': u.carrier,
+                     'mfa': u.mfa,
+                     'notify_activity': u.notify_activity})
         if settings.DEBUG:
             print("Not in the post in the get")
         return render(request, 'accounts/user_edit.html',

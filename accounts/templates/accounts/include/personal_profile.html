@@ -22,13 +22,17 @@
                     </p>
                 </a>
                 <a href="#" class="list-group-item">
-                    <h4 class="list-group-item-heading">Email Address:</h4>
+                    <h4 class="list-group-item-heading">Email Address:{% if user.notify_activity == "E" %}
+                        <i class="fa fa-paper-plane-o" style="color:green"></i>
+                        {% endif %}</h4>
                     <p class="list-group-item-text"> {{ user.email }}
                     </p>
                 </a>
                 {% if user.mobile %}
                 <div class="list-group-item">
-                    <h4 class="list-group-item-heading">Mobile Phone</h4>
+                    <h4 class="list-group-item-heading">Mobile Phone: {% if user.notify_activity == "T" %}
+                        <i class="fa fa-paper-plane-o" style="color:green"></i>
+                        {% endif %}</h4>
 
                     <p class="list-group-item-text">
                             {{ user.mobile }} on {{ user.carrier | upper }}

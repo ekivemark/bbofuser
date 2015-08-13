@@ -24,7 +24,8 @@ from accounts.forms.application import (ApplicationCheckForm)
 from accounts.forms.authenticate import AuthenticationForm
 from accounts.forms.register import RegistrationForm
 from accounts.models import Application
-from accounts.utils import cell_email
+from accounts.utils import (cell_email,
+                            send_activity_message)
 
 from apps.device.models import Device
 from apps.device.utils import Master_Account
@@ -137,9 +138,7 @@ def agree_to_terms(request):
     # Agree to Terms
     # Register for account
 
-    DEBUG = settings.DEBUG_SETTINGS
-
-    if DEBUG:
+    if settings.DEBUG:
         print(settings.APPLICATION_TITLE,
               "in accounts.views.agree_to_terms")
 

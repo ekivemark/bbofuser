@@ -23,17 +23,15 @@ from uuid import uuid4
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.contrib.auth.models import (
-    User, BaseUserManager, AbstractBaseUser)
+from django.contrib.auth.models import (User,
+                                        BaseUserManager,
+                                        AbstractBaseUser)
 from django.contrib.auth.signals import user_logged_out
 from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser
 from phonenumber_field.modelfields import PhoneNumberField
 
-from accounts.utils import (CARRIER_SELECTION,
-                            cell_email,
-                            send_sms_pin)
-
+from accounts.utils import CARRIER_SELECTION, cell_email, send_sms_pin
 
 # Extending Application with OAuth Toolkit
 from oauth2_provider.models import AbstractApplication
@@ -49,6 +47,11 @@ USER_ROLE_CHOICES = (('primary', 'Account Owner'),
                      ('none', 'NONE'),
                      )
 
+# DONE: Add Activity Notification Choices
+ACTIVITY_NOTIFY_CHOICES = (('N', "No Notifications"),
+                           ('E', "Email Message"),
+                           ('T', "Text Message")
+                           )
 
 # class Application(models.Model):
 # @login_required()
@@ -138,8 +141,12 @@ class User(AbstractBaseUser):
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    # DONE: Create link to Organization
-    # DONE: Create Organization Role
+
+    # DONE: Add Activity Notification
+    notify_activity = models.CharField(max_length=1,
+                                       default="N",
+                                       choices=ACTIVITY_NOTIFY_CHOICES,
+                                       verbose_name="Notify Account Activity")
 
     # DONE: Add mobile number and carrier
     mobile = PhoneNumberField(blank=True)
@@ -231,10 +238,9 @@ class ValidSMSCode(models.Model):
 
         # Removing mfa check.
         # Only call ValidSMSCode is user.MFA is true or Verifying phone
-        new_number = cell_email(up.mobile, up.carrier)
+        phone_email = cell_email(up.mobile, up.carrier)
         # send an sms code
-        self.send_outcome = send_sms_pin(up.mobile,
-                                         new_number,
+        self.send_outcome = send_sms_pin(phone_email,
                                          self.sms_code)
 
         super(ValidSMSCode, self).save(**kwargs)

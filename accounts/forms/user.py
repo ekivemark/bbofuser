@@ -9,7 +9,7 @@ __author__ = 'Mark Scrimshire:@ekivemark'
 
 from django import forms
 
-from accounts.models import User
+from accounts.models import User, ACTIVITY_NOTIFY_CHOICES
 
 
 class User_EditForm(forms.ModelForm):
@@ -19,7 +19,8 @@ class User_EditForm(forms.ModelForm):
                   'last_name',
                   'mobile',
                   'carrier',
-                  'mfa', ]
+                  'mfa',
+                  'notify_activity']
 
 
 class Verify_Mobile(forms.Form):
