@@ -212,15 +212,22 @@ def cell_email(phone, carrier):
     :return: email
     """
     if settings.DEBUG:
-        print(phone)
+        print("Phone:", phone)
     # make sure it is in 10 digit phone number format
     # no + or . or - or ( or )
+    if phone == None:
+        return None
+
+    # We have a phone number so let's get the email address
     phone_digits = str(phone)
     phone_digits = phone_digits.replace("+1", "")
 
-    if (carrier == "" or carrier == None):
+    # Now we need to check the carrier
+
+    if (carrier == "" or carrier == "NONE" or carrier == None):
         return None
 
+    # We have a phone and a carrier
     if settings.DEBUG:
         print(carrier)
     # lookup email
