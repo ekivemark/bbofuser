@@ -11,8 +11,9 @@ __author__ = 'Mark Scrimshire:@ekivemark'
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
-from django.core.mail import send_mail
-from django.template import RequestContext
+from django.core.mail import send_mail, EmailMultiAlternatives
+from django.template import (RequestContext,
+                             Context)
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
@@ -338,7 +339,7 @@ def send_activity_message(request, email, subject="", msg="" ):
     from_email = getattr(settings, 'REGISTRATION_DEFAULT_FROM_EMAIL',
                          settings.DEFAULT_FROM_EMAIL)
 
-    message_txt = mark_safe(build_message_text(request,context=ctx_dict,type="txt"))
+    message_txt = build_message_text(request,context=ctx_dict,type="txt")
 
 
     # if msg == "":
@@ -352,10 +353,19 @@ def send_activity_message(request, email, subject="", msg="" ):
         print("Subject:", subject)
         print("Message:", message_txt)
 
+    email = EmailMultiAlternatives(subject,
+                                   message_txt,
+                                   from_email,
+                                   send_to,
+                                   )
+    if settings.EMAIL_HTML:
+        message_html = build_message_text(request,context=ctx_dict,type="html")
+        email.attach_alternative(message_html, "text/html")
 
     try:
-        result = send_mail(subject, message_txt, from_email, send_to,
-                           fail_silently=False)
+        result = email.send(fail_silently=False)
+        # result = send_mail(subject, message_txt, from_email, send_to,
+        #                   fail_silently=False)
         if settings.DEBUG:
             print("Result of Send:", result)
     except:

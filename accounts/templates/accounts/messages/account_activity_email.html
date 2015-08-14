@@ -9,20 +9,21 @@
 
 <body>
 <p>
-    {{ user.first_name|capfirst }} {{ user.last_name|capfirst }}
-    {% blocktrans %},<br/>
-        <p>This is a courtesy message from {{ settings.APPLICATION_TITLE }}
-        to inform you that your account with the email address ({{ email }})
+    <b>{{ user.first_name|capfirst }} {{ user.last_name|capfirst }}</b>
+    ,<br/>
+        <p>This is a courtesy message from
+        <span style="font-style:italic;">{{ settings.APPLICATION_TITLE }}</span>
+        {% blocktrans %} to inform you that your account with the email address ({{ email }})
         just connected to our service.<br>
         </p>
         <p>
         If it is not you making the connection you may want to
-        log in and review your account at {% endblocktrans %}{{ site.domain }}.
+        log in and review your account at {% endblocktrans %}{{ settings.URL_PRE }}{{ site.domain }}.
         <br>
 
 </p>
 
-<p>
+<p style="font-size:5;">
     <a href="{{ settings.URL_PRE }}{{ site.domain }}">
         {{ site.name }}</a>
 </p>

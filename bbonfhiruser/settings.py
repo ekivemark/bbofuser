@@ -324,6 +324,8 @@ EMAIL_PORT = str2int(parser.get('global', 'email_port'))
 EMAIL_HOST_USER = parser.get('global', 'email_host_user')
 EMAIL_HOST_PASSWORD = parser.get('global', 'email_host_password')
 
+EMAIL_HTML = str2bool(parser.get('global', 'email_html'))
+
 # EMAIL_USE_TLS = True
 # Port 465 = SSL
 # Port 587 = TLS
