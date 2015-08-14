@@ -325,16 +325,12 @@ def ask_user_for_permission(request):
                 if user.notify_activity in "ET":
                     msg = PERM_MSG0 + user.email + PERM_MSG1 + device.device + PERM_MSG2
                     subject = "Device Connected to " + settings.APPLICATION_TITLE
-                    if user.notify_activity == "T":
-                        send_activity_message(request, cell_email(user.mobile,
-                                                         user.carrier),
+                    if user.notify_activity in "ET":
+                        send_activity_message(request,
+                                              user,
                                               subject,
                                               msg)
-                    elif user.notify_activity == "E":
-                        send_activity_message(request, user.email,
-                                              subject,
-                                              msg)
-                # Otherwise don't send a message
+              # Otherwise don't send a message
 
                 django_login(request, user)
                 session_set = session_device(request, device.device)
@@ -354,7 +350,7 @@ def ask_user_for_permission(request):
             else:
                 # Failed - Go back to Login
                 messages.error(request, "Sorry - that was the wrong answer")
-                Post_Device_Access(request, device.device, action="WRONG")
+                Post_Device_Access(request, device, action="WRONG")
                 # DONE: Record Access in DeviceAccessLog
                 return HttpResponseRedirect(reverse('device:device_login'))
         else:
@@ -376,7 +372,9 @@ def ask_user_for_permission(request):
     return render(request,
                   'device/device_permission.html',
                    {'form': form,
-                    'question': question})
+                    'question': question,
+                    'device': device},
+                    )
 
 
 
@@ -399,6 +397,7 @@ def Post_Device_Access(request, device, action="ACCESS"):
     # DONE: Delete entries older than CurrentTime = DEVICE_ACCESS_LOG_DAYS
     to_be_deleted_date = timezone.now() - timedelta(days=oldest_days)
     print("date to delete before:", to_be_deleted_date)
+
     log = DeviceAccessLog.objects.filter(device=device,accessed__lte=to_be_deleted_date)
     if settings.DEBUG:
         print("Device:", device)
@@ -571,7 +570,7 @@ def Device_Login(request, *args, **kwargs):
                                 # So check if permitted
                             permission_check = False
                             messages.error(request, "You are not permitted access with this account")
-                            Post_Device_Access(request, device.device, action="NOTPERMITD")
+                            Post_Device_Access(request, device, action="NOTPERMITD")
                             # DONE: Record Access in DeviceAccessLog
 
                             return HttpResponseRedirect(reverse("api:home"))
@@ -584,7 +583,7 @@ def Device_Login(request, *args, **kwargs):
                 else:
                     permission_check = False
                     messages.error(request,"Inactive device/account.")
-                    Post_Device_Access(request, device.device, action="INACTIVE")
+                    Post_Device_Access(request, device, action="INACTIVE")
                     # DONE: Record Access in DeviceAccessLog
                     return HttpResponseRedirect(reverse('api:home'))
 

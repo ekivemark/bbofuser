@@ -8,11 +8,13 @@
 </head>
 
 <body>
+{% if msg %}{{ msg }}{% else %}
 <p>
     <b>{{ user.first_name|capfirst }} {{ user.last_name|capfirst }}</b>
     ,<br/>
         <p>This is a courtesy message from
         <span style="font-style:italic;">{{ settings.APPLICATION_TITLE }}</span>
+
         {% blocktrans %} to inform you that your account with the email address ({{ email }})
         just connected to our service.<br>
         </p>
@@ -27,7 +29,7 @@
     <a href="{{ settings.URL_PRE }}{{ site.domain }}">
         {{ site.name }}</a>
 </p>
-
+{%  endif %}
 <p>
         <br>
         <br>Sincerely,<br>

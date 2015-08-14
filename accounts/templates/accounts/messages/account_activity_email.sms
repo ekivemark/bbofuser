@@ -1,6 +1,8 @@
 {% load i18n %}
+{% if msg %}{{ msg %}{% else %}
 From {{ settings.APPLICATION_TITLE }}:{{ email }} just logged in to {{ settings.URL_PRE }}{{ site.name }}.
 If it was you no action is needed.
+{% endif %}
 {% comment %}
 **accounts/messages/account_activity_email.txt**
 

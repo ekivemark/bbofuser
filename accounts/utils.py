@@ -332,10 +332,6 @@ def build_message_text(request,context={},
 def send_activity_message(request, user, subject="", msg="" ):
     """
     Send an email
-    :param email:
-    :param subject:
-    :param msg:
-    :return:
     """
     # Template files use the Django Template System.
 
@@ -356,8 +352,9 @@ def send_activity_message(request, user, subject="", msg="" ):
     # usermodel = User_Model.objects.get(email=email)
     ctx_dict.update({
         'email': email,
-        'user': user,
-        'site': Site.objects.get_current(),
+        'user' : user,
+        'msg'  : msg,
+        'site' : Site.objects.get_current(),
         })
 
     if settings.DEBUG:

@@ -1,5 +1,6 @@
 {% load i18n %}
-{{ user.first_name|capfirst }} {{user.last_name|capfirst }}{% blocktrans %},
+{{ user.first_name|capfirst }} {{user.last_name|capfirst }}
+{% if msg %}{{ msg }}{% else %}{% blocktrans %},
 This is a courtesy security message.
 
 You, or someone pretending to be you, have logged in to your account ( {{ email }} ) at
@@ -8,6 +9,7 @@ If this was you, you can safely ignore this email.
  {% endblocktrans %}
 {{ settings.URL_PRE}}{{ site.name }}
 
+{% endif %}
 {% blocktrans %}
 Sincerely,
 
