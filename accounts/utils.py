@@ -204,6 +204,28 @@ def strip_url(domain, www=None):
     return result
 
 
+def email_mask(email=""):
+    """
+    mask and potentially shorten an email address
+    Useful for communications
+    :param email:
+    :return:
+    """
+
+    if email=="":
+        return None
+
+    domain = "@"+email.split("@")[1]
+    tld    = "."+domain.split(".")[1]
+
+    if settings.DEBUG:
+        print("Domain:",domain)
+
+    result_email = email[:2]+"**" + domain[:2] + "**" + tld[:2] + "**"
+
+    return result_email
+
+
 def cell_email(phone, carrier):
     """
     Receive Phone number and carrier and return sms-email address
@@ -271,14 +293,15 @@ def send_sms_pin(email, pin):
 
 def build_message_text(request,context={},
                        template="accounts/messages/account_activity_email",
-                       type="txt",
+                       extn="txt",
                        ):
     """
     Compose a message to include in an email message
     :param request:
     :param template:
-    :param type: txt or html
+    :param extn: txt, html or sms
             (this becomes the file extension for the template)
+            sms is a brief template suitable for SMS Text Messages
     :param email:
     :return:
     """
@@ -297,7 +320,7 @@ def build_message_text(request,context={},
     # if settings.DEBUG:
     #     print("BMT:Context ctxt is:", ctxt)
 
-    source_plate = template + "." + type
+    source_plate = template + "." + extn
 
     message = render_to_string(source_plate, ctxt)
     if settings.DEBUG:
@@ -306,7 +329,7 @@ def build_message_text(request,context={},
     return message
 
 
-def send_activity_message(request, email, subject="", msg="" ):
+def send_activity_message(request, user, subject="", msg="" ):
     """
     Send an email
     :param email:
@@ -316,12 +339,12 @@ def send_activity_message(request, email, subject="", msg="" ):
     """
     # Template files use the Django Template System.
 
-    from_email = settings.EMAIL_HOST_USER
-    send_to= []
-    send_to.append(email)
-
-    if subject=="":
-        subject = settings.APPLICATION_TITLE + " Account Activity for " + email
+    phone_email_to = cell_email(user.mobile, user.carrier)
+    email          = user.email
+    from_email     = settings.EMAIL_HOST_USER
+    send_to        = []
+    message_txt    = ""
+    message_html   = ""
 
     ctx_dict = {}
     if request is not None:
@@ -329,31 +352,47 @@ def send_activity_message(request, email, subject="", msg="" ):
         #     print("Request is this:",request)
         ctx_dict = RequestContext(request, ctx_dict)
 
-    User_Model = get_user_model()
-    usermodel = User_Model.objects.get(email=email)
+    # User_Model = get_user_model()
+    # usermodel = User_Model.objects.get(email=email)
     ctx_dict.update({
         'email': email,
-        'user': usermodel,
+        'user': user,
         'site': Site.objects.get_current(),
         })
 
     if settings.DEBUG:
         print("SAM-ctx_dict:", ctx_dict)
 
-    # Remove any newlines from subject
-    subject = ''.join(subject.splitlines())
-
     from_email = getattr(settings, 'REGISTRATION_DEFAULT_FROM_EMAIL',
                          settings.DEFAULT_FROM_EMAIL)
 
-    message_txt = build_message_text(request,context=ctx_dict,type="txt")
+    if user.notify_activity.upper() == "E":
+        if subject=="":
+            subject = settings.APPLICATION_TITLE + " Account Activity for " + email
 
 
-    # if msg == "":
-    #     message_txt = render_to_string('accounts/messages/account_activity_email.txt',
-    #                                    ctx_dict)
-    # else:
-    #     message_txt = msg
+        # Otherwise we take the subject line passed in to the function
+        # Remove any newlines from subject
+        subject = ''.join(subject.splitlines())
+
+        # Now we will build the message
+        send_to.append(email)
+        message_txt = build_message_text(request,
+                                         context=ctx_dict,
+                                         extn="txt")
+        if settings.EMAIL_HTML:
+            # If True: Generate and attach the HTML version
+            message_html = build_message_text(request,
+                                              context=ctx_dict,
+                                              extn="html")
+    if user.notify_activity.upper() == "T":
+        # Text messages do not have subject lines so we need to reset
+        subject = ""
+        send_to.append(phone_email_to)
+
+        message_txt = build_message_text(request,
+                                         context=ctx_dict,
+                                         extn="sms")
 
     if settings.DEBUG:
         print("Sending:", send_to)
@@ -365,14 +404,12 @@ def send_activity_message(request, email, subject="", msg="" ):
                                    from_email,
                                    send_to,
                                    )
-    if settings.EMAIL_HTML:
-        message_html = build_message_text(request,context=ctx_dict,type="html")
+    if not message_html == "":
+        # If html was created we should attach it before message is sent
         email.attach_alternative(message_html, "text/html")
 
     try:
         result = email.send(fail_silently=False)
-        # result = send_mail(subject, message_txt, from_email, send_to,
-        #                   fail_silently=False)
         if settings.DEBUG:
             print("Result of Send:", result)
     except:

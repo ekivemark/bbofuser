@@ -195,14 +195,12 @@ def sms_login(request, *args, **kwargs):
                     session_device(request,
                                    "True",
                                    Session="auth_master")
-                    # DONE: Send a message on login
-                    if user.notify_activity == "T":
+                    # DONE: Now Send a message on login
+                    if user.notify_activity in "ET":
                         send_activity_message(request,
-                                              cell_email(user.phone,
-                                                         user.carrier))
-                    elif user.notify_activity == "E":
-                        send_activity_message(request, user.email)
+                                              user)
                     # Otherwise don't send a message
+
                     return HttpResponseRedirect(reverse('home'))
                 else:
 

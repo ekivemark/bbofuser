@@ -326,7 +326,7 @@ def ask_user_for_permission(request):
                     msg = PERM_MSG0 + user.email + PERM_MSG1 + device.device + PERM_MSG2
                     subject = "Device Connected to " + settings.APPLICATION_TITLE
                     if user.notify_activity == "T":
-                        send_activity_message(request, cell_email(user.phone,
+                        send_activity_message(request, cell_email(user.mobile,
                                                          user.carrier),
                                               subject,
                                               msg)
