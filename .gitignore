@@ -4,6 +4,11 @@ bbonfhiruser/local_settings.py
 ### Python template
 =======
 >>>>>>> 791547b52449e17e3cd25221126566122b5a1c9b
+
+# exclude private configuration information
+local_settings.py
+local.ini
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -127,9 +132,6 @@ coverage.xml
 
 # Django stuff:
 *.log
-# exclude private configuration information
-local_settings.py
-local.ini
 
 # exclude migrations
 ????_initial.py
