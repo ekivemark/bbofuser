@@ -2,7 +2,8 @@
 {#  DONE: Link to Privacy Statement #}
 <div class="container-fluid">
     <div class="row-fluid">
-        <div class="nav navbar navbar-nav navbar-fixed-bottom panel-footer footer-wrapper ">
+        <div class="nav navbar navbar-nav navbar-fixed-bottom panel-footer footer-wrapper"
+        {% if request.META.HTTP_HOST == "localhost:8000" %} style="background-color:lightcyan"{% endif %}>
             <div class="col-lg-2">
 
                 <a href="https://github.com/ekivemark/bbofuser"
