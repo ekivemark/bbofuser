@@ -1,0 +1,14 @@
+<ExplanationOfBenefit xmlns="http://hl7.org/fhir"> doco
+ <!-- from Resource: id, meta, implicitRules, and language -->
+ <!-- from DomainResource: text, contained, extension, and modifierExtension -->
+ <identifier><!-- 0..* Identifier Business Identifier --></identifier>
+ <request><!-- 0..1 Reference(Claim) Claim reference --></request>
+ <outcome value="[code]"/><!-- 0..1 complete | error -->
+ <disposition value="[string]"/><!-- 0..1 Disposition Message -->
+ <ruleset><!-- 0..1 Coding Resource version --></ruleset>
+ <originalRuleset><!-- 0..1 Coding Original version --></originalRuleset>
+ <created value="[dateTime]"/><!-- 0..1 Creation date -->
+ <organization><!-- 0..1 Reference(Organization) Insurer --></organization>
+ <requestProvider><!-- 0..1 Reference(Practitioner) Responsible practitioner --></requestProvider>
+ <requestOrganization><!-- 0..1 Reference(Organization) Responsible organization --></requestOrganization>
+</ExplanationOfBenefit>

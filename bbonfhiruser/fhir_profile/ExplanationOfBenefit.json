@@ -1,0 +1,11 @@
+{
+  "resourceType": "ExplanationOfBenefit",
+  // from Resource: id, meta, implicitRules, and language
+  // from DomainResource: text, contained, extension, and modifierExtension
+  "identifier": [{ Identifier }], // Business Identifier
+  "request": { Reference(Claim) }, // Claim reference
+  "outcome": "<code>", // complete | error
+  "created": "dateTime>", // Creation date
+
+  // Add more
+}

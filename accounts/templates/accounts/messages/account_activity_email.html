@@ -4,32 +4,32 @@
 
 <head>
     <title>{{ site.name }} {% trans "Account Activity" %}
-        for {{ user|capfirst }}</title>
+        for {{ user.first_name|capfirst }} {{ user.last_name|capfirst }}</title>
 </head>
 
 <body>
 <p>
-    {{ user|capfirst }}
+    {{ user.first_name|capfirst }} {{ user.last_name|capfirst }}
     {% blocktrans %},<br/>
         <p>This is a courtesy message from {{ settings.APPLICATION_TITLE }}
-        to inform you that your account with the email address ({{ email }}
+        to inform you that your account with the email address ({{ email }})
         just connected to our service.<br>
         </p>
         <p>
         If it is not you making the connection you may want to
-        log in and review your account at {{ settings.DOMAIN }}.
+        log in and review your account at {% endblocktrans %}{{ site.domain }}.
         <br>
-{% endblocktrans %}
+
 </p>
 
 <p>
     <a href="{{ settings.URL_PRE }}{{ site.domain }}">
-        {{ site.domain }}</a>
+        {{ site.name }}</a>
 </p>
 
 <p>
         <br>
-        <br>Regards<br>
+        <br>Sincerely,<br>
         Your Support Team at
         {{ settings.APPLICATION_TITLE }}
 

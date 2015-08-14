@@ -1,11 +1,12 @@
-{% load i18n %}{{ user.first_name|capfirst }} {{user.last_name|capfirst }}{% blocktrans %},
+{% load i18n %}
+{{ user.first_name|capfirst }} {{user.last_name|capfirst }}{% blocktrans %},
 This is a courtesy security message.
 
-you, or someone pretending to be you, have logged in to your account ( {{ email }} ) at
+You, or someone pretending to be you, have logged in to your account ( {{ email }} ) at
 {% endblocktrans %}{{ settings.APPLICATION_TITLE }} ( {{ settings.URL_PRE }}{{ site.name }} ){% blocktrans %}.
 If this was you, you can safely ignore this email.
  {% endblocktrans %}
-{{ settings.URL_PRE}}{{ site.domain }}
+{{ settings.URL_PRE}}{{ site.name }}
 
 {% blocktrans %}
 Sincerely,

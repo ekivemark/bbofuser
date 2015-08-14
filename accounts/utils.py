@@ -14,7 +14,7 @@ from django.contrib.sites.models import Site
 from django.core.mail import send_mail
 from django.template import RequestContext
 from django.template.loader import render_to_string
-
+from django.utils.safestring import mark_safe
 
 # Carrier Selection shows carriers with their email address
 # All names must be unique
@@ -261,6 +261,43 @@ def send_sms_pin(email, pin):
     return result
 
 
+def build_message_text(request,context={},
+                       template="accounts/messages/account_activity_email",
+                       type="txt",
+                       ):
+    """
+    Compose a message to include in an email message
+    :param request:
+    :param template:
+    :param type: txt or html
+            (this becomes the file extension for the template)
+    :param email:
+    :return:
+    """
+    # Template files use the Django Template System.
+
+    ctxt = {}
+    if context is not None:
+        # print("BMT:Context is:", context)
+        ctxt = RequestContext(request, context)
+        # print("BMT:ctxt with context:", ctxt)
+
+    if request is not None:
+        # print("BMT:Request is:", request)
+        ctxt = RequestContext(request, ctxt)
+
+    # if settings.DEBUG:
+    #     print("BMT:Context ctxt is:", ctxt)
+
+    source_plate = template + "." + type
+
+    message = render_to_string(source_plate, ctxt)
+    if settings.DEBUG:
+        print("Message:",message)
+
+    return message
+
+
 def send_activity_message(request, email, subject="", msg="" ):
     """
     Send an email
@@ -269,6 +306,7 @@ def send_activity_message(request, email, subject="", msg="" ):
     :param msg:
     :return:
     """
+    # Template files use the Django Template System.
 
     from_email = settings.EMAIL_HOST_USER
     send_to= []
@@ -279,6 +317,8 @@ def send_activity_message(request, email, subject="", msg="" ):
 
     ctx_dict = {}
     if request is not None:
+        # if settings.DEBUG:
+        #     print("Request is this:",request)
         ctx_dict = RequestContext(request, ctx_dict)
 
     User_Model = get_user_model()
@@ -288,17 +328,24 @@ def send_activity_message(request, email, subject="", msg="" ):
         'user': usermodel,
         'site': Site.objects.get_current(),
         })
+
+    if settings.DEBUG:
+        print("SAM-ctx_dict:", ctx_dict)
+
     # Remove any newlines from subject
     subject = ''.join(subject.splitlines())
 
     from_email = getattr(settings, 'REGISTRATION_DEFAULT_FROM_EMAIL',
                          settings.DEFAULT_FROM_EMAIL)
 
-    if msg == "":
-        message_txt = render_to_string('accounts/messages/account_activity_email.txt',
-                                       ctx_dict)
-    else:
-        message_txt = msg
+    message_txt = mark_safe(build_message_text(request,context=ctx_dict,type="txt"))
+
+
+    # if msg == "":
+    #     message_txt = render_to_string('accounts/messages/account_activity_email.txt',
+    #                                    ctx_dict)
+    # else:
+    #     message_txt = msg
 
     if settings.DEBUG:
         print("Sending:", send_to)
