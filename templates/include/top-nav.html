@@ -2,7 +2,11 @@
 {% load staticfiles %}
 
 <div class="container-fluid">
-    <div class="navbar navbar-default navbar-fixed-top">
+    <div class="navbar navbar-default navbar-fixed-top" {% if request.META.HTTP_HOST == "localhost:8000" %} style="background-color:lightcyan"{% endif %}>
+{% comment %}
+Add a color to the NavBar if we are on localhost:8000
+Just to avoid confusion...
+{% endcomment %}
         <ul class="nav navbar-nav">
             <li>
                 <a href="{% if request.session.auth_device %}{% url 'api:home' %}
