@@ -105,6 +105,15 @@ class Device(models.Model):
             result = True
         return result
 
+    def set_used(self):
+        # DONE: Return whether Device has been logged in
+        result = False
+        if not self.used:
+            self.used = True
+            super(Device, self).save()
+            result = True
+        return result
+
     def is_permitted(self):
         # DONE: Add check for Device is permitted to access
         result = False

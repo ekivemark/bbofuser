@@ -292,7 +292,7 @@ def send_sms_pin(email, pin):
 
 
 def build_message_text(request,context={},
-                       template="accounts/messages/account_activity_email",
+                       template="",
                        extn="txt",
                        ):
     """
@@ -320,6 +320,9 @@ def build_message_text(request,context={},
     # if settings.DEBUG:
     #     print("BMT:Context ctxt is:", ctxt)
 
+    if template=="":
+        template="accounts/messages/account_activity_email"
+
     source_plate = template + "." + extn
 
     message = render_to_string(source_plate, ctxt)
@@ -329,7 +332,13 @@ def build_message_text(request,context={},
     return message
 
 
-def send_activity_message(request, user, subject="", msg="" ):
+def send_activity_message(request,
+                          user,
+                          subject="",
+                          template="",
+                          msg="",
+                          context={}
+                          ):
     """
     Send an email
     """
@@ -357,6 +366,9 @@ def send_activity_message(request, user, subject="", msg="" ):
         'site' : Site.objects.get_current(),
         })
 
+    if context is not None:
+        ctx_dict.update(context)
+
     if settings.DEBUG:
         print("SAM-ctx_dict:", ctx_dict)
 
@@ -376,11 +388,13 @@ def send_activity_message(request, user, subject="", msg="" ):
         send_to.append(email)
         message_txt = build_message_text(request,
                                          context=ctx_dict,
+                                         template=template,
                                          extn="txt")
         if settings.EMAIL_HTML:
             # If True: Generate and attach the HTML version
             message_html = build_message_text(request,
                                               context=ctx_dict,
+                                              template=template,
                                               extn="html")
     if user.notify_activity.upper() == "T":
         # Text messages do not have subject lines so we need to reset
@@ -389,6 +403,7 @@ def send_activity_message(request, user, subject="", msg="" ):
 
         message_txt = build_message_text(request,
                                          context=ctx_dict,
+                                         template=template,
                                          extn="sms")
 
     if settings.DEBUG:

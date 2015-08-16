@@ -22,5 +22,6 @@ email_use_ssl = True
 default_from_email = __ADD_DEFAULT_FROM_EMAIL_IN_LOCAL.INI__
 account_activation_days = 5
 registration_auto_login = False
+device_permission_count = 3
 auth_ldap_scope="ou=python-user,dc=example,dc=com"
 default_valid_until = 365

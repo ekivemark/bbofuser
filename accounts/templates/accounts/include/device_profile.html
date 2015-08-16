@@ -22,6 +22,7 @@
                 <th>Edit</th>
                 <th>Active</th>
                 <th>Used</th>
+                <th>permitted</th>
                 <th>Device</th>
                 <th>Account</th>
                 <th>Password</th>
@@ -36,6 +37,10 @@
                 </td>
                 <td style="text-align:center;">
                     {% if device.active %}<i class="fa fa-check-square-o fa-lg" style="color:green"></i>
+                    {% else %}<i class="fa fa-square-o fa-lg" style="color:red"></i>{% endif %}
+                </td>
+                <td style="text-align:center;">
+                    {% if device.permitted %}<i class="fa fa-check-square-o fa-lg" style="color:green"></i>
                     {% else %}<i class="fa fa-square-o fa-lg" style="color:red"></i>{% endif %}
                 </td>
                 <td style="text-align:center">

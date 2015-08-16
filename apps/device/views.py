@@ -28,7 +28,8 @@ from django.utils import timezone
 from accounts.decorators import session_master
 from accounts.models import User
 from accounts.utils import (send_activity_message,
-                            cell_email)
+                            cell_email,
+                            email_mask)
 from apps.device.models import (Device,
                                 DeviceAccessLog)
 from apps.device.forms import (Device_AuthenticationForm,
@@ -271,12 +272,19 @@ def ask_user_for_permission(request):
     :param device:
     :return:
     """
+    if 'device_ask_permission' in request.session:
+        ask_count = int(request.session['device_ask_permission']['count'])
+    else:
+        ask_count = 0
+    ask_count += 1
+
     if 'device_permission' in request.session:
         device_id = request.session['device_permission']['device']
         user_email   = request.session['device_permission']['user']
         if settings.DEBUG:
             print("User:  ", user_email)
             print("Device:", device_id)
+            print("Ask Count:", ask_count)
 
         user = get_user_model().objects.get(email=user_email)
         device = Device.objects.get(pk=device_id)
@@ -285,7 +293,28 @@ def ask_user_for_permission(request):
         if settings.DEBUG:
             print("Not passed from Device Login correctly")
         messages.error(request, "Unable to Check Permission")
-        return render_to_response(reverse('api:home'))
+        return HttpResponseRedirect(reverse("api:home"))
+
+    # Check the number of attempts to get permission
+    # DONE: Check ask_permission count against settings.
+    if settings.DEVICE_PERMISSION_COUNT:
+        max_count = settings.DEVICE_PERMISSION_COUNT
+    else:
+        # Set a default
+        max_count = 3
+
+    if max_count > 0:
+        # We need to check the number of attempts
+        if ask_count > max_count:
+            # Set device as used
+            # set message
+            # return to api:home
+            device.set_used()
+            # now we can clear down the count
+            request.session['device_ask_permission'] = {}
+
+            messages.error(request, "Too many permission attempts. This device is locked. The account owner will need to reset this device account")
+            return HttpResponseRedirect(reverse("api:home"))
 
     # Now to Ask for Permission
 
@@ -310,8 +339,11 @@ def ask_user_for_permission(request):
                 # Finish the login process
                 # Also have to set device.permitted to True
                 permitted_result = Device_Set_To_Permitted(device)
+                # DONE: Set device.used = True
+                used_result = device.set_used()
                 if settings.DEBUG:
                     print("device is now permitted?:", permitted_result)
+                    print("device in set to used:", used_result)
                 User_Model = get_user_model()
                 user = User_Model.objects.get(email=device.user)
                 user.backend = 'django.contrib.auth.backends.ModelBackend'
@@ -323,25 +355,29 @@ def ask_user_for_permission(request):
 
                 # DONE: Add Email Notification of Permission Given
                 if user.notify_activity in "ET":
-                    msg = PERM_MSG0 + user.email + PERM_MSG1 + device.device + PERM_MSG2
+                    # msg = PERM_MSG0 + user.email + PERM_MSG1 + device.device + PERM_MSG2
                     subject = "Device Connected to " + settings.APPLICATION_TITLE
                     if user.notify_activity in "ET":
                         send_activity_message(request,
                                               user,
                                               subject,
-                                              msg)
+                                              template="accounts/messages/device_permission_email",
+                                              context={'device':device.device,
+                                                       'email_mask':email_mask(user.email)},
+                                              )
               # Otherwise don't send a message
 
                 django_login(request, user)
                 session_set = session_device(request, device.device)
                 # DONE: Record Access in DeviceAccessLog
 
-                dal_result = Post_Device_Access(request, device)
+                dal_result = Post_Device_Access(request, device, action="PERMISSION")
                 if settings.DEBUG:
                     print("Post to Device Access Log:", dal_result)
 
                 # CLEAR DOWN THE REQUEST.SESSION VARIABLE
                 request.session['device_permission'] = {}
+                request.session['device_ask_permission'] = {}
                 if settings.DEBUG:
                     print("User:", user)
                     print("Sessions:", request.session )
@@ -351,6 +387,9 @@ def ask_user_for_permission(request):
                 # Failed - Go back to Login
                 messages.error(request, "Sorry - that was the wrong answer")
                 Post_Device_Access(request, device, action="WRONG")
+                # DONE: increment counter in request.session
+                request.session['device_ask_permission'] = {'count': ask_count}
+
                 # DONE: Record Access in DeviceAccessLog
                 return HttpResponseRedirect(reverse('device:device_login'))
         else:
@@ -383,6 +422,7 @@ def Post_Device_Access(request, device, action="ACCESS"):
     """
 
     Add the record of a device access to the DeviceAccessLog
+    update Device.Connected_From
 
     :param device:
     :return:
@@ -401,7 +441,7 @@ def Post_Device_Access(request, device, action="ACCESS"):
     log = DeviceAccessLog.objects.filter(device=device,accessed__lte=to_be_deleted_date)
     if settings.DEBUG:
         print("Device:", device)
-        print("Records Deleted from Log:", log.count())
+        print("Records to be Deleted from Log:", log.count())
 
     if log.count()>0:
         log.delete()
@@ -417,8 +457,9 @@ def Post_Device_Access(request, device, action="ACCESS"):
     DAL.action  = action
 
     if settings.DEBUG:
-        print(request.META.get('HTTP_USER_AGENT', ''))
-        print(len(request.META.get('HTTP_USER_AGENT', '')))
+        print("Log action:", action)
+        print("User Agent:", request.META.get('HTTP_USER_AGENT', ''))
+        print(len(request.META.get('HTTP_USER_AGENT', '')), " characters")
 
     DAL.info    = request.META.get('HTTP_USER_AGENT', '')
     DAL.source  = request.META.get('HTTP_X_FORWARDED_FOR’,''') or request.META.get('REMOTE_ADDR')
@@ -426,74 +467,74 @@ def Post_Device_Access(request, device, action="ACCESS"):
     result = DAL.save()
 
     # DONE: Update Device used field.
-    device.used = True
+    # device.used = True
     device.connected_from = DAL.source
     device.save()
 
     return result
 
 
-# TODO: Give Device Permission
-def Give_Device_Permission(request, user, device,):
-    """
-    Ask for Device Permission
-    Ask a Security Question
-    Check Security Answer
-    If Passed security then ask for permission
-
-    If permission is denied then set Device.active to false
-        Return False
-    :param device:
-    :return:
-    """
-    result = False
-    if settings.DEBUG:
-        print("Entering apps.device.views.Give_Device_Permission")
-
-    check = device.is_authorized()
-    # is active, is not deleted, is permitted. is valid_until.
-    if not 'result' in check:
-        # No warnings sent bck from is_authorized
-        if settings.DEBUG:
-            print("Check result:", check)
-        return True
-
-    # There was an issue with is_authorized()
-    if not device.used:
-        if not device.permitted:
-            # Device has not been used and we need to check permission
-            # DONE: check permission if device is not used before
-            # We need to Ask Permission and use a challenge question
-            #permission_result = Ask_User_For_Permission(request,
-            #                                            user,
-            #                                            device)
-
-            # Call the ask_permission Screen
-            if settings.DEBUG:
-                print("About to ask Permission")
-            return HttpResponseRedirect(reverse("device:ask_permission"))
-
-        else:
-            if settings.DEBUG:
-                print("Device Used:", device.used,
-                      " Permitted:", device.permitted)
-            # Device is permitted
-            return True
-
-    else: # Device has been used
-        if 'result' in check:
-            if settings.DEBUG:
-                print("Authorized Result", check['result'],":", check['message'])
-                # Failed authorization checks
-                # So check if permitted
-            return False
-        else:
-            if settings.DEBUG:
-                print("Check:", check)
-                # Authorized Check is empty - so there were no problems
-            return True
-
-
+# DONE: Give Device Permission
+# def Give_Device_Permission(request, user, device,):
+#     """
+#     Ask for Device Permission
+#     Ask a Security Question
+#     Check Security Answer
+#     If Passed security then ask for permission
+#
+#     If permission is denied then set Device.active to false
+#         Return False
+#     :param device:
+#     :return:
+#     """
+#     result = False
+#     if settings.DEBUG:
+#         print("Entering apps.device.views.Give_Device_Permission")
+#
+#     check = device.is_authorized()
+#     # is active, is not deleted, is permitted. is valid_until.
+#     if not 'result' in check:
+#         # No warnings sent bck from is_authorized
+#         if settings.DEBUG:
+#             print("Check result:", check)
+#         return True
+#
+#     # There was an issue with is_authorized()
+#     if not device.used:
+#         if not device.permitted:
+#             # Device has not been used and we need to check permission
+#             # DONE: check permission if device is not used before
+#             # We need to Ask Permission and use a challenge question
+#             #permission_result = Ask_User_For_Permission(request,
+#             #                                            user,
+#             #                                            device)
+#
+#             # Call the ask_permission Screen
+#             if settings.DEBUG:
+#                 print("About to ask Permission")
+#             return HttpResponseRedirect(reverse("device:ask_permission"))
+#
+#         else:
+#             if settings.DEBUG:
+#                 print("Device Used:", device.used,
+#                       " Permitted:", device.permitted)
+#             # Device is permitted
+#             return True
+#
+#     else: # Device has been used
+#         if 'result' in check:
+#             if settings.DEBUG:
+#                 print("Authorized Result", check['result'],":", check['message'])
+#                 # Failed authorization checks
+#                 # So check if permitted
+#             return False
+#         else:
+#             if settings.DEBUG:
+#                 print("Check:", check)
+#                 # Authorized Check is empty - so there were no problems
+#             return True
+#
+#
 def Device_Login(request, *args, **kwargs):
     """
     Device Login

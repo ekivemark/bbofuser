@@ -424,6 +424,10 @@ DEFAULT_VALID_DAYS = 365
 DEVICE_ACCESS_LOG_DAYS = int(parser.get('global', 'device_access_log_days'))
 #DEVICE_ACCESS_LOG_DAYS = 365
 
+# number of Device Permission Attempts before flagging Device
+# USED and NOT_PERMITTED
+DEVICE_PERMISSION_COUNT = int(parser.get('global', 'device_permission_count'))
+#DEVICE_PERMISSION_COUNT = 3
 
 SECURITY_QUESTION_CHOICES = (
     ('1', 'What is the name of your best friend?'),
