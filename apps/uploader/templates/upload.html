@@ -5,20 +5,32 @@
 {% block pretitle %}{% endblock %}
 {% block extra_head %}
 {% endblock %}
+{% block breadcrumbs %}
+    <div class="container">
+        <ul class="breadcrumb">
+            <li><a href="{% url 'home' %}">Home</a></li>
 
-{% block pagename %}Welcome{% endblock %}
+            <li class="active">Upload</li>
+        </ul>
+    </div>
+{% endblock %}
+{% block pagename %}FHIR Management Functions{% endblock %}
 {% block content %}
 
     <div class="hero-unit">
 
-        <h2>Uploader:{{ settings.APPLICATION_TITLE }}</h2>
+        <h2>Upload:{{ settings.APPLICATION_TITLE }}</h2>
 
         <div class="container-fluid">
-            <div class="col-md-6"><p>Upload data to the FHIR Server</p>
+            <div class="col-md-6">
                 {% if user.is_authenticated %}
-                    <a href="{% url "accounts:manage_account" %}"
-                       class="btn btn-primary btn-large">Manage Your
-                        Account</a>
+                    {%  if user.is_staff %}<h4>Staff Functions</h4>
+                        <p>
+                            Upload data to the FHIR Server
+                        </p>
+                        <a href="{% url "upload:partdweekly" %}"
+                         class="btn btn-primary btn-large">Load Medicare Part D Weekly Extract</a>
+                    {% endif %}
                 {% else %}
                     <a href="{% url "accounts:sms_code" %}?next=/"><input
                             type="button"

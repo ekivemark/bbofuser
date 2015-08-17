@@ -10,9 +10,14 @@ from datetime import datetime
 from datetime import datetime
 
 from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.loader import render_to_string
+
 
 __author__ = 'Mark Scrimshire:@ekivemark'
 import fileinput
@@ -131,7 +136,7 @@ PT_D_DRUG_XTRCT[8] = {'len': 195, 'type': "str", 'field': 'filler', }
 # FILLER	X(195).
 """
 
-
+@staff_member_required
 def home_index(request):
     # Show UploaderHome Page
 
@@ -173,6 +178,7 @@ def str_to_num(strn, fmt):
     return result
 
 
+@staff_member_required
 def upload_part_d_weekly(request,
                          file_name="/Users/mark/PycharmProjects/bbofu/bbofuser/sitestatic/week_extract.txt",
                          chunkSize=400):
@@ -190,21 +196,26 @@ def upload_part_d_weekly(request,
     :return: result
     """
     # TODO: get file from upload directory - passed as parameter
-    # TODO: limit access to function to special upload account(s)
+    # DONE: limit access to function to staff account(s)
 
     if settings.DEBUG:
         print("Processing Part D Weekly Extract")
         print("file:", file_name)
 
+    messages.info(request, "Processing lines from Part D weekly Extract")
+    counter = 0
     for line in fileinput.input([file_name]):
         process_line(line, PT_D_XTRCT)
+        counter +=1
 
+    messages.info(request, str(counter) + " line(s) processed in file:" + file_name)
     # TODO: test for error in return
     # TODO: post to FHIR API
 
-    return
+    return HttpResponseRedirect(reverse("upload:home"))
 
 
+@staff_member_required
 def upload_drug_extract(request,
                         file_name="/Users/mark/PycharmProjects/bbofu/bbofuser/sitestatic/week_drug_extract.txt",
                         chunkSize=400):
@@ -231,6 +242,7 @@ def upload_drug_extract(request,
         print("Processing Drug Extract")
         print("file:", file_name)
 
+    xml_upload = {}
     for line in fileinput.input([file_name]):
         m = process_line(line, PT_D_DRUG_XTRCT)
 

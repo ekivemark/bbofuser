@@ -36,8 +36,8 @@ class Device(models.Model):
     connected_from = models.CharField(max_length=1000, blank=True)
     active       = models.BooleanField(default=True)
     deleted      = models.BooleanField(default=False)
-    used         = models.BooleanField(default=False)
-    permitted    = models.BooleanField(default=False)
+    used         = models.BooleanField(default=False, verbose_name="Used to access your Account")
+    permitted    = models.BooleanField(default=False, verbose_name="Permission Given")
 
     def save(self, *args, **kwargs):
         created = self.date_created is None

@@ -184,6 +184,8 @@ def device_edit(request, pk):
                                         'account': d.account,
                                         'password': d.password,
                                         'valid_until': d.valid_until,
+                                        'used': d.used,
+                                        'permitted': d.permitted,
                                              })
         if settings.DEBUG:
             print("Not in the post in the get")

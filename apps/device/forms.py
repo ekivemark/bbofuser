@@ -69,6 +69,8 @@ class Device_EditForm(forms.ModelForm):
                               'cols': 80}))
     password = LowerCaseCharField(max_length=40, widget=HiddenInput())
     valid_until = forms.DateTimeField()
+    used = forms.BooleanField(help_text="Has device been used to connect to your account?")
+    permitted = forms.BooleanField(help_text="Has permission been given for this device to access your account?")
 
     class Meta:
         model = Device
@@ -77,6 +79,8 @@ class Device_EditForm(forms.ModelForm):
                   'valid_until',
                   'password',
                   'active',
+                  'used',
+                  'permitted',
                   )
     def clean(self):
         error_messages = []

@@ -5,7 +5,7 @@
 
 This is a courtesy message from {{ settings.APPLICATION_TITLE }} to inform you
 that your account ({{ email_mask }}) just connected to
-our service and gave permission for one of your device accounts ( {{ device }}) to connect.
+our service and gave permission for one of your device accounts ( {{ device|safe }}) to connect.
 
 If it is not you giving permission you may want to log in and review your account at
 {{ settings.site }}.

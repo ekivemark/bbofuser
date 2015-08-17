@@ -37,11 +37,26 @@
                     You need to login with your master account.
                     </p>
                         {% endif %}
-                    <a href="{% url "accounts:sms_code" %}?next=/">
+                        <div class="col-lg-4">
+                        <h4>Login to your account</h4>
+                        <a href="{% url "accounts:sms_code" %}?next=/">
                         <i class="fa fa-unlock fa-2x" style="color:green"></i><input
                             type="button"
                             class="active btn btn-large btn-success"
-                            value="{% trans " Login " %}"/></a>
+                            value="{% trans " Main Account Login " %}"/></a>
+                        </div>
+                        <div class="col-lg-4">
+                        <h4>Login with a device account</h4>
+                        <a href="{% url "device:device_login" %}?next=/">
+                        <i class="fa fa-unlock fa-2x" style="color:green"></i><input
+                            type="button"
+                            class="active btn btn-large btn-success"
+                            value="{% trans "Device Login " %}"/></a>
+                        </div>
+                        <div class="col-lg-4">
+
+                        </div>
+
                     {% endif %}
                 </p>
             <div class="col-md-8">

@@ -101,7 +101,7 @@ Just to avoid confusion...
                 <li>
                     <a href="{%  url 'accounts:account_access' %}">
                     [<i class="fa fa-cogs"></i> {{ user.first_name }} {{ user.last_name }} {% if request.session.auth_device %}
-                        via {{ request.session.auth_device }} {% endif %}]</a>
+                        <br>via {{ request.session.auth_device }} {% endif %}]</a>
                 </li>
             {% endif %}
             <li>
