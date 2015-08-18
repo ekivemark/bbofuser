@@ -47,14 +47,6 @@ from apps.secretqa.views import (Get_Question,
                                  Check_Answer)
 from apps.device.forms import Question_Form
 
-PERM_MSG0 = "This is a courtesy message from " + settings.APPLICATION_TITLE
-PERM_MSG0 = PERM_MSG0 + " to inform you that your account with the email address ("
-PERM_MSG1 = ") just connected to our service and gave permission for one of your device accounts ("
-PERM_MSG2 = ") to connect.\n"
-PERM_MSG2 = PERM_MSG2 + "\nIf it is not you giving permission you may want to "
-PERM_MSG2 = PERM_MSG2 + "log in and review your account at " +settings.DOMAIN +" ."
-PERM_MSG2 = PERM_MSG2 + "\n\n\nRegards \nYour Support Team at\n" + settings.APPLICATION_TITLE
-
 
 @session_master
 @login_required

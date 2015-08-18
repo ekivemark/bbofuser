@@ -103,11 +103,11 @@ def patient(request, key=1, *args, **kwargs):
               'mask'   : mask,
               'key'    : key,
               'fmt'    : fmt,
-              'output' : "test output ",
-              'args'   : args,
-              'kwargs' : kwargs,
-              'get'    : request.GET,
-              'pass_to': pass_to,
+              #'output' : "test output ",
+              #'args'   : args,
+              #'kwargs' : kwargs,
+              #'get'    : request.GET,
+              #'pass_to': pass_to,
               }
     try:
         r = requests.get(pass_to)
