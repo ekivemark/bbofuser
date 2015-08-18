@@ -26,10 +26,20 @@
                            {{ pass_to }}<br>
                            {{ settings.DOMAIN }}{{ request.get_full_path }}
                        </div>
-                       <p>Result:<br>
-                           {{ result|safe }}<br>
-                           [END]
-                       </p>
+
+                           <h4>Result:</h4>
+                        <div class="results">
+                        {% if text %}<p>{{ text|safe }}</p>{% endif %}
+                           <a href="#" class="results">
+                               <div class="hover-container results" style="font-style:italic;">
+                                Display detailed structured data?
+                                <div class="hover-content modal-content results col-lg-12 well">
+                                    {{ result|safe }}
+                                </div>
+                                </div></a>
+                            <p style="font-style:italic;">[END]</p>
+                        </div>
+
 
                        <div class="col-md-12 well">
                            Get: {{ '{' }}{{ get.QueryDict }}{{ '}' }}

@@ -17,16 +17,17 @@ from django.conf.urls import (patterns,
                               url)
 from django.contrib import admin
 
-from apps.v1api.views import *
+from apps.v1api.views.home import *
+from apps.v1api.views.patients import *
 from apps.device.views import device_authenticate
 admin.autodiscover()
 
 urlpatterns = patterns('',
                        # Examples:
-                       url(r'^$', 'apps.v1api.views.api_index',
+                       url(r'^$', 'apps.v1api.views.home.api_index',
                            name='home'),
                        url(r'^patient/(?P<key>\w+)/$',
-                           'apps.v1api.views.patient',
+                           'apps.v1api.views.patients.patient',
                            name='patient'),
 
                        url(r'^admin/', include(admin.site.urls)),

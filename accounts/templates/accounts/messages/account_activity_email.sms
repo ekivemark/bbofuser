@@ -4,7 +4,7 @@ From {{ settings.APPLICATION_TITLE }}:{{ email }} just logged in to {{ settings.
 If it was you no action is needed.
 {% endif %}
 {% comment %}
-**accounts/messages/account_activity_email.txt**
+**accounts/messages/account_activity_email.sms**
 
 Used to generate the text body of the account activity email. Should display a
 link the user can click to check their account. This template has the

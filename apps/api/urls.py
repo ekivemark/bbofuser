@@ -17,7 +17,6 @@ from django.conf.urls import (patterns,
 from django.contrib import admin
 
 from apps.api.views import *
-from apps.v1api.views import *
 from apps.device.views import device_authenticate
 admin.autodiscover()
 

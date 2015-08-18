@@ -5,7 +5,10 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
 # Register your models here.
-from accounts.models import (User, ValidSMSCode, Application)
+from accounts.models import (User,
+                             ValidSMSCode,
+                             Application,
+                             Crosswalk)
 
 
 # TODO: Fix Admin Panels - Bootstrap Layout is not fully functional
@@ -118,5 +121,6 @@ admin.site.register(User, UserAdmin)
 admin.site.register(Application, ApplicationAdmin)
 # admin.site.register(ApplicationKey)
 admin.site.register(ValidSMSCode)
+admin.site.register(Crosswalk)
 
 admin.site.unregister(Group)

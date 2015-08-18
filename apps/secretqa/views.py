@@ -46,7 +46,7 @@ def secretqa_index(request):
 @login_required()
 def secretqa_add(request):
 
-    # TODO: Get QA Add Working
+    # DONE: Get QA Add Working
     if settings.DEBUG:
         print("In apps.secretqa.views.secretqa_add")
 
