@@ -171,10 +171,10 @@ def patient(request, key=1, *args, **kwargs):
 
             if settings.DEBUG:
                 print("resourceType:", content['resource'] )
-                print("text:", content['resource']['text'])
+                print("text:", content['resource']['text']['div'])
 
             context['result'] = r.json() # convert
-            context['text']   = content['resource']['text']
+            context['text']   = content['resource']['text']['div']
 
         # Setup the page
 
