@@ -6019,6 +6019,10 @@ button.close {
 .modal-body {
   position: relative;
   padding: 20px;
+  /* DONE:fix for scrollable model body
+   per http://stackoverflow.com/questions/26807524/twitter-bootstrap-3-modal-with-scrollable-body */
+  max-height: calc(150vh - 212px);
+    overflow-y: auto;
 }
 .modal-footer {
   padding: 20px;

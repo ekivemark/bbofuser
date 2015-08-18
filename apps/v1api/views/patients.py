@@ -12,7 +12,6 @@ __author__ = 'Mark Scrimshire:@ekivemark'
 
 import json
 import requests
-import untangle
 
 from collections import OrderedDict
 from xml.dom import minidom
@@ -31,7 +30,8 @@ from django.template import RequestContext
 
 from accounts.models import Crosswalk
 
-from apps.v1api.utils import get_format
+from apps.v1api.utils import (get_format, etree_to_dict,
+                              xml_str_to_json_str)
 
 # TODO: Setup DJANGO REST Framework
 # DONE: Apply user scope to FHIR Pass through
@@ -97,65 +97,90 @@ def patient(request, key=1, *args, **kwargs):
     pass_to = pass_to + fmt_type
     mask_to = settings.DOMAIN
 
+    # Set Context
+    context ={'display': Txn['display'],
+              'name'   : Txn['name'],
+              'mask'   : mask,
+              'key'    : key,
+              'fmt'    : fmt,
+              'output' : "test output ",
+              'args'   : args,
+              'kwargs' : kwargs,
+              'get'    : request.GET,
+              'pass_to': pass_to,
+              }
     try:
         r = requests.get(pass_to)
 
         if fmt == "xml":
 
-            root = ET.fromstring(r.text)
+            xml_text = minidom.parseString(r.text)
+            print("XML_TEXT:", xml_text.toxml())
+            root     = ET.fromstring(r.text)
+            #root_out = etree_to_dict(r.text)
+
+            json_string = ""
+            #json_out = xml_str_to_json_str(r.text, json_string)
             if settings.DEBUG:
                 print("Root ET XML:", root)
+                #print("XML:", root_out)
+                #print("JSON_OUT:", json_out,":", json_string)
 
-            xml_text = minidom.parseString(r.text)
+            drill_down = ['Bundle',
+                          'entry',
+                          'Patient',]
+            level = 0
+
+            tag0 = xml_text.getElementsByTagName("text")
+            #tag1 = tag0.getElementsByTagName("entry")
+
+            print("Patient?:", tag0)
+            print("DrillDown:", drill_down[level])
+            print("root find:", root.find(drill_down[level]))
+            for element in root:
+                print("Child Element:", element)
+                if drill_down[level] in element:
+                    level+=1
+                    for element2 in element:
+                        print("Element2:", element2)
+                        if drill_down[level] in element2:
+                            print("Element2.iter()", element2.iter())
+            text = root[4][0][0][2][1].findtext("text")
+
             pretty_xml = xml_text.toprettyxml()
+            if settings.DEBUG:
+                print("TEXT:", text)
+                #print("Pretty XML:", pretty_xml)
 
-            print("DOM:", xml_text.toxml())
-            convert = untangle.parse(xml_text.toxml())
+            context['result'] = pretty_xml # convert
+            context['text']   = pretty_xml
 
-            #print("Elements:", xml_text._get_firstChild())
-            bundle =  xml_text._get_firstChild()
-            untangled = untangle.parse(r.text)
-            child_name = untangled.Bundle.entry
-            print("Bundle:", child_name)
-            for element in child_name:
-                print("child_item element:", child_name[element])
-
-            #result = convert['name']
-            print("Result:", result)
         else:
 
             convert = OrderedDict(r.json())
             # result = mark_safe(convert)
 
-        if settings.DEBUG:
-            print("Convert:", convert)
-            #print("Next Level - entry:", convert['entry'])
-            #print("\n ANOTHER Level- text:", convert['entry'][0])
+            if settings.DEBUG:
+                print("Convert:", convert)
+                #print("Next Level - entry:", convert['entry'])
+                #print("\n ANOTHER Level- text:", convert['entry'][0])
 
-        content = OrderedDict(convert['entry'][0])
+            content = OrderedDict(convert['entry'][0])
 
-        text = ""
+            text = ""
 
-        if settings.DEBUG:
-            print("resourceType:", content['resource'] )
-            print("text:", content['resource']['text'])
+            if settings.DEBUG:
+                print("resourceType:", content['resource'] )
+                print("text:", content['resource']['text'])
 
-        context = {'display': Txn['display'],
-                   'name'   : Txn['name'],
-                   'mask'   : mask,
-                   'key'    : key,
-                   'output' : "test output ",
-                   'args'   : args,
-                   'kwargs' : kwargs,
-                   'get'    : request.GET,
-                   'pass_to': pass_to,
-                   'result' : r.json(), # convert,
-                   'text'   : content['resource']['text'],
-                    }
+            context['result'] = r.json() # convert
+            context['text']   = content['resource']['text']
+
+        # Setup the page
 
         if settings.DEBUG:
             print()
-            print("Context:",context)
+            #print("Context:",context)
 
         return render_to_response(Txn['template'],
                               RequestContext(request,

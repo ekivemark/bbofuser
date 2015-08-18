@@ -17,34 +17,34 @@
 {% endblock %}
 {% block pagename %}{{ settings.APPLICATION_TITLE }} | api/v1/{{ name }}{% endblock %}
 {% block content %}
-    <div class="hero-unit">
+
        <div class="container-fluid">
-                <p>
+
                  {% if user.is_authenticated %}
                    <div class="col-md-8">
                        <div class="col-md-12 well">
-                           {{ pass_to }}<br>
-                           {{ settings.DOMAIN }}{{ request.get_full_path }}
+                           <h4>Call Info:</h4>
+                           {{ settings.URL_PRE }}{{ settings.DOMAIN }}{{ request.get_full_path }}<br>
+                           {% comment %}Get: {{ '{' }}{{ get.QueryDict }}{{ '}' }}
+                           Args: {{ args }} | KWargs: {{ kwargs }}{% endcomment %}
                        </div>
 
-                           <h4>Result:</h4>
-                        <div class="results">
-                        {% if text %}<p>{{ text|safe }}</p>{% endif %}
-                           <a href="#" class="results">
-                               <div class="hover-container results" style="font-style:italic;">
-                                Display detailed structured data?
-                                <div class="hover-content modal-content results col-lg-12 well">
-                                    {{ result|safe }}
-                                </div>
-                                </div></a>
-                            <p style="font-style:italic;">[END]</p>
+                        <div class="col-md-12 well">
+                            <h4>Result:</h4>
+                            <p>&nbsp;</p>
+                            {% if text %}<p>{{ text|safe }}</p>{% endif %}
+                            <p>&nbsp;</p>
                         </div>
 
-
-                       <div class="col-md-12 well">
-                           Get: {{ '{' }}{{ get.QueryDict }}{{ '}' }}
-                           Args: {{ args }} | KWargs: {{ kwargs }}
-                       </div>
+                        <div class="results">
+                           <a href="#" class="results scroll">
+                               <div class="hover-container results" style="font-style:italic;">
+                                    Display snapshot of detailed structured data?
+                                    <div class="hover-content results col-lg-12 modal-body modal-content modal-form ">
+                                    {% if fmt == "xml" %}{{ result }}{% else %}{{ result|safe }}{% endif %}
+                                    </div>
+                                </div></a>
+                        </div>
 
                     </div>
                 {% else %}
@@ -54,14 +54,14 @@
                             value="{% trans "login" %}"/>
                     </a>
                 {% endif %}
-                </p>
 
             <div class="col-md-4"><img
                     src="{% static 'img/layout/blue-button.png' %}"
-                    style="height:300px"></div>
+                    style="height:300px">
+            </div>
 
         </div>
-    </div>
+
 
 
 {% endblock %}
