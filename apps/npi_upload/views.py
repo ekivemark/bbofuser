@@ -42,24 +42,25 @@ def write_practitioner_narrative(profile):
     :param profile:
     :return: text string
     """
+    # Use <br/> to force line breaks. <br> will not validate successfully
 
     narrative = "Welcome to my Practice..."
 
     narrative = profile['Provider_Name_Prefix_Text']+profile['Provider_First_Name']+" "+profile['Provider_Last_Name_Legal_Name']
     if profile['Provider_Name_Suffix_Text']:
         narrative = narrative + " "+profile['Provider_Name_Suffix_Text']
-    narrative = narrative + ".<br>"
-    narrative = narrative + "Tel:" + profile['Provider_Business_Practice_Location_Address_Telephone_Number']+"<br>"
-    narrative = narrative + "Practice Address:<br>"
-    narrative = narrative + profile['Provider_First_Line_Business_Practice_Location_Address']+"<br>"
+    narrative = narrative + ".<br/>"
+    narrative = narrative + "Tel:" + profile['Provider_Business_Practice_Location_Address_Telephone_Number']+"<br/>"
+    narrative = narrative + "Practice Address:<br/>"
+    narrative = narrative + profile['Provider_First_Line_Business_Practice_Location_Address']+"<br/>"
     if profile['Provider_Second_Line_Business_Practice_Location_Address']:
-        narrative = narrative +profile['Provider_Second_Line_Business_Practice_Location_Address']+"<br>"
+        narrative = narrative +profile['Provider_Second_Line_Business_Practice_Location_Address']+"<br/>"
     narrative = narrative + profile['Provider_Business_Practice_Location_Address_City_Name']+" "
-    narrative = narrative + profile['Provider_Business_Practice_Location_Address_State_Name']+"<br>"
-    narrative = narrative + profile['Provider_Business_Practice_Location_Address_Postal_Code']+"<br>"
+    narrative = narrative + profile['Provider_Business_Practice_Location_Address_State_Name']+"<br/>"
+    narrative = narrative + profile['Provider_Business_Practice_Location_Address_Postal_Code']+"<br/>"
 
-    if settings.DEBUG:
-        print("Narrative function:", narrative)
+    # if settings.DEBUG:
+    #     print("Narrative function:", narrative)
 
     return narrative
 
@@ -83,7 +84,11 @@ def get_npi(request, profile, context={}):
 
     data_array = OrderedDict()
     data = {}
-    counter = 0
+
+    # Use next two counter values to control record processing
+    # Allows blocks of records to be processed.
+    rec_counter = 0
+    end_rec_counter = 9
     reader = OrderedDict()
     row_under = profile # passed in as OrderedDict()
     last_ten = 0
@@ -97,7 +102,7 @@ def get_npi(request, profile, context={}):
                             quotechar = '"')
 
         for row in reader:
-            counter += 1
+            rec_counter += 1
             row_under = profile # Passed in as OrderedDict()
             for fld_name in reader.fieldnames:
                 # Write Fields in order of Fieldnames in CSV
@@ -107,29 +112,34 @@ def get_npi(request, profile, context={}):
                 # We are now writing the field value to the new key dict
                 row_under[key.replace(" ","_").replace("(","").replace(")","")] = value
 
-            row_under['guid'] = str(uuid4().urn)[9:]
+            #row_under['guid'] = str(uuid4().urn)[9:]
             row_under['mode'] = 'create'
             row_under['versionId'] = "1"
+            # We will need to make this next piece generic
+            # May be write_narrative(txn['resourceType'], row_under)
+            # Then use resourceType to define Narrative format
             row_under['narrative'] = write_practitioner_narrative(row_under)
+
             # if settings.DEBUG:
             #     print("row_under", row_under )
             #     print("Narrative:", row_under['narrative'])
 
             if row_under['Entity_Type_Code'] == '1':
-                if settings.DEBUG:
-                    print("Processing Provider")
-                context.update({'resourceType': "Practitioner",
+                # if settings.DEBUG:
+                #     print("Processing ", context['txn']['resourceType'])
+                context.update({'resourceType': context['txn']['resourceType'],
                                 'profile': row_under,
                                 'updated': date_to_iso(datetime.datetime.now()),
                            })
                 # Format: 2015-06-09T00:04:55.757-04:00
-                if settings.DEBUG:
-                    print("iso time for updated:", context['updated'])
+                # if settings.DEBUG:
+                #     print("iso time for updated:", context['updated'])
 
                 fhir_profile = build_fhir_profile(request,
                                                   context,
-                                                  "v1api/fhir_profile/practitioner",
-                                                  "json.html")
+                                                  context['txn']['template'],
+                                                  context['txn']['extn'],
+                                                  )
 
                 # if settings.DEBUG:
                     # print("fhir_Profile:", fhir_profile)
@@ -138,8 +148,8 @@ def get_npi(request, profile, context={}):
 
                 target_url = context['txn']['server'] + context['txn']['locn']+"?_format=json"
                 headers = {'Content-Type': 'application/json', 'Accept': 'text/plain'}
-                if settings.DEBUG:
-                    print("request=",target_url)
+                #if settings.DEBUG:
+                #    print("request=",target_url)
 
                 try:
                     r = requests.post(target_url,
@@ -148,43 +158,52 @@ def get_npi(request, profile, context={}):
                     if r.status_code == 201:
                         # POST was successful
                         # Get the id
-                        commit_data = r.__dict__
-
-                        print("Record Location:",
-                              r.headers['content-location'])
-                        print("ID:", commit_data)
+                        # commit_data = r.__dict__
+                        commit_data = r.headers['content-location']
+                        # print("Record Location:",
+                        #      r.headers['content-location'])
+                        # print("ID:", commit_data)
 
                     last_ten += 1
                     if last_ten == 10:
                         last_ten = 0
-                    message_content_update[last_ten] = [row_under['NPI'],row_under['guid']]
+                    message_content_update[last_ten] = [row_under['NPI']+"["+str(r.status_code)+"]"]
 
-                    if settings.DEBUG:
-                        print("r:", r)
+                    #if settings.DEBUG:
+                    #    print("r:", r)
 
                 except requests.ConnectionError:
-                    messages.error(request,"Problem posting:"+row_under['guid']+" / "+row_under['NPI'])
+                    messages.error(request,"Problem posting:"+row_under['NPI'])
 
-                if settings.DEBUG:
-                    print("Target:", target_url)
+                # if settings.DEBUG:
+                #     print("Target:", target_url)
 
 
             else: # Not a Practitioner but an organization - Entity_Type=2
                 if settings.DEBUG:
-                    print(counter," Skipping:", row_under['NPI'])
+                    print(rec_counter," Skipping:", row_under['NPI'])
                 last_ten += 1
                 if last_ten == 10:
                     last_ten = 0
-                message_content_skipped[counter] = [row_under['NPI']]
+                message_content_skipped[rec_counter] = [row_under['NPI']]
 
-            if counter >8:
+            if rec_counter >end_rec_counter:
                 break
 
     dest_f.close()
-    messages.info(request, "Last 10 records updated:" + message_content_update)
-    messages.info(request, message_content_skipped)
+
+    str_message = ""
+    for msg, value in message_content_update.items():
+        str_message = str_message + str(msg)+":"+str(message_content_update[msg])+". "
+    skp_message = ""
+    for msg, value in message_content_skipped.items():
+        skp_message = skp_message + str(msg)+":"+str(message_content_skipped[msg])+". "
+
+    messages.info(request, "Last 10 records updated:" + str_message)
+    messages.info(request, "Skipped:"+ skp_message)
     context = {}
-    print("Done")
+    if settings.DEBUG:
+        print("Done")
     return message_content_update
 
 
@@ -200,20 +219,19 @@ def write_fhir_practitioner(request):
             'mask'  : True,
             'server': settings.FHIR_SERVER,
             'locn'  : "/baseDstu2/Practitioner",
-            'template' : 'v1api/fhir_profile/practitioner.json.html',
+            'template' : 'v1api/fhir_profile/practitioner',
+            'extn'  : 'json.html',
             }
 
-
     practitioner = OrderedDict()
-
 
     context = {'txn' : Txn,
                }
 
     result = get_npi(request, profile=practitioner, context=context)
 
-    if settings.DEBUG:
-        print("Result:", result)
+    # if settings.DEBUG:
+    #     print("Result:", result)
 
     return render_to_response('npi_upload/index.html',
                               RequestContext(request, context,))
