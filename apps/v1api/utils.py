@@ -8,11 +8,17 @@ Created: 8/17/15 11:44 AM
 __author__ = 'Mark Scrimshire:@ekivemark'
 
 import json
+import time
 
-from django.conf import settings
+from lxml import etree
+
 from collections import (OrderedDict,
                          defaultdict)
-from lxml import etree
+from datetime import datetime
+
+from django.conf import settings
+from django.template import RequestContext
+from django.template.loader import render_to_string
 
 FORMAT_OPTIONS = ['json', 'xml']
 
@@ -150,4 +156,65 @@ def dict_to_json(dictionary, json_output):
                        indent=4))
     f.close()
     return
+
+def build_fhir_profile(request,context={},
+                       template="",
+                       extn="json.html",
+                       ):
+    """
+    Build a FHIR Profile in JSON
+    Use to submit to FHIR Server
+    :param template:
+    :param extn: json.html or json.xml (use .html to enable
+                    template editing error checking
+            (this becomes the file extension for the template)
+            sms is a brief template suitable for SMS Text Messages
+    :param email:
+    :return:
+    """
+    # Template files use the Django Template System.
+
+    this_context = {}
+    if context is not None:
+        # print("BMT:Context is:", context)
+        this_context = RequestContext(request, context)
+        # print("BMT:this_context with context:", this_context)
+
+    if request is not None:
+        # print("BMT:Request is:", request)
+        this_context = RequestContext(request, this_context)
+
+    if template=="":
+        template="v1api/fhir_profile/practitioner"
+
+    source_plate = template + "." + extn
+
+    profile = render_to_string(source_plate, this_context)
+    if settings.DEBUG:
+        print("Profile:",profile)
+
+    return profile
+
+
+def date_to_iso(thedate, decimals=True):
+    """
+    Convert date to isoformat time
+    :param thedate:
+    :return:
+    """
+    strdate = thedate.strftime("%Y-%m-%dT%H:%M:%S")
+
+    minute = (time.localtime().tm_gmtoff / 60) % 60
+    hour = ((time.localtime().tm_gmtoff / 60) - minute) / 60
+    utcoffset = "%.2d%.2d" %(hour, minute)
+
+    if decimals:
+        three_digits = "."+ str(thedate.microsecond)[:3]
+    else:
+        three_digits = ""
+
+    if utcoffset[0] != '-':
+        utcoffset = '+' + utcoffset
+
+    return strdate + three_digits + utcoffset
 

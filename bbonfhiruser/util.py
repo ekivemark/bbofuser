@@ -20,3 +20,4 @@ def str2bool(inp):
         output = False
 
     return output
+

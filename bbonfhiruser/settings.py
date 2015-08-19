@@ -169,6 +169,7 @@ THIRD_PARTY_APPS = (
     'ldap3',
     'rest_framework',
     'requests',
+    'numpy',
 )
 
 LOCAL_APPS = (
@@ -179,6 +180,7 @@ LOCAL_APPS = (
     'apps.secretqa',
     'apps.api',
     'apps.v1api',
+    'apps.npi_upload',
 )
 
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS

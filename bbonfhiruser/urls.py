@@ -55,6 +55,9 @@ urlpatterns = patterns('',
                            name='password_reset_done'),
                        url(r'^o/', include('oauth2_provider.urls',
                                            namespace='oauth2_provider')),
+                       url(r'^npi_up/', include('apps.npi_upload.urls',
+                                           namespace='npi_upload')),
+
 
                        url(r'^admin/', include(admin.site.urls)),
                        # Uncomment the admin/doc line below to enable admin documentation:

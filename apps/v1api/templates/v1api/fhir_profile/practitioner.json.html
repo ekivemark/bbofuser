@@ -1,0 +1,78 @@
+{"resourceType":"{{ txn.resourceType }}",{% if profile.mode == "create" %}{% else %}
+  "id" : "{{ profile.guid }}",{% endif %}
+  "meta": {"versionId": "{{ profile.versionId }}",
+           "lastUpdated": "{{ updated }}"},
+  "identifier": [{"use": "official",
+                  "type": "NPI",
+                  "system": "http://www.cms.gov",
+                  "value": "{{ profile.NPI }}"}],
+  "name":{"use": "official",
+         "text": "{{ profile.Provider_First_Name }}{% if profile.Provider_Middle_Name %} {{ profile.Provider_Middle_Name }}{% endif %} {{ profile.Provider_Last_Name_Legal_Name }}",
+         "family": ["{{ profile.Provider_Last_Name_Legal_Name }}"],
+         "given": ["{{ profile.Provider_First_Name }}"{% if profile.Provider_Other_First_Name %},
+          "{{ profile.Provider_Other_First_Name }}"{% endif %}{% if profile.Provider_Middle_Name %},
+          "{{ profile.Provider_Middle_Name }}"{% endif %}]{% if profile.Provider_Name_Prefix_Text %},
+         "prefix":["{{ profile.Provider_Name_Prefix_Text }}"]{% endif %}{% if profile.Provider_Name_Suffix_Text %},
+         "suffix":["{{ profile.Provider_Name_Suffix_Text }}"]{% endif %}},
+  "text": {"status": "additional",
+           "div": "<div><div id='userEntered'>{{ profile.narrative|safe }}</div></div>"},
+  "gender": "{{ profile.Provider_Gender_Code }}"
+}
+{% comment %}
+{
+  "resourceType" : "Practitioner",
+  // from Resource: id, meta, implicitRules, and language
+  // from DomainResource: text, contained, extension, and modifierExtension
+  "identifier" : [{ Identifier }], // A identifier for the person as this agent
+  "name" : { HumanName }, // A name associated with the person
+  "telecom" : [{ ContactPoint }], // A contact detail for the practitioner
+  "address" : [{ Address }], // Where practitioner can be found/visited
+  "gender" : "<code>", // male | female | other | unknown
+  "birthDate" : "<date>", // The date  on which the practitioner was born
+  "photo" : [{ Attachment }], // Image of the person
+  "practitionerRole" : [{ // The list of Roles/Organizations that the Practitioner is associated with
+    "managingOrganization" : { Reference(Organization) }, // The Organization where the Practitioner performs the roles associated
+    "role" : { CodeableConcept }, // Roles which this practitioner may perform
+    "specialty" : [{ CodeableConcept }], // Specific specialty of the practitioner
+    "period" : { Period }, // The period during which the practitioner is authorized to perform in these role(s)
+    "location" : [{ Reference(Location) }], // The location(s) at which this practitioner provides care
+    "healthcareService" : [{ Reference(HealthcareService) }] // The list of healthcare services that this worker provides for this role's Organization/Location(s)
+  }],
+  "qualification" : [{ // Qualifications obtained by training and certification
+    "identifier" : [{ Identifier }], // An identifier for this qualification for the practitioner
+    "code" : { CodeableConcept }, // R!  Coded representation of the qualification
+    "period" : { Period }, // Period during which the qualification is valid
+    "issuer" : { Reference(Organization) } // Organization that regulates and issues the qualification
+  }],
+  "communication" : [{ CodeableConcept }] // A language the practitioner is able to use in patient communication
+}{% endcomment %}
+{% comment %}
+
+XML:
+<Practitioner xmlns="http://hl7.org/fhir"> doco
+ <!-- from Resource: id, meta, implicitRules, and language -->
+ <!-- from DomainResource: text, contained, extension, and modifierExtension -->
+ <identifier><!-- 0..* Identifier A identifier for the person as this agent --></identifier>
+ <name><!-- 0..1 HumanName A name associated with the person --></name>
+ <telecom><!-- 0..* ContactPoint A contact detail for the practitioner --></telecom>
+ <address><!-- 0..* Address Where practitioner can be found/visited --></address>
+ <gender value="[code]"/><!-- 0..1 male | female | other | unknown -->
+ <birthDate value="[date]"/><!-- 0..1 The date  on which the practitioner was born -->
+ <photo><!-- 0..* Attachment Image of the person --></photo>
+ <practitionerRole>  <!-- 0..* The list of Roles/Organizations that the Practitioner is associated with -->
+  <managingOrganization><!-- 0..1 Reference(Organization) The Organization where the Practitioner performs the roles associated --></managingOrganization>
+  <role><!-- 0..1 CodeableConcept Roles which this practitioner may perform --></role>
+  <specialty><!-- 0..* CodeableConcept Specific specialty of the practitioner --></specialty>
+  <period><!-- 0..1 Period The period during which the practitioner is authorized to perform in these role(s) --></period>
+  <location><!-- 0..* Reference(Location) The location(s) at which this practitioner provides care --></location>
+  <healthcareService><!-- 0..* Reference(HealthcareService) The list of healthcare services that this worker provides for this role's Organization/Location(s) --></healthcareService>
+ </practitionerRole>
+ <qualification>  <!-- 0..* Qualifications obtained by training and certification -->
+  <identifier><!-- 0..* Identifier An identifier for this qualification for the practitioner --></identifier>
+  <code><!-- 1..1 CodeableConcept Coded representation of the qualification --></code>
+  <period><!-- 0..1 Period Period during which the qualification is valid --></period>
+  <issuer><!-- 0..1 Reference(Organization) Organization that regulates and issues the qualification --></issuer>
+ </qualification>
+ <communication><!-- 0..* CodeableConcept A language the practitioner is able to use in patient communication  --></communication>
+</Practitioner>*/
+{% endcomment %}

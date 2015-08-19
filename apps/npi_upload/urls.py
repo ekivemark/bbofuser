@@ -17,11 +17,12 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
                        # Examples:
-                       url(r'^$', 'apps.npi_upload.views.npi_index',
+                       url(r'^$',
+                           'apps.npi_upload.views.npi_index',
                            name='npi_home'),
                        url(r'^upload',
-                            'apps.device.views.upload',
-                            name='upload'),
+                           'apps.npi_upload.views.write_fhir_practitioner',
+                           name='upload'),
 
                        url(r'^admin/', include(admin.site.urls)),
 
