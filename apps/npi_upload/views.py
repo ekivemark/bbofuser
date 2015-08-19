@@ -65,6 +65,80 @@ def write_practitioner_narrative(profile):
     return narrative
 
 
+def find_profile(request, resourceType, profile, search_spec):
+    """
+    Search a profile for an item
+    :param request:
+    :param resourceType:
+    :param profile:
+    :param search_spec:
+    :return: dict with matched values
+    """
+
+    # We are constructing this url:
+    # http://localhost:8080/fhir-p/
+    # baseDstu2/Practitioner
+    # ?identifier=http://www.cms.gov|1215930367
+    # &_format=json
+
+
+    # search_spec = {'namespace': "http://www.cms.gov",
+    #                        'txn'  : context['txn'],
+    #                        'field': "identifier",
+    #                        'value': "NPI", # Field Name from Profile
+    #                        }
+     # txn =  {'resourceType' :"Practitioner",
+     #        'display' :'Practitioner',
+     #        'mask'  : True,
+     #        'server': settings.FHIR_SERVER,
+     #        'locn'  : "/baseDstu2/Practitioner",
+     #        'template' : 'v1api/fhir_profile/practitioner',
+     #        'extn'  : 'json.html',}
+
+    search_result = {}
+
+    search_q = "?" + search_spec['field'] + "="
+
+    if 'namespace' in search_spec:
+        search_q = search_q + search_spec['namespace'] + "|"
+
+    search_q = search_q + profile[search_spec['value']]
+    search_q = search_q + "&_format=json"
+
+    target_url = search_spec['txn']['server'] + search_spec['txn']['locn'] + search_q
+
+    headers = {'Content-Type': 'application/json', 'Accept': 'text/plain'}
+
+    try:
+        r = requests.get(target_url)
+
+        search_result['status_code'] = r.status_code
+        if r.status_code == 200:
+            # we found something so get the content
+            content = OrderedDict(r.json())
+            if settings.DEBUG:
+                print("SEARCH result:  ", r.json())
+                print("SEARCH Content: ", content)
+                print("total:",content['total'])
+
+            search_result['total'] = content['total']
+            if search_result['total'] > 0:
+                search_result['id'] = content['entry'][0]['resource']['id']
+                search_result['versionId'] = content['entry'][0]['resource']['meta']['versionId']
+                if settings.DEBUG:
+                    print("id:", search_result['id'])
+        if r.status_code == 404:
+            print("Nothing found:[",r.status_code,"]" )
+
+        messages.info(request, "found "+ str(search_result['total']) + " items.")
+
+    except requests.ConnectionError:
+        messages.error(request,"We had a problem reaching the fhir server")
+
+
+    return search_result
+
+
 def get_npi(request, profile, context={}):
     """
 
@@ -112,9 +186,48 @@ def get_npi(request, profile, context={}):
                 # We are now writing the field value to the new key dict
                 row_under[key.replace(" ","_").replace("(","").replace(")","")] = value
 
+            ###############
+            # We have a record
+            # Use a key field to search FHIR Profiles for matching key
+            # For providers/practitioners this is NPI
+            search_spec = {'namespace': "http://www.cms.gov",
+                           'txn'  : context['txn'],
+                           'field': "identifier",
+                           'value': "NPI", # Field Name from Profile
+                           }
+            search_result = find_profile(request,
+                                         context['txn']['resourceType'],
+                                         row_under,
+                                         search_spec)
+
+            print("Search Result:", search_result)
+            # should return:
+            #    search_result['status_code'] = r.status_code
+            #    search_result['total'] = r.content['total']
+            #    search_result['id'] = r.content['entry']['resource']['id']
+            #    search_result['versionId'] = r.content['entry']['resource']['meta']['versionId']
+
+
             #row_under['guid'] = str(uuid4().urn)[9:]
-            row_under['mode'] = 'create'
-            row_under['versionId'] = "1"
+            if 'status_code' in search_result:
+                if search_result['status_code'] == 404:
+                    row_under['mode'] = 'create'
+                    row_under['versionId'] = "1"
+
+                elif search_result['status_code'] == 200:
+                    # Search can return no results with a
+                    # status_code of 200. in which case total = 0
+                    if search_result['total']>0:
+                        # a record exists
+                        row_under['mode'] = 'update'
+                        row_under['versionId'] = str(int(search_result['versionId']) + 1)
+                        row_under['guid'] = search_result['id']
+                    else:
+                        row_under['mode'] = 'create'
+                        row_under['versionId'] = "1"
+            if settings.DEBUG:
+                print("action:", row_under['mode'] + " ver:" + row_under['versionId'])
+
             # We will need to make this next piece generic
             # May be write_narrative(txn['resourceType'], row_under)
             # Then use resourceType to define Narrative format
@@ -146,7 +259,11 @@ def get_npi(request, profile, context={}):
 
                 # Update the Fhir Server with this FHIR Profile
 
-                target_url = context['txn']['server'] + context['txn']['locn']+"?_format=json"
+                target_url = context['txn']['server'] + context['txn']['locn']
+                if 'guid' in row_under:
+                    # If we have a guid and row_under['mode'] = 'update'
+                    target_url = target_url + "/" + row_under['guid']
+                target_url = target_url + "?_format=json"
                 headers = {'Content-Type': 'application/json', 'Accept': 'text/plain'}
                 #if settings.DEBUG:
                 #    print("request=",target_url)
