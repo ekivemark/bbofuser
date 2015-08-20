@@ -1,5 +1,5 @@
 {% load i18n %}
-{% if msg %}{{ msg %}{% else %}From {{ settings.APPLICATION_TITLE }}:{{ email_mask }} just gave access permission to {{ device|safe }} at {{ settings.URL_PRE }}{{ site.name }}.
+{% if msg %}{{ msg }}{% else %}From {{ settings.APPLICATION_TITLE }}:{{ email_mask }} just gave access permission to {{ device|safe }} at {{ settings.URL_PRE }}{{ site.name }}.
 If it was you no action is needed.
 {% endif %}
 {% comment %}

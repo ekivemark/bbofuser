@@ -16,6 +16,7 @@ from uuid import uuid4
 from collections import OrderedDict
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils import timezone
@@ -24,6 +25,7 @@ from django.utils.html import escape
 from apps.v1api.utils import (build_fhir_profile,
                               date_to_iso)
 
+@login_required()
 def npi_index(request):
     # Show NPI Upload Home Page
 
@@ -63,6 +65,72 @@ def write_practitioner_narrative(profile):
     #     print("Narrative function:", narrative)
 
     return narrative
+
+
+def delete_oldest(request, resourceType, txn, search_result):
+    """
+    Get the duplicates list from search_result
+    and delete all but oldest duplicate record.
+    :param request:
+    :param resourceType:
+    :param search_result:
+    :return:
+    """
+
+    # txn =  {'resourceType' :"Practitioner",
+    #        'display' :'Practitioner',
+    #        'mask'  : True,
+    #        'server': settings.FHIR_SERVER,
+    #        'locn'  : "/baseDstu2/Practitioner",
+    #        'template' : 'v1api/fhir_profile/practitioner',
+    #        'extn'  : 'json.html',
+    #        'DEADLY': True,
+    #       }
+
+    # We are constructing this url:
+    # http://localhost:8080/fhir-p/
+    # baseDstu2/Practitioner/{id}/
+    # ?_format=json
+    # in a DELETE transaction
+
+    # Find the latest Update
+
+    delete_result = {'deleted': 0,
+                     'latestId': ""}
+
+    if not 'duplicates' in search_result:
+        return delete_result
+
+    if   len(search_result['duplicates']) == 0:
+        # Nothing to do
+        return delete_result
+    elif len(search_result['duplicates']) == 1:
+        # One or less duplicates - so nothing to do
+        delete_result['latestId'] = search_result['duplicates'][0][0]
+        if settings.DEBUG:
+            print("delete_result:", delete_result)
+        return delete_result
+
+    # We have entries to delete
+    # Find the latest update
+    # Set delete_result['latestId'] to last updated record Id
+
+    latest = {'id': "",
+              'lastUpdated': ""}
+
+    for key in search_result['duplicates']:
+        # Loop through and check for latest update
+        if key[1]:
+            print("key:", key)
+            print("id:", key[0],":", key[1])
+
+
+    # Loop through list - if not latest we delete entry
+    # keep count of deletions
+
+    # save deletions count to delete_result['delete']
+
+    return delete_result
 
 
 def find_profile(request, resourceType, profile, search_spec):
@@ -116,17 +184,25 @@ def find_profile(request, resourceType, profile, search_spec):
         if r.status_code == 200:
             # we found something so get the content
             content = OrderedDict(r.json())
-            if settings.DEBUG:
-                print("SEARCH result:  ", r.json())
-                print("SEARCH Content: ", content)
-                print("total:",content['total'])
+            # if settings.DEBUG:
+                # print("SEARCH result:  ", r.json())
+                # print("SEARCH Content: ", content)
+                # print("total:",content['total'])
 
             search_result['total'] = content['total']
             if search_result['total'] > 0:
                 search_result['id'] = content['entry'][0]['resource']['id']
                 search_result['versionId'] = content['entry'][0]['resource']['meta']['versionId']
-                if settings.DEBUG:
-                    print("id:", search_result['id'])
+                # if settings.DEBUG:
+                #    print("id:", search_result['id'])
+                search_result['duplicates'] = []
+                for item in content['entry']:
+                    #print("getting duplicates:", item['resource'])
+                    #print(item['resource']['id'])
+                    search_result['duplicates'].append({item['resource']['id'],
+                                                        item['resource']['meta']['lastUpdated']})
+                # if settings.DEBUG:
+                #     print("duplicates List:", search_result['duplicates'])
         if r.status_code == 404:
             print("Nothing found:[",r.status_code,"]" )
 
@@ -200,7 +276,8 @@ def get_npi(request, profile, context={}):
                                          row_under,
                                          search_spec)
 
-            print("Search Result:", search_result)
+            if settings.DEBUG:
+                print("Search Result:", search_result)
             # should return:
             #    search_result['status_code'] = r.status_code
             #    search_result['total'] = r.content['total']
@@ -222,6 +299,28 @@ def get_npi(request, profile, context={}):
                         row_under['mode'] = 'update'
                         row_under['versionId'] = str(int(search_result['versionId']) + 1)
                         row_under['guid'] = search_result['id']
+                    elif search_result['total']>1:
+                        # We have duplicates
+                        if settings.DEBUG:
+                            print("We have ",
+                                  len(search_result['duplicates']),
+                                  " duplicates")
+                        # find the latest updates in the list to keep
+                        # delete the rest
+                        if 'DEADLY' in context['txn']:
+                            # We have the Delete Command
+                            if context['txn']['DEADLY'] == True:
+                                del_result = delete_oldest(request,
+                                                           context['txn']['resourceType'],
+                                                           context['txn'],
+                                                           search_result,
+                                                          )
+                                ##########################
+                                ##########################
+                                #
+                                # Back from Delete function
+                                #
+                                ##########################
                     else:
                         row_under['mode'] = 'create'
                         row_under['versionId'] = "1"
@@ -352,4 +451,49 @@ def write_fhir_practitioner(request):
 
     return render_to_response('npi_upload/index.html',
                               RequestContext(request, context,))
+
+
+def remove_duplicate_npi(request):
+    """
+    Remove duplicate NPI Entries
+    :param request:
+    :return:
+
+    We will find the NPI.
+    Get the total
+    Find all the entries by Id
+    put the Ids in a list
+    Find the highest number (Latest entry)
+    cycle through the list and if not latest delete the record
+
+    """
+
+    # set up the transaction
+
+    # call find_profile
+
+    Txn =  {'resourceType' :"Practitioner",
+            'display' :'Practitioner',
+            'mask'  : True,
+            'server': settings.FHIR_SERVER,
+            'locn'  : "/baseDstu2/Practitioner",
+            'template' : 'v1api/fhir_profile/practitioner',
+            'extn'  : 'json.html',
+            'DEADLY': True,  # If DEADLY = True we will delete records
+            }
+
+    practitioner = OrderedDict()
+
+    context = {'txn' : Txn,
+               }
+
+    result = get_npi(request, profile=practitioner, context=context)
+
+    # if settings.DEBUG:
+    #     print("Result:", result)
+
+    return render_to_response('npi_upload/index.html',
+                              RequestContext(request, context,))
+
+
 

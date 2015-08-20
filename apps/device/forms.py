@@ -69,8 +69,8 @@ class Device_EditForm(forms.ModelForm):
                               'cols': 80}))
     password = LowerCaseCharField(max_length=40, widget=HiddenInput())
     valid_until = forms.DateTimeField()
-    used = forms.BooleanField(help_text="Has device been used to connect to your account?")
-    permitted = forms.BooleanField(help_text="Has permission been given for this device to access your account?")
+    used = forms.BooleanField(required=False , help_text="Has device been used to connect to your account?")
+    permitted = forms.BooleanField(required=False, help_text="Has permission been given for this device to access your account?")
 
     class Meta:
         model = Device
@@ -127,7 +127,8 @@ class Device_AuthenticationForm(forms.Form):
     Device Login form
     """
     account = LowerCaseCharField(widget=forms.widgets.TextInput)
-    password = LowerCaseCharField(widget=forms.widgets.PasswordInput)
+    password = LowerCaseCharField(widget=forms.widgets.PasswordInput,
+                                  label="Key")
 
     class Meta:
         fields = ['account',

@@ -150,6 +150,8 @@ def device_edit(request, pk):
             d.account = form.cleaned_data['account'].strip().lower()
             d.password = form.cleaned_data['password'].strip().lower()
             d.valid_until = form.cleaned_data['valid_until']
+            d.used = form.cleaned_data['used']
+            d.permitted = form.cleaned_data['permitted']
 
             # Update Fields above
             if settings.DEBUG:
