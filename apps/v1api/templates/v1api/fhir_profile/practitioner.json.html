@@ -1,24 +1,25 @@
-{"resourceType":"{{ txn.resourceType }}",{% if profile.mode == "create" %}{% else %}
+{"resourceType":"{{ profile.resourceType }}",{% if profile.mode == "create" %}{% else %}
   "id" : "{{ profile.guid }}",{% endif %}
   "meta": {"versionId": "{{ profile.versionId }}",
            "lastUpdated": "{{ updated }}"},
-  "identifier": [{"use": "official",
+  {% include "v1api/fhir_profile/include/fhir_identifier.json.html" %}
+  {% comment %}"identifier": [{"use": "official",
                   "type": "NPI",
                   "system": "http://www.cms.gov",
-                  "value": "{{ profile.NPI }}"}],
-  "name":{"use": "official",
-         "text": "{{ profile.Provider_First_Name }}{% if profile.Provider_Middle_Name %} {{ profile.Provider_Middle_Name }}{% endif %} {{ profile.Provider_Last_Name_Legal_Name }}",
-         "family": ["{{ profile.Provider_Last_Name_Legal_Name }}"],
-         "given": ["{{ profile.Provider_First_Name }}"{% if profile.Provider_Other_First_Name %},
-          "{{ profile.Provider_Other_First_Name }}"{% endif %}{% if profile.Provider_Middle_Name %},
-          "{{ profile.Provider_Middle_Name }}"{% endif %}]{% if profile.Provider_Name_Prefix_Text %},
-         "prefix":["{{ profile.Provider_Name_Prefix_Text }}"]{% endif %}{% if profile.Provider_Name_Suffix_Text %},
-         "suffix":["{{ profile.Provider_Name_Suffix_Text }}"]{% endif %}},
+                  "value": "{{ profile.NPI }}"}],{% endcomment %}
+  {% include "v1api/fhir_profile/include/fhir_human_name.json.html" %}
+  {% include "v1api/fhir_profile/include/fhir_contactpoint.json.html" %}
+  {% include "v1api/fhir_profile/include/fhir_address.json.html" %}
+  {% include "v1api/fhir_profile/include/fhir_address.json.html" %}
+  {% if profile.gender %}"gender": "{{ profile.gender }}"{% endif %}{% if profile.narrative %},
   "text": {"status": "additional",
-           "div": "<div><div id='userEntered'>{{ profile.narrative|safe }}</div></div>"},
-  "gender": "{{ profile.Provider_Gender_Code }}"
+           "div": "<div><div id='narrative'>{{ profile.narrative|safe }}</div></div>"}{% endif %}
+  {% include "v1api/fhir_profile/include/fhir_extension.json.html" %}
 }
 {% comment %}
+
+Updated to use include of fhir_human_name.json.html
+
 {
   "resourceType" : "Practitioner",
   // from Resource: id, meta, implicitRules, and language

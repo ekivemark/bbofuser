@@ -8,6 +8,8 @@
     <div class="container">
         <ul class="breadcrumb">
             <li><a hef="{% url 'home' %}">Home</a></li>
+            <li><a hef="{% url 'npi_upload:npi_home' %}">NPI Toolkit</a></li>
+
             <li class="active">NPI Upload</li>
 
         </ul>
@@ -24,7 +26,23 @@
                 <p>
                  {% if user.is_authenticated %}
                    <div class="col-md-8">
-                        Nothing here
+                   <h2>Commands Available</h2>
+                       <div class="col-lg-12 well">
+                           <h4>NPI Upload</h4>
+                           <p style="font-style:italic">Paste the following command in to your browser.
+                            Change "/0/10/" to the start and end rows in the NPI CSV file you want to process</p>
+
+                       {{ settings.URL_PRE }}{{ site.domain }}/npi_up/upload/0/10/
+                       </div>
+                        <div class="col-lg-12 well">
+                           <h4>NPI deduplicate</h4>
+                           <p style="font-style:italic">Paste the following command in to your browser.
+                            Change "/0/10/" to the start and end rows in the NPI CSV file you want to process</p>
+
+                       {{ settings.URL_PRE }}{{ site.domain }}/npi_up/deduplicate/0/10/
+                       </div>
+
+
                     </div>
                 {% else %}
                     <a href="{% url "accounts:sms_code" %}?next=/"><input

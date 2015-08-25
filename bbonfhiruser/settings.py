@@ -20,7 +20,7 @@ parser = RawConfigParser()
 import os
 import sys
 from platform import python_version
-from bbonfhiruser.util import str2bool, str2int
+from bbonfhiruser.utils import str2bool, str2int
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -522,6 +522,9 @@ FHIR_SERVER = parser.get('global', 'fhir_server')
 if FHIR_SERVER == '':
     FHIR_SERVER = 'http://fhir.bbonfhir.com:8080/fhir-p'
     # FHIR_SERVER = 'http://localhost:8080/fhir-p'
+
+NPI_SOURCE_FOLDER = "/Users/mark/Downloads/NPPES_Data_Dissemination_August_2015.zip/NPPES_Data_Dissemination_August_2015/"
+NPI_SOURCE_FILE   = "npidata_20050523-20150809.csv"
 
 if DEBUG_SETTINGS:
     print("FHIR_SERVER:", FHIR_SERVER)

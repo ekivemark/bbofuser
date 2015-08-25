@@ -190,8 +190,8 @@ def build_fhir_profile(request,context={},
     source_plate = template + "." + extn
 
     profile = render_to_string(source_plate, this_context)
-    if settings.DEBUG:
-        print("Profile:",profile)
+    #if settings.DEBUG:
+    #    print("Profile:",profile)
 
     return profile
 
@@ -202,6 +202,7 @@ def date_to_iso(thedate, decimals=True):
     :param thedate:
     :return:
     """
+
     strdate = thedate.strftime("%Y-%m-%dT%H:%M:%S")
 
     minute = (time.localtime().tm_gmtoff / 60) % 60
