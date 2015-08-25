@@ -14,12 +14,8 @@
      "period": { {% for item, date in addr.period.items %}
                 "{{ item }}" : "{{ date }}"{% if forloop.last %}{% else %},{% endif %}{% endfor %}
             }{% endif %}
-
-     }{% endfor %}
-    ],
-{% endif %}
-
-{% comment %}
+     }{% if forloop.last %}{% else %},{% endif %}{% endfor %}
+    ],{% endif %}{% comment %}
 JSON: http://hl7-fhir.github.io/datatypes.html#HumanName
 {
   "resourceType" : "Address",
@@ -42,8 +38,7 @@ Period:
   "end" : "<dateTime>" // C? End time with inclusive boundary, if not ongoing
 }
 
-{% endcomment %}
-{% comment %}
+{% endcomment %}{% comment %}
 
 XML:
 <[name] xmlns="http://hl7.org/fhir"> doco

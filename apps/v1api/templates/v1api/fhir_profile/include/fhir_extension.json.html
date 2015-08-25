@@ -1,12 +1,10 @@
-{% if profile.fhir_extension %},
-    "extension": [{
-     {% for key, value in profile.fhir_extension.items %}{
-         "{{ key }}" : "{{ value }}"{% if forloop.last %}{% else %},{% endif %}
-     {% endfor %}
-            }{% if forloop.last %}{% else %},{% endif %}
-     ]
-{% endif %}
-
+ "extension" : [
+    {% for key, value in profile.fhir_extension.items %}{% if key == "NPI_Provider_Record" %} {
+        "{{ key }}" : {
+     {% for k, v in value.items %}"{{ k }}" : "{{ v }}"{% if forloop.last %}{% else %},{% endif %}
+     {% endfor %} } {% if forloop.last %}{% else %}, {% endif %}{% else %}
+     {  "{{ key }}" : "{{ value }}" } {% if forloop.last %}{% else %},{% endif %}{% endif %}
+     {% endfor %}]
 {% comment %}
 JSON: http://hl7-fhir.github.io/datatypes.html#HumanName
 {

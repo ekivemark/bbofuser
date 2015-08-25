@@ -78,8 +78,8 @@ def contact_point(source):
     # Setup the Dictionary
     cp = {}
 
-    if settings.DEBUG:
-        print("Contact Point source:", source)
+    # if settings.DEBUG:
+    #    print("Contact Point source:", source)
 
     # Map values across to new dictionary
     cp['resourceType'] = "ContactPoint"
@@ -92,8 +92,8 @@ def contact_point(source):
             cp['rank'] = int(get_rank)
     cp['period'] = assign_str(source, 'period')
 
-    if settings.DEBUG:
-        print("Returning CP:", cp)
+    # if settings.DEBUG:
+    #     print("Returning CP:", cp)
     #return the dictionary
     return cp
 

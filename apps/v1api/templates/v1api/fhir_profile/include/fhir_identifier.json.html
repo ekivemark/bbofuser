@@ -14,10 +14,8 @@
      "period": { {% for item, date in addr.period.items %}
                 "{{ item }}" : "{{ date }}"{% if forloop.last %}{% else %},{% endif %}{% endfor %}
             }{% endif %}
-
      }{% endfor %}
-    ],
-{% endif %}
+    ],{% endif %}
 
 {% comment %}
 JSON: http://hl7-fhir.github.io/datatypes.html#HumanName

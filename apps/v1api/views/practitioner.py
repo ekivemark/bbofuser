@@ -76,8 +76,8 @@ Profile elements:
 
     fp = {}
 
-    if settings.DEBUG:
-        print("Source:", src_dict)
+    # if settings.DEBUG:
+    #     print("Source:", src_dict)
 
     # fp.update(src_dict)
     if not 'resourceType' in fp:
@@ -203,7 +203,6 @@ Profile elements:
         addr_source = {}
 
         addr_list = []
-        rank = 1
 
         # ad['resourceType'] = "Address"
         # ad['use']        = assign_str(source, 'use',)
@@ -247,7 +246,7 @@ Profile elements:
         # Get User readable text
         fp['narrative'] = write_practitioner_narrative(src_dict)
 
-        fp['fhir_extension'] = npi_provider_extension(src_dict)
+        #fp['fhir_extension'] = npi_provider_extension(src_dict)
 
     return fp
 
@@ -281,9 +280,14 @@ def npi_provider_extension(source):
         if isinstance(value, dict):
             if len(value) > 0:
                 extn[key] = value
+            else:
+                pass
 
     extn_dict = {'url' : settings.FHIR_SERVER + "/StructureDefinition/NPI_Provider_Record",
-                 'extension' : extn
+                 'NPI_Provider_Record' : extn
                 }
 
+    if settings.DEBUG:
+        print("extension:", extn_dict)
+        print("=====================")
     return extn_dict

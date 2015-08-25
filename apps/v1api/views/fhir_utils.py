@@ -21,8 +21,8 @@ def assign_str(source, key, default=""):
     """
     if key in source:
         if not source[key] == "":
-            if settings.DEBUG:
-                print("Got Source[key]:", key, ":", source[key])
+            # if settings.DEBUG:
+            #     print("Got Source[key]:", key, ":", source[key])
             if isinstance(source[key], str):
                 return source[key]
             if isinstance(source[key], (int, float, complex)):

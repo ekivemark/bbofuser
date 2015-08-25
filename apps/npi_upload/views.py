@@ -30,6 +30,14 @@ from apps.v1api.views.fhir_elements import (human_name,
                                             )
 from apps.v1api.views.practitioner import generate_fhir_profile
 
+
+# def UnicodeDictReader(utf8_data, **kwargs):
+#     # http://stackoverflow.com/questions/5004687/python-csv-dictreader-with-utf-8-data
+#     csv_reader = csv.DictReader(utf8_data, **kwargs)
+#     for row in csv_reader:
+#         yield {key: str(value, 'utf-8') for key, value in row.iteritems()}
+
+
 @staff_member_required
 @login_required
 def npi_index(request):
@@ -105,7 +113,9 @@ def find_by_npi(request, record_no ):
     # unicode, utf-8, iso-8859-1, latin-1, windows-1253, iso8859-7
     encode = "utf-8"
 
-    with open(f,'r', encoding=encode) as fn:
+    with open(f,'r',
+              encoding=encode,
+              errors="surrogateescape") as fn:
 
         reader = csv.DictReader(fn,
                                 delimiter = delimiter,
@@ -121,7 +131,7 @@ def find_by_npi(request, record_no ):
                 for key, value in row.items():
                     # We are now writing the field value to the new
                     # key dict
-                    row_under[key.replace(" ", "_").replace("(", "").replace(")", "").replace(".","")] = value
+                    row_under[key.replace(" ", "_").replace("(", "").replace(")", "").replace(".","")] = value.decode('utf-8')
 
                     # if settings.DEBUG:
                     #     print(">>>>>>>>>>>>>>>>>")
@@ -226,7 +236,8 @@ def display_npi_source_record(request, record_no ):
     encode = "utf-8"
 
     with open(f,'r',
-              encoding=encode,) as fn:
+              encoding=encode,
+              errors="surrogateescape") as fn:
         reader = csv.DictReader(fn,
                                 delimiter = delimiter,
                                 quotechar = '"',
@@ -260,10 +271,29 @@ def display_npi_source_record(request, record_no ):
                     # We are now writing the field value to the new
                     # key dict
 
-                    row_under[key.replace(" ",
-                                          "_").replace("(",
-                                                       "").replace(")",
-                                                                   "").replace(".","")] = value
+                    if isinstance(value, str):
+                        if "�" in value:
+                            print("We have crap to deal with", "=======")
+                            print("Value:", value)
+                            print("Encoded Value:", value.encode('utf-8'))
+                            print("Str of encoded:", str(value.encode('utf-8').decode('utf-8')))
+                            row_under[key.replace(" ",
+                                                  "_").replace("(",
+                                                               "").replace(")",
+                                                                           "").replace(".","")] = value
+
+                            pass
+                        else:
+                            row_under[key.replace(" ",
+                                                  "_").replace("(",
+                                                               "").replace(")",
+                                                                           "").replace(".","")] = value
+                    else:
+                        row_under[key.replace(" ",
+                                              "_").replace("(",
+                                                           "").replace(")",
+                                                                       "").replace(".","")] = value
+
                 # if settings.DEBUG:
                 #     print(">>>>>>>>>>>>>>>>>")
                 #     print("Compiled Record:", row_under)
@@ -298,7 +328,7 @@ def display_npi_source_record(request, record_no ):
                 context['fhir_profile'] = fhir_profile
 
                 if settings.DEBUG:
-                    print("Profile_DICT:", context['profile'])
+                    # print("Profile_DICT:", context['profile'])
                     print("Profile:", fhir_profile)
 
                 messages.info(request,"Found Record:"+str(rec_counter)+" with NPI:"+row_under['NPI'])
@@ -475,8 +505,8 @@ def find_profile(request, resourceType, profile, search_spec):
 
         search_result['status_code'] = r.status_code
         if r.status_code == 200:
-            if settings.DEBUG:
-                print("SEARCH result:  ", r.json())
+            # if settings.DEBUG:
+            #    print("SEARCH result:  ", r.json())
             # we found something so get the content
             content = OrderedDict(r.json())
             # if settings.DEBUG:
@@ -489,7 +519,7 @@ def find_profile(request, resourceType, profile, search_spec):
                 search_result['id'] = content['entry'][0]['resource']['id']
                 search_result['versionId'] = content['entry'][0]['resource']['meta']['versionId']
                 # if settings.DEBUG:
-                #    print("id:", search_result['id'])
+                #     print("id:", search_result['id'])
                 search_result['duplicates'] = []
                 for item in content['entry']:
                     #print("getting duplicates:", item['resource'])
@@ -506,8 +536,8 @@ def find_profile(request, resourceType, profile, search_spec):
     except requests.ConnectionError:
         messages.error(request,"We had a problem reaching the fhir server")
 
-    if settings.DEBUG:
-        print("Returning search_result", search_result)
+    # if settings.DEBUG:
+    #     print("Returning search_result", search_result)
     return search_result
 
 
@@ -552,7 +582,9 @@ def get_npi(request, profile, context={}):
     # unicode, utf-8, iso-8859-1, latin-1, windows-1253, iso8859-7
     encode = "utf-8"
 
-    with open(file_name,'r', encoding=encode) as fn:
+    with open(file_name,'r',
+              encoding=encode,
+              errors="surrogateescape") as fn:
         reader = csv.DictReader(fn,
                                 delimiter = delimiter,
                                 quotechar = '"')
@@ -569,12 +601,13 @@ def get_npi(request, profile, context={}):
 
             for key, value in row.items():
                 # We are now writing the field value to the new key dict
-                # if isinstance(value, str):
-                #     value = value.encode('utf-8')
+                # We need to deal with non-ascii crap in the input
+                if isinstance(value, str):
+                    value = value.encode('utf-8')
                 row_under[key.replace(" ",
                                       "_").replace("(",
                                                    "").replace(")",
-                                                               "").replace(".","")] = value
+                                                               "").replace(".","")] = value.decode('utf-8')
 
             ###############
             # We have a record
@@ -585,15 +618,15 @@ def get_npi(request, profile, context={}):
                            'field': "identifier",
                            'value': "NPI", # Field Name from Profile
                            }
-            if settings.DEBUG:
-                print("Record:", rec_counter)
+            # if settings.DEBUG:
+            #     print("Record:", rec_counter)
             search_result = find_profile(request,
                                          context['txn']['resourceType'],
                                          row_under,
                                          search_spec)
 
-            #if settings.DEBUG:
-            #    print("Search Result:", search_result)
+            if settings.DEBUG:
+                print("Search Result:", search_result)
             # should return:
             #    search_result['status_code'] = r.status_code
             #    search_result['total'] = r.content['total']
@@ -610,7 +643,11 @@ def get_npi(request, profile, context={}):
                 elif search_result['status_code'] == 200:
                     # Search can return no results with a
                     # status_code of 200. in which case total = 0
-                    if search_result['total'] < 2:
+                    if search_result['total'] == 0:
+                        # No record found so create one
+                        row_under['mode'] = 'create'
+                        row_under['versionId'] = "1"
+                    elif search_result['total'] == 1:
                         # a record exists
                         row_under['mode'] = 'update'
                         if 'versionId' in search_result:
@@ -698,16 +735,16 @@ def get_npi(request, profile, context={}):
                                                   context['txn']['extn'],
                                                   )
 
-                # if settings.DEBUG:
-                    # print("fhir_Profile:", fhir_profile)
+                if settings.DEBUG:
+                    print("fhir_Profile:", fhir_profile)
 
                 # Update the Fhir Server with this FHIR Profile
 
                 target_url = context['txn']['server'] + context['txn']['locn']
-                if 'guid' in row_under:
-                    # If we have a guid and row_under['mode'] = 'update'
-                    target_url = target_url + "/" + row_under['guid']
-                target_url = target_url + "?_format=json"
+                #if 'guid' in row_under and not row_under['mode'] == 'create':
+                #    # If we have a guid and row_under['mode'] = 'update'
+                #    target_url = target_url + "/" + row_under['guid']
+                #target_url = target_url + "?_format=json"
                 headers = {'Content-Type': 'application/json+fhir; charset=UTF-8',
                            'Accept'      : 'text/plain'}
                 #if settings.DEBUG:
@@ -715,11 +752,11 @@ def get_npi(request, profile, context={}):
 
                 try:
                     if row_under['mode'] == 'create':
-                        r = requests.post(target_url,
+                        r = requests.post(target_url + "?_format=json",
                                           data=fhir_profile,
                                           headers=headers )
                     else:
-                        r = requests.put(target_url,
+                        r = requests.put(target_url + "/" + row_under['guid'] + "?_format=json",
                                          data=fhir_profile,
                                          headers=headers )
                     if r.status_code == 201:
@@ -740,6 +777,8 @@ def get_npi(request, profile, context={}):
                             #      #r.headers['content-location'],
                             #      )
                             #print("ID:", commit_data)
+                    if settings.DEBUG:
+                        print(rec_counter,":","Mode:", row_under['mode'],"[",r.status_code,"] NPI:", row_under['NPI'],r.__dict__)
                     last_ten += 1
                     if last_ten == 10:
                         last_ten = 0

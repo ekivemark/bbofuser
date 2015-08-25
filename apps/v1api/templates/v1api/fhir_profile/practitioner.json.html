@@ -3,18 +3,14 @@
   "meta": {"versionId": "{{ profile.versionId }}",
            "lastUpdated": "{{ updated }}"},
   {% include "v1api/fhir_profile/include/fhir_identifier.json.html" %}
-  {% comment %}"identifier": [{"use": "official",
-                  "type": "NPI",
-                  "system": "http://www.cms.gov",
-                  "value": "{{ profile.NPI }}"}],{% endcomment %}
   {% include "v1api/fhir_profile/include/fhir_human_name.json.html" %}
   {% include "v1api/fhir_profile/include/fhir_contactpoint.json.html" %}
   {% include "v1api/fhir_profile/include/fhir_address.json.html" %}
-  {% include "v1api/fhir_profile/include/fhir_address.json.html" %}
   {% if profile.gender %}"gender": "{{ profile.gender }}"{% endif %}{% if profile.narrative %},
   "text": {"status": "additional",
-           "div": "<div><div id='narrative'>{{ profile.narrative|safe }}</div></div>"}{% endif %}
-  {% include "v1api/fhir_profile/include/fhir_extension.json.html" %}
+           "div": "<div><div id='narrative'>{{ profile.narrative }}</div></div>"
+    }{% endif %}{% if profile.fhir_extension %},
+  {% include "v1api/fhir_profile/include/fhir_extension.json.html" %}{% endif %}
 }
 {% comment %}
 
