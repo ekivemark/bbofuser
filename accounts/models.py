@@ -259,7 +259,14 @@ class Crosswalk(models.Model):
     guid = models.CharField(max_length=40)
     hicn = models.CharField(max_length=40, blank=True)
     fhir = models.CharField(max_length=40, blank=True )
+    fhir_url_id = models.CharField(max_length=80, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
+
+    # FHIR = Identifier contained in the Patient Profile
+    # fhir_url_id = Identifier used in the patient Profile URL
+    # eg. /baseDstu2/Patient/{id}
+    # This will allow us to construct a URL to make a call directly to
+    # a record, rather than requiring a search
 
     def save(self, *args, **kwargs):
         created = self.date_created is None
