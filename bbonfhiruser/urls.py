@@ -33,6 +33,8 @@ urlpatterns = patterns('',
                            include('apps.api.urls', namespace='api')),
                        url(r'^npi_up/', include('apps.npi_upload.urls',
                                            namespace='npi_upload')),
+                      url(r'^getbb/', include('apps.getbb.urls',
+                                           namespace='getbb')),
 
                        url(r'^registration/register/$',
                            RegistrationView.as_view(

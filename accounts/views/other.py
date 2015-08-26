@@ -204,7 +204,7 @@ def manage_account(request):
 # DONE: Update User.affiliated_to and User.organization_role
 # DONE: Save Organization with link to User
 # DONE: Create developer/connect_organization.html
-# DONE: Add view to accounts/urls.py
+# DONE: Add view to accounts/urls.py.py
 
 
 @session_master

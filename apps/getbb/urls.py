@@ -1,9 +1,9 @@
 """
-bbofuser: apps.v1api
+bbofuser: apps.getbb
 FILE: urls.py
 Created: 8/6/15 6:34 PM
 
-We will call this from the apps.api namespace as v1
+We will call this from the apps.api namespace as get_bb
 
 i.e. [Server_root]/api/v1/
 
@@ -17,18 +17,21 @@ from django.conf.urls import (patterns,
                               url)
 from django.contrib import admin
 
-from apps.v1api.views.home import *
-from apps.v1api.views.patient import patient
-from apps.device.views import device_authenticate
+from apps.getbb.views.mym_login import *
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
                        # Examples:
-                       url(r'^$', 'apps.v1api.views.home.api_index',
+                       url(r'^$',
+                           'apps.getbb.views.main.bb_index',
                            name='home'),
-                       url(r'^patient/(?P<key>\w+)/$',
-                           'apps.v1api.views.patient.patient',
-                           name='patient'),
+                       url(r'^connect/$',
+                           'apps.getbb.views.mym_login.connect',
+                           name='connect'),
+                       url(r'^disconnect/$',
+                           'apps.getbb.views.mym_login.disconnect',
+                           name='disconnect'),
 
                        url(r'^admin/', include(admin.site.urls)),
 

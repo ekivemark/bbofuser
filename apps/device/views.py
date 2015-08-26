@@ -326,7 +326,7 @@ def ask_user_for_permission(request):
     # should be able to use request.session
     # DONE: Create Ask User For Permission
     # DONE: Create Form and View to get permission
-    # DONE: Add view to urls.py
+    # DONE: Add view to urls.py.py
     if request.POST:
         form = Question_Form(request.POST)
         if form.is_valid():

@@ -1,9 +1,13 @@
 {% extends "base.html" %}
+{% if get_fmt == "xml" or get_fmt == "json" %}
+{{ result }}
+{% else %}
 {% load i18n %}
 {% load staticfiles %}
 {% block pretitle %}Welcome to the {% endblock %}
 {% block title %}{{ settings.APPLICATION_TITLE }} api/v1/{{ name }}/{% endblock %}
 {% block extra_head %}
+
 {% endblock %}
 {% block breadcrumbs %}
     <div class="container">
@@ -21,7 +25,7 @@
        <div class="container-fluid">
 
                  {% if user.is_authenticated %}
-                   <div class="col-md-8">
+                   <div class="col-md-12">
                        <div class="col-md-12 well">
                            <h4>Call Info:</h4>
                            {{ settings.URL_PRE }}{{ settings.DOMAIN }}{{ request.get_full_path }}<br>
@@ -30,23 +34,25 @@
                        </div>
 
                         <div class="col-md-12 well">
-                            <h4>Result: [{{ fmt|capfirst }}]</h4>
+                            <h4>Result: [{% if get_fmt %}{{ get_fmt|capfirst }}{% else %}{{ in_fmt|upper }}{% endif %}]</h4>
                             <p>&nbsp;</p>
                             {% if text %}<p>{{ text|safe }}</p>{% endif %}
                             <p>&nbsp;</p>
                         </div>
 
-                        <div class="results">
-                           <a href="#" class="results scroll">
-                               <div class="hover-container results" style="font-style:italic;">
-                                    Display snapshot of detailed structured data?
-                                    <div class="hover-content results col-lg-12 modal-body modal-content modal-form ">
-                                    {% if fmt == "xml" %}{{ result }}{% else %}{{ result|safe }}{% endif %}
-                                    </div>
-                                </div></a>
-                        </div>
+                   </div>
+                   <div class="collapse-group">
 
-                    </div>
+                            <p class="collapse" id="viewdetails">
+                                {% if get_fmt == "xml" %}{{ result }}{% else %}{{ result }}{% endif %}
+                            </p>
+                            <p>
+                                <a class="btn viewdetails btn-success"
+                                   data-toggle="collapse"
+                                   data-target="#viewdetails">Show Details</a>
+                            </p>
+                   </div>
+
                 {% else %}
                     <a href="{% url "device:device_login" %}?next=/api"><input
                             type="button"
@@ -54,11 +60,6 @@
                             value="{% trans "login" %}"/>
                     </a>
                 {% endif %}
-
-            <div class="col-md-4"><img
-                    src="{% static 'img/layout/blue-button.png' %}"
-                    style="height:300px">
-            </div>
 
         </div>
 
@@ -85,3 +86,4 @@ context = {'display': Txn['dsply'],
                'result' : convert,
                }
 {% endcomment %}
+{% endif %}

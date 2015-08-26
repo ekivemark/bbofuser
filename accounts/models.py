@@ -257,7 +257,8 @@ class Crosswalk(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     guid = models.CharField(max_length=40)
-    hicn = models.CharField(max_length=40)
+    hicn = models.CharField(max_length=40, blank=True)
+    fhir = models.CharField(max_length=40, blank=True )
     date_created = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
@@ -287,3 +288,7 @@ class Crosswalk(models.Model):
     def get_email(self):
         # Return the email/username
         return self.user_id
+
+    def get_fhir(self):
+        # Return the FHIR Identifier
+        return self.fhir

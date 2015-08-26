@@ -570,7 +570,7 @@ def get_npi(request, profile, context={}):
     else:
         stop = 0
 
-    rec_counter = int(start)
+    rec_counter = 0
     end_rec_counter = int(stop)
     reader = OrderedDict()
     row_under = profile # passed in as OrderedDict()
@@ -589,8 +589,13 @@ def get_npi(request, profile, context={}):
                                 delimiter = delimiter,
                                 quotechar = '"')
 
+
         for row in reader:
             rec_counter += 1
+            if rec_counter < start:
+                if settings.DEBUG:
+                    print(".", end="")
+                continue
             row_under = profile # Passed in as OrderedDict()
             for fld_name in reader.fieldnames:
                 # Write Fields in order of Fieldnames in CSV

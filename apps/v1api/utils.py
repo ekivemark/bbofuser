@@ -61,7 +61,7 @@ def get_format(in_get):
     got_get = get_to_lower(in_get)
 
     # set default to return
-    result = "json"
+    result = ""
 
     if "_format" in got_get:
         # we have something to process

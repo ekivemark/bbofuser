@@ -170,6 +170,7 @@ THIRD_PARTY_APPS = (
     'rest_framework',
     'requests',
     'numpy',
+
 )
 
 LOCAL_APPS = (
@@ -181,6 +182,7 @@ LOCAL_APPS = (
     'apps.api',
     'apps.v1api',
     'apps.npi_upload',
+    'apps.getbb',
 )
 
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -518,13 +520,16 @@ if REMOTE_LDAP_CHECK:
 
     print("Server_Info:", server.info)
 
+# BeautifulSoup
+BS_PARSER = 'lxml'
+
 FHIR_SERVER = parser.get('global', 'fhir_server')
 if FHIR_SERVER == '':
     FHIR_SERVER = 'http://fhir.bbonfhir.com:8080/fhir-p'
     # FHIR_SERVER = 'http://localhost:8080/fhir-p'
 
 NPI_SOURCE_FOLDER = "/Users/mark/Downloads/NPPES_Data_Dissemination_August_2015.zip/NPPES_Data_Dissemination_August_2015/"
-NPI_SOURCE_FILE   = "npidata_20050523-20150809.csv"
+NPI_SOURCE_FILE   = "npidata_20050523-20150809-utf8.csv"
 
 if DEBUG_SETTINGS:
     print("FHIR_SERVER:", FHIR_SERVER)

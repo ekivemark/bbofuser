@@ -21,8 +21,11 @@ from xml.etree import ElementTree as ET
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.core import serializers
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import (HttpResponseRedirect,
+                         HttpResponse,
+                         JsonResponse,)
 from django.utils.safestring import mark_safe
 
 from django.shortcuts import render, render_to_response
@@ -36,7 +39,7 @@ from apps.v1api.utils import (get_format, etree_to_dict,
 # TODO: Setup DJANGO REST Framework
 # DONE: Apply user scope to FHIR Pass through
 # DONE: Test Pass through to FHIR Server
-# DONE: Create api:vi namespace in urls.py
+# DONE: Create api:vi namespace in urls.py.py
 # TODO: Detect url of accessing apps. Store in Connected_from of Device field
 # TODO: Extract site domain from querying url in Connected_From
 
@@ -44,7 +47,7 @@ from apps.v1api.utils import (get_format, etree_to_dict,
 @login_required
 def patient(request, key=1, *args, **kwargs):
     """
-
+    Display Patient Profile
     :param request:
     :param args:
     :param kwargs:
@@ -68,6 +71,9 @@ def patient(request, key=1, *args, **kwargs):
         print("Crosswalk   :", xwalk)
         print("GUID        :", xwalk.guid)
 
+    # We will deal internally in JSON Format if caller does not choose
+    # a format
+    in_fmt = "json"
 
     # DONE: Define Transaction Dictionary to enable generic presentation of API Call
     Txn =  {'name'  :"Patient",
@@ -76,6 +82,7 @@ def patient(request, key=1, *args, **kwargs):
             'server': settings.FHIR_SERVER,
             'locn'  : "/baseDstu2/Patient/",
             'template' : 'v1api/patient.html',
+            'in_fmt': in_fmt,
              }
 
     mask = False
@@ -85,24 +92,41 @@ def patient(request, key=1, *args, **kwargs):
     pass_to = Txn['server'] + Txn['locn']
     pass_to = pass_to + str(key)+"/"
 
-    # Check for _format=
-    fmt = get_format(request.GET)
+    # We need to detect if a format was requested in the URL Parameters
+    # ie. _format=json|xml
+    # modify get_format to default to return nothing. ie. make no change
+    # internal data handling will be JSON
+    # _format will drive external display
+    # if no _format setting  we will display in html (Current mode)
+    # if valid _format string we will pass content through to display in
+    # raw format
+
+    # Check for _format
+    get_fmt = get_format(request.GET)
     if settings.DEBUG:
-        print("get_Format returned:", fmt)
+        print("get_Format returned:", get_fmt)
 
-    #fmt_type = "?_format=xml"
-    #fmt_type = "?_format=json"
+    #get_fmt_type = "?_format=xml"
+    #get_fmt_type = "?_format=json"
 
-    fmt_type = "$everything?_format=" + fmt
-    pass_to = pass_to + fmt_type
+    if get_fmt:
+        get_fmt_type = "$everything?_format=" + get_fmt
+        pass_to = pass_to + get_fmt_type
+    else:
+        if settings.DEBUG:
+            print("Get Format:[", get_fmt, "]")
+        in_fmt_type = "$everything?_format=" + in_fmt
+        pass_to = pass_to + in_fmt_type
+
     mask_to = settings.DOMAIN
 
     # Set Context
-    context ={'display': Txn['display'],
-              'name'   : Txn['name'],
-              'mask'   : mask,
-              'key'    : key,
-              'fmt'    : fmt,
+    context ={'display' : Txn['display'],
+              'name'    : Txn['name'],
+              'mask'    : mask,
+              'key'     : key,
+              'get_fmt' : get_fmt,
+              'in_fmt'  : Txn['in_fmt'],
               #'output' : "test output ",
               #'args'   : args,
               #'kwargs' : kwargs,
@@ -112,7 +136,7 @@ def patient(request, key=1, *args, **kwargs):
     try:
         r = requests.get(pass_to)
 
-        if fmt == "xml":
+        if get_fmt == "xml":
 
             xml_text = minidom.parseString(r.text)
             print("XML_TEXT:", xml_text.toxml())
@@ -182,9 +206,20 @@ def patient(request, key=1, *args, **kwargs):
             print()
             #print("Context:",context)
 
-        return render_to_response(Txn['template'],
-                              RequestContext(request,
-                                             context,))
+        if get_fmt == 'xml' or get_fmt == 'json':
+            if settings.DEBUG:
+                print("Mode = ", get_fmt)
+                print("Context['result']: ", context['result'])
+            if get_fmt == "xml":
+                return HttpResponse(context['result'],
+                                    content_type='application/'+get_fmt)
+            if get_fmt == "json":
+                return JsonResponse(context['result'],)
+
+        else:
+            return render_to_response(Txn['template'],
+                                          RequestContext(request,
+                                                 context,))
 
     except requests.ConnectionError:
         print("Whoops - Problem connecting to FHIR Server")

@@ -27,7 +27,7 @@ from django.template import RequestContext
 # TODO: Setup DJANGO REST Framework
 # DONE: Apply user scope to FHIR Pass through
 # DONE: Test Pass through to FHIR Server
-# DONE: Create api:vi namespace in urls.py
+# DONE: Create api:vi namespace in urls.py.py
 # TODO: Detect url of accessing apps. Store in Connected_from of Device field
 # TODO: Extract site domain from querying url in Connected_From
 
