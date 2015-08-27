@@ -219,3 +219,46 @@ def date_to_iso(thedate, decimals=True):
 
     return strdate + three_digits + utcoffset
 
+def get_url_query_string(get, skip_parm=[]):
+    """
+    Receive the request.GET Query Dict
+    Evaluate against skip_parm by skipping any entries in skip_parm
+    Return a query string ready to pass to a REST API.
+    http://hl7-fhir.github.io/search.html#all
+
+    # We need to force the key to lower case and skip params should be
+    # lower case too
+
+    eg. _lastUpdated=>2010-10-01&_tag=http://acme.org/codes|needs-review
+
+    :param get: {}
+    :param skip_parm: []
+    :return: Query_String (QS)
+    """
+
+    # Check we got a get dict
+    if not get:
+        return ""
+
+    qs = ""
+    # Now we work through the parameters
+
+    for k, v in get.items():
+        if settings.DEBUG:
+            print("K/V: [",k, "/", v,"]" )
+        if k.lower() in skip_parm:
+            pass
+        else:
+            # Build the query_string
+            if len(qs) > 1:
+                # Use & to concatanate items
+                qs = qs + "&"
+            # build the string
+            qs = qs + k.strip() + "=" + v.strip()
+
+    return qs
+
+
+
+
+

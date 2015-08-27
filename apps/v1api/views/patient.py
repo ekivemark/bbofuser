@@ -33,8 +33,10 @@ from django.template import RequestContext
 
 from accounts.models import Crosswalk
 
-from apps.v1api.utils import (get_format, etree_to_dict,
-                              xml_str_to_json_str)
+from apps.v1api.utils import (get_format,
+                              etree_to_dict,
+                              xml_str_to_json_str,
+                              get_url_query_string,)
 
 # TODO: Setup DJANGO REST Framework
 # DONE: Apply user scope to FHIR Pass through
@@ -70,6 +72,8 @@ def patient(request, key=1, *args, **kwargs):
         print("KWargs      :", kwargs)
         print("Crosswalk   :", xwalk)
         print("GUID        :", xwalk.guid)
+        print("FHIR        :", xwalk.fhir)
+        print("FHIR URL ID :", xwalk.fhir_url_id)
 
     # We will deal internally in JSON Format if caller does not choose
     # a format
@@ -84,6 +88,22 @@ def patient(request, key=1, *args, **kwargs):
             'template' : 'v1api/patient.html',
             'in_fmt': in_fmt,
              }
+
+    # Since this is BlueButton and we are dealing with Patient Records
+    # We need to limit the id search to the specific beneficiary.
+    # A BlueButton user should not be able to request a patient profile
+    # that is not their own.
+    # We do this via the CrossWalk. The xwalk.fhir_url_id is the patient
+    # id as used in the url. eg. /Patient/23/
+    # FHIR also allows an enquiry with ?_id=23. We need to detect that
+    # and remove it from the parameters that are passed.
+    # All other query parameters should be passed through to the
+    # FHIR server.
+
+    # Add URL Parameters to skip_parm to ignore or perform custom
+    # processing with them. Use lower case values for matching.
+    # DO NOT USE Uppercase
+    skip_parm = ['_id', '_format']
 
     mask = False
     if 'mask' in Txn:
@@ -101,7 +121,8 @@ def patient(request, key=1, *args, **kwargs):
     # if valid _format string we will pass content through to display in
     # raw format
 
-    # Check for _format
+
+    # Check for _format and process in this section
     get_fmt = get_format(request.GET)
     if settings.DEBUG:
         print("get_Format returned:", get_fmt)
@@ -118,6 +139,20 @@ def patient(request, key=1, *args, **kwargs):
         in_fmt_type = "$everything?_format=" + in_fmt
         pass_to = pass_to + in_fmt_type
 
+    url_param = get_url_query_string(request.GET, skip_parm)
+    if len(url_param) > 1:
+        if settings.DEBUG:
+            print("URL Params = ", url_param)
+        if "?" in pass_to:
+            # We already have the start of a query string in the url
+            # So we prefix with "&"
+            pass_to = pass_to + "&" + url_param
+        else:
+            # There is no ? so we need to start the query string
+            pass_to = pass_to + "?" + url_param
+    if settings.DEBUG:
+        print("URL Pass_To:", pass_to)
+
     mask_to = settings.DOMAIN
 
     # Set Context
@@ -131,7 +166,7 @@ def patient(request, key=1, *args, **kwargs):
               #'args'   : args,
               #'kwargs' : kwargs,
               #'get'    : request.GET,
-              #'pass_to': pass_to,
+              'pass_to': pass_to,
               }
     try:
         r = requests.get(pass_to)

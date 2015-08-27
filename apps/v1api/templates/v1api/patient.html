@@ -29,6 +29,7 @@
                        <div class="col-md-12 well">
                            <h4>Call Info:</h4>
                            {{ settings.URL_PRE }}{{ settings.DOMAIN }}{{ request.get_full_path }}<br>
+                           {{ pass_to }}
                            {% comment %}Get: {{ '{' }}{{ get.QueryDict }}{{ '}' }}
                            Args: {{ args }} | KWargs: {{ kwargs }}{% endcomment %}
                        </div>

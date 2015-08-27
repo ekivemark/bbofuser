@@ -299,3 +299,8 @@ class Crosswalk(models.Model):
     def get_fhir(self):
         # Return the FHIR Identifier
         return self.fhir
+
+    def get_fhir_url_id(self):
+        # Return the patient profile id to add to url
+        return self.fhir_url_id
+
