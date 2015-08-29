@@ -169,7 +169,7 @@ THIRD_PARTY_APPS = (
     'ldap3',
     'rest_framework',
     'requests',
-    'numpy',
+    #'numpy',
 
 )
 
