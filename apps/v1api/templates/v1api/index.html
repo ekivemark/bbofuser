@@ -21,10 +21,10 @@
        <div class="container-fluid">
                 <p>
                  {% if user.is_authenticated %}
-                   <div class="col-md-8">
+                   <div class="col-md-8 well">
 
                         <p>
-                         Access the Test: <a href="{% url 'api:v1:patient' '1' %}">Beneficiary Profile</a>.
+                         Access the Test: <a href="{% url 'api:v1:patient' %}">Beneficiary Profile</a>.
                         </p>
                     </div>
                 {% else %}

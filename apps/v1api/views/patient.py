@@ -36,7 +36,8 @@ from accounts.models import Crosswalk
 from apps.v1api.utils import (get_format,
                               etree_to_dict,
                               xml_str_to_json_str,
-                              get_url_query_string,)
+                              get_url_query_string,
+                              concat_string)
 
 # TODO: Setup DJANGO REST Framework
 # DONE: Apply user scope to FHIR Pass through
@@ -47,7 +48,7 @@ from apps.v1api.utils import (get_format,
 
 
 @login_required
-def patient(request, key=1, *args, **kwargs):
+def get_patient(request, *args, **kwargs):
     """
     Display Patient Profile
     :param request:
@@ -66,6 +67,14 @@ def patient(request, key=1, *args, **kwargs):
         messages.error(request, "Unable to find Patient ID")
         return HttpResponseRedirect(reverse('api:v1:home'))
 
+    if xwalk.fhir_url_id == "":
+        err_msg = ['Sorry, We were unable to find',
+                   'any of your patient records',]
+        exit_message = concat_string("",
+                                     msg=err_msg,
+                                     delimiter=" ",
+                                     last=".")
+        messages.error(request, exit_message)
 
     if settings.DEBUG:
         print("Request.GET :", request.GET)
@@ -105,12 +114,14 @@ def patient(request, key=1, *args, **kwargs):
     # DO NOT USE Uppercase
     skip_parm = ['_id', '_format']
 
+    key = xwalk.fhir_url_id.strip()
+
     mask = False
     if 'mask' in Txn:
         mask = Txn['mask']
 
     pass_to = Txn['server'] + Txn['locn']
-    pass_to = pass_to + str(key)+"/"
+    pass_to = pass_to + key + "/"
 
     # We need to detect if a format was requested in the URL Parameters
     # ie. _format=json|xml

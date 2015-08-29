@@ -18,7 +18,7 @@ from django.conf.urls import (patterns,
 from django.contrib import admin
 
 from apps.v1api.views.home import *
-from apps.v1api.views.patient import patient
+from apps.v1api.views.patient import get_patient
 from apps.device.views import device_authenticate
 admin.autodiscover()
 
@@ -26,8 +26,8 @@ urlpatterns = patterns('',
                        # Examples:
                        url(r'^$', 'apps.v1api.views.home.api_index',
                            name='home'),
-                       url(r'^patient/(?P<key>\w+)/$',
-                           'apps.v1api.views.patient.patient',
+                       url(r'^patient$',
+                           'apps.v1api.views.patient.get_patient',
                            name='patient'),
 
                        url(r'^admin/', include(admin.site.urls)),

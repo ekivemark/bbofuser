@@ -258,7 +258,23 @@ def get_url_query_string(get, skip_parm=[]):
 
     return qs
 
+def concat_string(target, msg=[], delimiter="", last=""):
+    """
+    Concatenate a series of strings to the end of the target
+    Delimiter is optional filler between items
+    :param target:
+    :param msg:
+    :return: target
+    """
 
+    result = target
+
+    for m in msg[:-1]:
+        result = result + m + delimiter
+
+    result = result + msg[-1] + last
+
+    return result
 
 
 
