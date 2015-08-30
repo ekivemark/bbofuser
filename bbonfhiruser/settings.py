@@ -300,11 +300,14 @@ STATICFILES_FINDERS = (
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-SESSION_COOKIE_SECURE = False
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = '/var/www/html/dev.bbonfhir.com'
+
+
+SESSION_COOKIE_SECURE = False
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # For Django Registration:
 # settings are stored in local.ini in parent directory
