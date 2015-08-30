@@ -300,7 +300,6 @@ STATICFILES_FINDERS = (
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-
 STATIC_URL = '/static/'
 
 STATIC_ROOT = '/var/www/html/dev.bbonfhir.com'
