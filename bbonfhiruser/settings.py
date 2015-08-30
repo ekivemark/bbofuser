@@ -302,7 +302,7 @@ STATICFILES_FINDERS = (
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = '/var/www/html/dev.bbonfhir.com'
+STATIC_ROOT = '/var/www/html/dev.bbonfhir.com/'
 
 
 SESSION_COOKIE_SECURE = False
