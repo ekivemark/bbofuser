@@ -416,7 +416,7 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 # GEt a file name that stores words we will use to create fake accounts
 WORD_LIST = parser.get('global', 'word_dictionary').strip()
-WORD_LIST = BASE_DIR + "/WORDS/" + WORD_LIST
+WORD_LIST = BASE_DIR + "/words/" + WORD_LIST
 
 if DEBUG_SETTINGS:
     print("===================================")
