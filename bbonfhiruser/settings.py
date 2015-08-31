@@ -348,6 +348,12 @@ if EMAIL_BACKEND_TYPE == 'smtp':
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+# Default page for Login process
+# Setting this to stage 1 of Login with SMS Code
+LOGIN_URL = "/accounts/smscode"
+
+# Default Location to redirect to after successful login
+# Overridden by next= parameter
 LOGIN_REDIRECT_URL = '/'
 
 # SMS code Time out in Minutes (used for Multi-factor Authentication
