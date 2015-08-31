@@ -9,7 +9,6 @@ from django.contrib import messages
 
 __author__ = 'Mark Scrimshire:@ekivemark'
 
-
 import json
 import requests
 
@@ -75,6 +74,7 @@ def get_patient(request, *args, **kwargs):
                                      delimiter=" ",
                                      last=".")
         messages.error(request, exit_message)
+        return HttpResponseRedirect(reverse('api:v1:home'))
 
     if settings.DEBUG:
         print("Request.GET :", request.GET)
