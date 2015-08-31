@@ -68,7 +68,7 @@ def get_patient(request, *args, **kwargs):
 
     if xwalk.fhir_url_id == "":
         err_msg = ['Sorry, We were unable to find',
-                   'any of your patient records',]
+                   'your record',]
         exit_message = concat_string("",
                                      msg=err_msg,
                                      delimiter=" ",
