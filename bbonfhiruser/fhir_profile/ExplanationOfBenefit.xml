@@ -2,13 +2,34 @@
  <!-- from Resource: id, meta, implicitRules, and language -->
  <!-- from DomainResource: text, contained, extension, and modifierExtension -->
  <identifier><!-- 0..* Identifier Business Identifier --></identifier>
+ <contained>
+     <Practitioner id="practitioner1"><!-- 0..* reference -->
+         <!-- relevant patient facing information ... -->
+     </Practitioner>
+     <Organization id="org1"><!-- 0..* reference -->
+        <!-- Relevant patient facing information... -->
+     </Organization>
+       <!-- embed any other potentially repeating information -->
+       <!-- refer to item via relative link e.g. #practitioner1 from -->
+       <!-- elsewhere in the EOB document -->
+       <!-- Each item in the contains section should contain an id that enables -->
+       <!-- a suitably authorized person to track back to the original record. -->
+ </contained>
  <request><!-- 0..1 Reference(Claim) Claim reference --></request>
  <outcome value="[code]"/><!-- 0..1 complete | error -->
  <disposition value="[string]"/><!-- 0..1 Disposition Message -->
- <ruleset><!-- 0..1 Coding Resource version --></ruleset>
- <originalRuleset><!-- 0..1 Coding Original version --></originalRuleset>
- <created value="[dateTime]"/><!-- 0..1 Creation date -->
+ <period><!-- 1..1 Period: Start and End date that the claim covers -->
+ </period>
+ <adjudication><!-- 0..* claim adjudication -->
+     <code><!-- 1..1 Coding Adjudication category such as co-pay, eligible, benefit, etc. --></code>
+     <amount><!-- 0..1 Quantity(Money) Monetary amount --></amount>
+     <value value="[decimal]"/><!-- 0..1 Non-monitory value -->
+ </adjudication>
  <organization><!-- 0..1 Reference(Organization) Insurer --></organization>
- <requestProvider><!-- 0..1 Reference(Practitioner) Responsible practitioner --></requestProvider>
- <requestOrganization><!-- 0..1 Reference(Organization) Responsible organization --></requestOrganization>
-</ExplanationOfBenefit>
+ <coverage>
+     <identifier>
+         <!-- 0..1 Reference(Organization) Insurer -->
+     </identifier>
+     <plan value="[string]"/><!-- 0..1 An identifier for the plan -->
+ </coverage>
+ </ExplanationOfBenefit>

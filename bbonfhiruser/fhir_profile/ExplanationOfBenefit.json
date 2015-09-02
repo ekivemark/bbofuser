@@ -1,11 +1,32 @@
 {
-  "resourceType": "ExplanationOfBenefit",
-  // from Resource: id, meta, implicitRules, and language
-  // from DomainResource: text, contained, extension, and modifierExtension
-  "identifier": [{ Identifier }], // Business Identifier
-  "request": { Reference(Claim) }, // Claim reference
-  "outcome": "<code>", // complete | error
-  "created": "dateTime>", // Creation date
-
-  // Add more
+ "resourceType" : "ExplanationOfBenefit",
+ // from Resource: id, meta, implicitRules, and language
+ // from DomainResource: text, contained, extension, and modifierExtension
+ "identifier" : [{ Identifier }], // Business Identifier    
+ "contained" : [ 
+    {"resourceType" : "Practitioner",
+     "id" : "practitioner1",  // relevant patient facing information ...
+    },
+    {"resourceType" : "Organization",
+     "id" : "org1",
+       // relevant patient facing information... }
+       // embed any other potentially repeating information 
+       // refer to item via relative link e.g. #practitioner1 from
+       // elsewhere in the EOB document
+       // Each item in the contains section should contain an id that enables
+       // a suitably authorized person to track back to the original record.   
+ ],
+ "request" : { Reference(ClaimResponse) }, // Claim reference and details
+ "outcome" : "<code>", // complete | error
+ "disposition" : "<string>", // Disposition Message
+ "period" :  { Period }, // Claim start and end dates
+ "adjudication" : [{ // claim adjudication
+   "code" : { Coding }, // R!  Adjudication category such as co-pay, eligible, benefit, etc.
+   "amount" : { Quantity(Money) }, // Monetary amount
+   "value" : <decimal> // Non-monitory value
+ }],
+ "organization" : { Reference(Organization) },  // payer
+ "coverage" :  { "identifier" : Reference(Identifier),
+                 "plan" : "<string>" },
+ "text" : "<string>" // text representation of EOB content
 }
