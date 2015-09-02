@@ -17,6 +17,7 @@ from apps.v1api.views.fhir_elements import (npid,
                                             contact_point,
                                             address,
                                             )
+from apps.v1api.views.fhir_utils import (remove_empty_string)
 
 
 def write_practitioner_narrative(profile):
@@ -139,13 +140,18 @@ Profile elements:
         # hn['given']  = assign_str(source, 'given')
         # hn['period'] = assign_str(source, 'period')
 
+        suffix = remove_empty_string([src_dict['Provider_Name_Suffix_Text'],
+                                     src_dict['Provider_Credential_Text']])
+        prefix = remove_empty_string([src_dict['Provider_Name_Prefix_Text']])
+
+        given = remove_empty_string([src_dict['Provider_First_Name'],
+                                    src_dict['Provider_Middle_Name']])
+
         name_source = {
-                       'suffix' : [src_dict['Provider_Name_Suffix_Text'],
-                                   src_dict['Provider_Credential_Text']],
-                       'prefix' : src_dict['Provider_Name_Prefix_Text'],
+                       'suffix' : suffix,
+                       'prefix' : prefix,
                        'family' : [src_dict['Provider_Last_Name_Legal_Name']],
-                       'given'  : [src_dict['Provider_First_Name'],
-                                   src_dict['Provider_Middle_Name']]
+                       'given'  : given
                       }
 
         fp['fhir_human_name'] = human_name(name_source)

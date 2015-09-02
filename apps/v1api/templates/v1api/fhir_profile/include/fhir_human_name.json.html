@@ -3,8 +3,8 @@
   "use": "{{ profile.fhir_human_name.use }}"{%  if profile.fhir_human_name.text.strip %},
   "text": "{{ profile.fhir_human_name.text }}"{% endif %},
   "family": [{% for item in profile.fhir_human_name.family %}"{{ item }}"{% if forloop.last %}{% else %},{% endif %}{% endfor %}],
-  "given": [{% for item in profile.fhir_human_name.given %}"{{ item }}"{% if forloop.last %}{% else %},{% endif %}{% endfor %}]{% if profile.fhir_human_name.prefix.strip %},
-  "prefix": [{% for item in profile.fhir_human_name.prefix %}"{{ item }}"{% if forloop.last %}{% else %},{% endif %}{% endfor %}]{% endif %}{% if profile.fhir_human_name.suffix.strip %},
+  "given": [{% for item in profile.fhir_human_name.given %}"{{ item }}"{% if forloop.last %}{% else %},{% endif %}{% endfor %}]{% if profile.fhir_human_name.prefix %},
+  "prefix": [{% for item in profile.fhir_human_name.prefix %}"{{ item }}"{% if forloop.last %}{% else %},{% endif %}{% endfor %}]{% endif %}{% if profile.fhir_human_name.suffix %},
   "suffix": [{% for item in profile.fhir_human_name.suffix %}"{{ item }}"{% if forloop.last %}{% else %},{% endif %}{% endfor %}]{% endif %}{% if profile.fhir_human_name.period %},
   "period": { {% for item, date in profile.fhir_human_name.period.items %}
             "{{ item }}" : "{{ date }}"{% if forloop.last %}{% else %},{% endif %}{% endfor %}

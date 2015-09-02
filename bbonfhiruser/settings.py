@@ -550,10 +550,15 @@ if FHIR_SERVER == '':
     FHIR_SERVER = 'http://fhir.bbonfhir.com:8080/fhir-p'
     # FHIR_SERVER = 'http://localhost:8080/fhir-p'
 
-NPI_SOURCE_FOLDER = "/Users/mark/Downloads/"\
-                        "NPPES_Data_Dissemination_August_2015.zip"\
-                        "NPPES_Data_Dissemination_August_2015/"
-NPI_SOURCE_FILE = "npidata_20050523-20150809-utf8.csv"
+if DB_PLATFORM == 'sqlite3':
+    NPI_SOURCE_FOLDER = "/Users/mark/Downloads/"\
+                            "NPPES_Data_Dissemination_August_2015.zip/"\
+                            "NPPES_Data_Dissemination_August_2015/"
+    NPI_SOURCE_FILE = "npidata_20050523-20150809-utf8.csv"
+else:
+    NPI_SOURCE_FOLDER = "/data/pyapps/npi/work/"
+    NPI_SOURCE_FILE = "npidata_source.csv"
+    
 
 if DEBUG_SETTINGS:
     print("FHIR_SERVER:", FHIR_SERVER)

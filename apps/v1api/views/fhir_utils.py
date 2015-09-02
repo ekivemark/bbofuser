@@ -9,6 +9,20 @@ __author__ = 'Mark Scrimshire:@ekivemark'
 
 from django.conf import settings
 
+def remove_empty_string(source):
+    """
+    Receive a list of text strings and remove any empty strings from the list
+    :param source:
+    :return:
+    """
+    result = []
+
+    for item in source:
+        if item:
+            result.append(str(item))
+
+    return result
+
 def assign_str(source, key, default=""):
     """
     Get the key value from source
@@ -34,6 +48,7 @@ def assign_str(source, key, default=""):
                         # We have something to return
                         ret_val = True
                         # Otherwise all values are "" or empty
+
 
                 if ret_val:
                     #print("returning source[key] list:", source[key],

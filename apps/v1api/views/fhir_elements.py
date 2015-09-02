@@ -38,6 +38,8 @@ def human_name(source):
     # Setup the dictionary
     hn = {}
 
+    if settings.DEBUG:
+        print("Source:", source)
     # Map values across to new dictionary
     hn['resourceType'] = "HumanName"
     hn['use'] = assign_str(source, 'use', "usual")
@@ -57,6 +59,9 @@ def human_name(source):
         hn['text'] = build_str(hn['text'], 'suffix', source)
 
     # Return the dictionary
+    if settings.DEBUG:
+        print("Human_Name element:", hn)
+
     return hn
 
 def contact_point(source):
