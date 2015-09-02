@@ -227,8 +227,9 @@ if DEBUG_SETTINGS:
 DB_PLATFORM = PARSE_INI.get('global', 'db_platform')
 if DEBUG_SETTINGS:
     print("DB Platform:", DB_PLATFORM)
-    
+    # postgresql_psycopg2
 if DB_PLATFORM == "postgresql_psycopg2":
+    print("Setting up Database with:", DB_PLATFORM)
     DATABASES = {
         'default' : {
             'ENGINE' : 'django.db.backends.postgresql_psycopg2',
@@ -243,6 +244,8 @@ if DB_PLATFORM == "postgresql_psycopg2":
         }
     }
 else: #  DB_PLATFORM == "sqlite3":
+    if DEBUG_SETTINGS:
+        print('Setting up Database', DB_PLATFORM)
     DATABASES = {
         'default' : {
             'ENGINE' : 'django.db.backends.sqlite3',
