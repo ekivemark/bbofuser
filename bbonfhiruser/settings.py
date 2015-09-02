@@ -227,6 +227,7 @@ if DEBUG_SETTINGS:
 DB_PLATFORM = PARSE_INI.get('global', 'db_platform')
 if DEBUG_SETTINGS:
     print("DB Platform:", DB_PLATFORM)
+    
 if DB_PLATFORM == "postgresql_psycopg2":
     DATABASES = {
         'default' : {
