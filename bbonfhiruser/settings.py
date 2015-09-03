@@ -551,15 +551,13 @@ if FHIR_SERVER == '':
     # FHIR_SERVER = 'http://localhost:8080/fhir-p'
 
 if DB_PLATFORM == 'sqlite3':
-    NPI_SOURCE_FOLDER = "/Users/mark/Downloads/"\
-                            "NPPES_Data_Dissemination_August_2015.zip/"\
+    MEDIA_ROOT = "/Users/mark/Downloads/"
+    NPI_SOURCE_FOLDER =  "NPPES_Data_Dissemination_August_2015.zip/"\
                             "NPPES_Data_Dissemination_August_2015/"
-    MEDIA_ROOT = NPI_SOURCE_FOLDER
     NPI_SOURCE_FILE = "npidata_20050523-20150809-utf8.csv"
 else:
-    NPI_SOURCE_FOLDER = "/data/pyapps/media/"
-    MEDIA_ROOT = NPI_SOURCE_FOLDER
-    NPI_SOURCE_FOLDER = NPI_SOURCE_FOLDER + "npi/work/"
+    MEDIA_ROOT = "/data/pyapps/media/"
+    NPI_SOURCE_FOLDER = "npi/work/"
     NPI_SOURCE_FILE = "npidata_source.csv"
 
 

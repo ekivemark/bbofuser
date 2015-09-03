@@ -59,7 +59,7 @@ def npi_file_spec():
     :return:
     """
 
-    file_name = settings.NPI_SOURCE_FOLDER + settings.NPI_SOURCE_FILE
+    file_name = settings.MEDIA_ROOT + settings.NPI_SOURCE_FOLDER + settings.NPI_SOURCE_FILE
 
     return file_name
 
