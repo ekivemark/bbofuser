@@ -557,7 +557,7 @@ if DB_PLATFORM == 'sqlite3':
     NPI_SOURCE_FILE = "npidata_20050523-20150809-utf8.csv"
 else:
     MEDIA_ROOT = "/data/pyapps/media/"
-    NPI_SOURCE_FOLDER = "npi/work/"
+    NPI_SOURCE_FOLDER = "npi/work/"  
     NPI_SOURCE_FILE = "npidata_source.csv"
 
 
