@@ -185,6 +185,7 @@ LOCAL_APPS = (
     'apps.v1api',
     'apps.npi_upload',
     'apps.getbb',
+    'apps.eob_upload',
 )
 
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -557,7 +558,7 @@ if DB_PLATFORM == 'sqlite3':
     NPI_SOURCE_FILE = "npidata_20050523-20150809-utf8.csv"
 else:
     MEDIA_ROOT = "/data/pyapps/media/"
-    NPI_SOURCE_FOLDER = "npi/work/"  
+    NPI_SOURCE_FOLDER = "npi/work/"
     NPI_SOURCE_FILE = "npidata_source.csv"
 
 

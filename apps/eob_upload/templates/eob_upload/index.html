@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+{% block pretitle %}{% endblock %}
+{% block extra_head %}
+{% endblock %}
+{% block breadcrumbs %}
+    <div class="container">
+        <ul class="breadcrumb">
+            <li><a hef="{% url 'home' %}">Home</a></li>
+            <li><a hef="{% url 'eob_upload:home' %}">NPI Toolkit</a></li>
+
+            <li class="active">EOB Upload</li>
+
+        </ul>
+    </div>
+{% endblock %}
+{% block pagename %}EOB Toolkit{% endblock %}
+{% block content %}
+
+    <div class="hero-unit">
+
+        <h2>{{ settings.APPLICATION_TITLE }}</h2>
+
+        <div class="container-fluid">
+                <p>
+                 {% if user.is_authenticated %}
+                   <div class="col-md-8">
+                   <h2>Commands Available</h2>
+                       <div class="col-lg-12 well">
+                           <h4>EOB load</h4>
+                           <p style="font-style:italic">Paste the following command in to your browser.
+                            Change "/0" to the patient_id</p>
+
+                       {{ settings.URL_PRE }}{{ site.domain }}/eob_up/load/0
+                       </div>
+
+                    </div>
+                {% else %}
+                    <a href="{% url "accounts:sms_code" %}?next=/"><input
+                            type="button"
+                            class="active btn btn-large btn-success"
+                            value="{% trans "login" %}"/></a>
+                {% endif %}
+                </p>
+
+
+            <div class="col-md-4"><img
+                    src="{% static 'img/layout/blue-button.png' %}"
+                    style="height:300px"></div>
+
+        </div>
+    </div>
+
+
+{% endblock %}
