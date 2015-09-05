@@ -222,32 +222,30 @@ Identifier:assigner:Reference:Organization
     sys_uri = "http://www.hl7.org/oid/OID_view.cfm?&Comp_OID=2.16.840.1.113883.4.6"
 
     # NPI Coding Data
-    npi_coding = {
-                  "system" : sys_uri,
-                  "code" : source['value'],
-                  "display" : source['value'],
-                  "userSelected" : False }
+    npi_coding = {'system' : sys_uri,
+                  'code' : source['value'],
+                  'display' : source['value'],
+                  'userSelected' : False }
 
-    npi_type = {
-                "coding" : [npi_coding],
-                "text" : source['value']}
+    npi_type = {'coding' : [npi_coding],
+                'text' : source['value']}
 
     # Setup the dictionary
 
     # TODO: Define a full Organization Reference for CMS
-    assigner_ref = {'resourceType': 'Organization','identifier': [{'use':  \
-                    'official','value': 'Centers for Medicare and Medicaid Services'}], \
-                    'name': 'Centers for Medicare and Medicaid Services'}
+    assigner_ref = "{'resourceType': 'Organization','identifier': [{'use': 'official','value': 'Centers for Medicare and Medicaid Services'}], 'name': 'Centers for Medicare and Medicaid Services'}"
 
     npi = {}
 
     # Map values across to new dictionary
     npi['use']        = assign_str(source, 'use', "official")
-    npi['type']       = assign_str(source, 'type', npi_type)
+    #npi['type']       = assign_str(source, 'type', str(npi_type))
+    #npi['type']       = npi_type
     npi['system']     = assign_str(source, 'system', sys_uri)
     npi['value']      = assign_str(source, 'value',)
     npi['period']     = assign_str(source, 'period',)
-    #npi['assigner']   = assign_str(source, 'assigner', assigner_ref)
+    #npi['assigner']   = assign_str(source, 'assigner', str(assigner_ref))
+    #npi['assigner']   = assigner_ref
 
     return npi
 

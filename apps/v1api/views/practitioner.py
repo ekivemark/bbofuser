@@ -146,7 +146,8 @@ Profile elements:
 
         fp['fhir_identifier'] = id_list
         if settings.DEBUG:
-            print("ID_Section:", fp['fhir_identifier'][0]['type'],":",fp['fhir_identifier'][0]['value'])
+            # print("ID_Section:", fp['fhir_identifier'][0]['type'],":",fp['fhir_identifier'][0]['value'])
+            pass
         # Now we need to map the name information to name
 
         #
