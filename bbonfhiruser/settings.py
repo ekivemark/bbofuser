@@ -213,8 +213,8 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'bbonfhiruser.urls'
 
-WSGI_APPLICATION = 'bbonfhiruser.wsgi.application'
-
+# Moved wsgi.py to apache2 sub-directory for better security protection
+WSGI_APPLICATION = 'bbonfhiruser.apache2.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases

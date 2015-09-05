@@ -88,13 +88,17 @@ Profile elements:
     if resourceType == "Practitioner":
         # Do Practitioner Specific mapping
 
-        source = {}
+        id_source = {}
         # Now we need to map NPI data in to the identifier segment
-        source['value']= src_dict['NPI']
+        id_source['value']= src_dict['NPI']
         if 'Replacement_NPI' in src_dict:
             # If a replacement NPI we need to use it
             if not src_dict['Replacement_NPI'] == "":
-                source['value'] = src_dict['Replacement_NPI']
+                id_source['value'] = src_dict['Replacement_NPI']
+        id_source['system'] = "https://nppes.cms.hhs.gov/NPPES/"
+        id_source['use'] = "official"
+        id_source['type'] = "PRN"
+        id_source['assigner'] = "CMS National Plan and Provider Enumeration System"
 
         # Let's set some dates:
         # Provider_Enumeration_Date = Date created. ie Period Start
@@ -102,33 +106,36 @@ Profile elements:
         # If NPI_Reactivation_Date
 
         id_list = []
+        id_source['period'] = {'start': date_to_iso(datetime.strptime(src_dict['Provider_Enumeration_Date'],"%m/%d/%Y"),decimals=False)}
         if 'NPI_Reactivation_Date' in src_dict:
             if 'NPI_Deactivation_Date' in src_dict:
                 if not src_dict['NPI_Deactivation_Date'] =="":
                     date_start = datetime.strptime(src_dict['Provider_Enumeration_Date'],"%m/%d/%Y")
                     date_end   = datetime.strptime(src_dict['NPI_Deactivation_Date'], "%m/%d/%Y")
-                    source['period'] = {'start' : date_to_iso(date_start),
+                    id_source['period'] = {'start' : date_to_iso(date_start),
                                         'end' : date_to_iso(date_end)}
-            id_list.append(npid(source))
+
+            id_list.append(npid(id_source))
             if src_dict['NPI_Reactivation_Date'] > src_dict['NPI_Deactivation_Date']:
                 date_start = datetime.strptime(src_dict['NPI_Reactivation_Date'],"%m/%d/%Y")
 
-                source['period'] = {'start' : date_to_iso(date_start)}
+                id_source['period'] = {'start' : date_to_iso(date_start)}
 
-                id_list.append(npid(source))
+                id_list.append(npid(id_source))
 
         else:
             date_start = datetime.strptime(src_dict['Provider_Enumeration_Date'],"%m/%d/%Y")
             date_end   = datetime.strptime(src_dict['NPI_Deactivation_Date'], "%m/%d/%Y")
 
-            source['period']['start'] = date_to_iso(date_start)
+            id_source['period']['start'] = date_to_iso(date_start)
             if 'NPI_Deactivation_Date' in src_dict:
                 if not src_dict['NPI_Deactivation_Date'] =="":
-                    source['period']['end'] = date_to_iso(date_end)
-            id_list.append(npid(source))
+                    id_source['period']['end'] = date_to_iso(date_end)
+            id_list.append(npid(id_source))
 
-        fp['identifier'] = id_list
-
+        fp['fhir_identifier'] = id_list
+        if settings.DEBUG:
+            print("ID_Section:", fp['fhir_identifier'][0]['type'],":",fp['fhir_identifier'][0]['value'])
         # Now we need to map the name information to name
 
         #

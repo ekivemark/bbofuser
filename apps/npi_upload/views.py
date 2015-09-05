@@ -275,10 +275,10 @@ def display_npi_source_record(request, record_no ):
 
                     if isinstance(value, str):
                         if "�" in value:
-                            print("We have crap to deal with", "=======")
-                            print("Value:", value)
-                            print("Encoded Value:", value.encode('utf-8'))
-                            print("Str of encoded:", str(value.encode('utf-8').decode('utf-8')))
+                            #print("We have crap to deal with", "=======")
+                            #print("Value:", value)
+                            #print("Encoded Value:", value.encode('utf-8'))
+                            #print("Str of encoded:", str(value.encode('utf-8').decode('utf-8')))
                             row_under[key.replace(" ",
                                                   "_").replace("(",
                                                                "").replace(")",
@@ -331,7 +331,8 @@ def display_npi_source_record(request, record_no ):
 
                 if settings.DEBUG:
                     # print("Profile_DICT:", context['profile'])
-                    print("Profile:", fhir_profile)
+                    #print("Profile:", fhir_profile)
+                    pass
 
                 messages.info(request,"Found Record:"+str(rec_counter)+" with NPI:"+row_under['NPI'])
                 # Update context with record

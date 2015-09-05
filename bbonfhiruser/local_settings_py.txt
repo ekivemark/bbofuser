@@ -6,6 +6,8 @@ It is advisable to place sensitive information in local_settings and
 put a placeholder with a false/default value in settings.py
 
 
+Superceded by Local.ini in root of application
+
 """
 __author__ = 'Mark Scrimshire:@ekivemark'
 # SECURITY WARNING: keep the secret key used in production secret!
