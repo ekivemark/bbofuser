@@ -59,8 +59,8 @@ def human_name(source):
         hn['text'] = build_str(hn['text'], 'suffix', source)
 
     # Return the dictionary
-    if settings.DEBUG:
-        print("Human_Name element:", hn)
+    # if settings.DEBUG:
+        # print("Human_Name element:", hn)
 
     return hn
 
@@ -235,7 +235,9 @@ Identifier:assigner:Reference:Organization
     # Setup the dictionary
 
     # TODO: Define a full Organization Reference for CMS
-    assigner_ref = "Centers for Medicare and Medicaid Services"
+    assigner_ref = {'resourceType': 'Organization','identifier': [{'use':  \
+                    'official','value': 'Centers for Medicare and Medicaid Services'}], \
+                    'name': 'Centers for Medicare and Medicaid Services'}
 
     npi = {}
 
@@ -245,7 +247,7 @@ Identifier:assigner:Reference:Organization
     npi['system']     = assign_str(source, 'system', sys_uri)
     npi['value']      = assign_str(source, 'value',)
     npi['period']     = assign_str(source, 'period',)
-    npi['assigner']   = assign_str(source, 'assigner', assigner_ref)
+    #npi['assigner']   = assign_str(source, 'assigner', assigner_ref)
 
     return npi
 

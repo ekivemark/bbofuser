@@ -75,7 +75,7 @@ def assign_str(source, key, default=""):
     return  # Nothing
 
 
-def build_str(inp, fld, source, delimiter = " "):
+def build_str(inp, fld, source, delimiter=" "):
     """
     add to the in string with the field in source
     delimiter allows override from space to other character eg. , comma

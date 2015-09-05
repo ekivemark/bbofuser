@@ -1,7 +1,7 @@
 {% comment %}TODO: Setup Identifier section {% endcomment %}
 {% if profile.fhir_identifier %}  "identifier": [
      {% for id in profile.fhir_identifier %}{
-     {% if id.resourceType %}"resourceType" : "{{ id.resourceType }}"{% endif %}{% if id.use %},
+     {% if id.resourceType %}"resourceType" : "{{ id.resourceType }}",{% endif %}{% if id.use %}
      "use" : "{{ id.use }}"{% endif %}{% if id.type %},
      "type" : "{{ id.type }}"{% endif %}{% if id.system %},
      "text" : "{{ id.system }}"{% endif %}{% if id.value %},

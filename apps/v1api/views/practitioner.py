@@ -11,12 +11,14 @@ __author__ = 'Mark Scrimshire:@ekivemark'
 from datetime import datetime
 from django.conf import settings
 
-from apps.v1api.utils import date_to_iso
+from apps.v1api.utils import (date_to_iso,
+                              concat_string)
 from apps.v1api.views.fhir_elements import (npid,
                                             human_name,
                                             contact_point,
                                             address,
                                             )
+
 from apps.v1api.views.fhir_utils import (remove_empty_string)
 
 
@@ -28,20 +30,29 @@ def write_practitioner_narrative(profile):
     """
     # Use <br/> to force line breaks. <br> will not validate successfully
 
-    narrative = "Welcome to my Practice..."
+    narrative = ""
+    narrative = concat_string(narrative, ["Provider Information:"], delimiter=" ")
+    narrative = concat_string(narrative, [profile['Provider_Name_Prefix_Text'],
+                                          profile['Provider_First_Name'],
+                                          profile['Provider_Last_Name_Legal_Name'],
+                                          profile['Provider_Name_Suffix_Text'],
+                                          ".<br/>"], delimiter=" ", last="")
 
-    narrative = profile['Provider_Name_Prefix_Text']+profile['Provider_First_Name']+" "+profile['Provider_Last_Name_Legal_Name']
-    if profile['Provider_Name_Suffix_Text']:
-        narrative = narrative + " "+profile['Provider_Name_Suffix_Text']
-    narrative = narrative + ".<br/>"
-    narrative = narrative + "Tel:" + profile['Provider_Business_Practice_Location_Address_Telephone_Number']+"<br/>"
-    narrative = narrative + "Practice Address:<br/>"
-    narrative = narrative + profile['Provider_First_Line_Business_Practice_Location_Address']+"<br/>"
-    if profile['Provider_Second_Line_Business_Practice_Location_Address']:
-        narrative = narrative +profile['Provider_Second_Line_Business_Practice_Location_Address']+"<br/>"
-    narrative = narrative + profile['Provider_Business_Practice_Location_Address_City_Name']+" "
-    narrative = narrative + profile['Provider_Business_Practice_Location_Address_State_Name']+"<br/>"
-    narrative = narrative + profile['Provider_Business_Practice_Location_Address_Postal_Code']+"<br/>"
+    narrative = concat_string(narrative, ["Tel:",
+                                      profile['Provider_Business_Practice_Location_Address_Telephone_Number'],
+                                      "<br/>",
+                                      "Practice Address:<br/>",
+                                      profile['Provider_First_Line_Business_Practice_Location_Address'],
+                                      "<br/>",
+                                      profile['Provider_Second_Line_Business_Practice_Location_Address'],
+                                      "<br/>",
+                                      profile['Provider_Business_Practice_Location_Address_City_Name'],
+                                      profile['Provider_Business_Practice_Location_Address_State_Name'],
+                                      "<br/>",
+                                      profile['Provider_Business_Practice_Location_Address_Postal_Code'],
+                                      "<br/>"
+                                      ], delimiter=" ", last="" )
+
 
     # if settings.DEBUG:
     #     print("Narrative function:", narrative)
@@ -95,10 +106,10 @@ Profile elements:
             # If a replacement NPI we need to use it
             if not src_dict['Replacement_NPI'] == "":
                 id_source['value'] = src_dict['Replacement_NPI']
-        id_source['system'] = "https://nppes.cms.hhs.gov/NPPES/"
-        id_source['use'] = "official"
-        id_source['type'] = "PRN"
-        id_source['assigner'] = "CMS National Plan and Provider Enumeration System"
+        #id_source['system'] = "https://nppes.cms.hhs.gov/NPPES/"
+        #id_source['use'] = "official"
+        #id_source['type'] = "PRN"
+        #id_source['assigner'] = "CMS National Plan and Provider Enumeration System"
 
         # Let's set some dates:
         # Provider_Enumeration_Date = Date created. ie Period Start

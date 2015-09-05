@@ -168,7 +168,7 @@ def find_by_npi(request, record_no ):
                                                   context['txn']['extn'],
                                                   )
                 if settings.DEBUG:
-                    print("Profile:", fhir_profile)
+                    print("Profile:", fhir_profile['fhir_identifier'][0]['value'])
 
                 messages.info(request,"Found Record:"+str(rec_counter)+" with NPI:"+row_under['NPI'])
                 # Update context with record
@@ -331,7 +331,7 @@ def display_npi_source_record(request, record_no ):
 
                 if settings.DEBUG:
                     # print("Profile_DICT:", context['profile'])
-                    #print("Profile:", fhir_profile)
+                    print("Profile:", fhir_profile)
                     pass
 
                 messages.info(request,"Found Record:"+str(rec_counter)+" with NPI:"+row_under['NPI'])
@@ -744,7 +744,7 @@ def get_npi(request, profile, context={}):
                                                   )
 
                 if settings.DEBUG:
-                    print("fhir_Profile:", fhir_profile)
+                    print("fhir_Profile:", fhir_profile['fhir_identifier'][0]['value'])
 
                 # Update the Fhir Server with this FHIR Profile
 
