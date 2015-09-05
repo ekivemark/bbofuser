@@ -744,7 +744,7 @@ def get_npi(request, profile, context={}):
                                                   )
 
                 if settings.DEBUG:
-                    print("fhir_Profile:", fhir_profile['fhir_identifier'][0]['value'])
+                    print("fhir_Profile:", fhir_profile)
 
                 # Update the Fhir Server with this FHIR Profile
 
