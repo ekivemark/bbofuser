@@ -277,4 +277,48 @@ def concat_string(target, msg=[], delimiter="", last=""):
     return result
 
 
+def build_params(get, skip_parm=['_id','_format']):
+    """
+    Build the URL Parameters.
+    We have to skip any in the skip list.
 
+    :param get:
+    :return:
+    """
+    # We will default to json for content handling
+    in_fmt = "json"
+
+    pass_to = ""
+
+   # Check for _format and process in this section
+    get_fmt = get_format(get)
+    if settings.DEBUG:
+        print("get_Format returned:", get_fmt)
+
+    #get_fmt_type = "?_format=xml"
+    #get_fmt_type = "?_format=json"
+
+    if get_fmt:
+        get_fmt_type = "_format=" + get_fmt
+        pass_to = get_fmt_type
+    else:
+        if settings.DEBUG:
+            print("Get Format:[", get_fmt, "]")
+        in_fmt_type = "_format=" + in_fmt
+        pass_to = pass_to + in_fmt_type
+
+    url_param = get_url_query_string(get, skip_parm)
+    if len(url_param) > 1:
+        if settings.DEBUG:
+            print("URL Params = ", url_param)
+        if "?" in pass_to:
+            # We already have the start of a query string in the url
+            # So we prefix with "&"
+            pass_to = pass_to + "&" + url_param
+        else:
+            # There is no ? so we need to start the query string
+            pass_to = pass_to + "?" + url_param
+    if settings.DEBUG:
+        print("URL Pass_To:", pass_to)
+
+    return pass_to

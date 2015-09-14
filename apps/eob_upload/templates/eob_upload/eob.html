@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+{% block pretitle %}Welcome to the {% endblock %}
+{% block title %}{{ settings.APPLICATION_TITLE }} BB Connect{% endblock %}
+{% block extra_head %}
+{% endblock %}
+{% block breadcrumbs %}
+    <div class="container">
+        <ul class="breadcrumb">
+            <li>Home</li>
+            <li><a href="{% url 'eob_upload:home' %}">EOB Upload</a></li>
+
+        </ul>
+    </div>
+{% endblock %}
+{% block pagename %}{{ settings.APPLICATION_TITLE }} | EOB List{% endblock %}
+{% block content %}
+
+    <!-- List of uploaded documents -->
+    {% if documents %}
+        <ul>
+        {% for document in documents %}
+            <li>
+            {{ document.claimNumber }}: {{ document.provider }}<br/>
+            {{ eob|safe }}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No documents.</p>
+    {% endif %}
+
+        <!-- Upload form. Note enctype attribute! -->
+        <form action="{% url 'eob_upload:load' patient_id %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <p>{{ form.non_field_errors }}</p>
+            <p>{{ form.bbjfile.label_tag }} {{ form.bbjfile.help_text }}</p>
+            <p>
+                {{ form.bbjfile.errors }}
+                {{ form.bbjfile }}
+            </p>
+            <p><input type="submit" value="Upload" /></p>
+        </form>
+{% endblock %}

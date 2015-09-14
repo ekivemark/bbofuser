@@ -17,9 +17,11 @@ from django.conf.urls import (patterns,
                               url)
 from django.contrib import admin
 
-from apps.v1api.views.home import *
-from apps.v1api.views.patient import get_patient
 from apps.device.views import device_authenticate
+from apps.v1api.views.home import *
+from apps.v1api.views.patient import (get_patient,
+                                      get_eob,
+                                      get_eob_view)
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -29,6 +31,12 @@ urlpatterns = patterns('',
                        url(r'^patient$',
                            'apps.v1api.views.patient.get_patient',
                            name='patient'),
+                        url(r'^eob/',
+                           'apps.v1api.views.patient.get_eob',
+                           name='eob'),
+                        url(r'^eobview/(?P<eob_id>[-\w]+)$',
+                           'apps.v1api.views.patient.get_eob_view',
+                           name='eobview'),
 
                        url(r'^admin/', include(admin.site.urls)),
 

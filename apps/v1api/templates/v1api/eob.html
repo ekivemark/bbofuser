@@ -70,11 +70,11 @@
 {% endblock %}
 
 {% comment %}
-Txn =  {'name'  :"Patient",
+Txn =  {'name'  :"EOB",
             'dsply':'Patient',
             'server': settings.FHIR_SERVER,
-            'locn'  : "/baseDstu2/Patient/",
-            'tmplt' : 'v1api/patient.html',
+            'locn'  : "/baseDstu2/ExplanationOfBenefit/",
+            'tmplt' : 'v1api/eob.html',
              }
 
 context = {'display': Txn['dsply'],

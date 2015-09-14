@@ -24,8 +24,11 @@
                    <div class="col-md-8 well">
 
                         <p>
-                         Access the <a href="{% url 'api:v1:patient' %}">Beneficiary Profile</a> [Test Mode].
+                         Access <a href="{% url 'api:v1:patient' %}">Your Beneficiary Profile</a>.
                         </p>
+                    </div>
+                    <div class="col-md-8 well">
+                        Get <a href="{% url "api:v1:eob" %}">your Explanation of Benefit records</a>.
                     </div>
                 {% else %}
                     <a href="{% url "device:device_login" %}?next=/api"><input

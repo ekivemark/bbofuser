@@ -1,17 +1,8 @@
-{% if profile.fhir_identifier %}  "identifier": [
-     {% for id in profile.fhir_identifier %}{
-     {% if id.resourceType %}"resourceType" : "{{ id.resourceType }}",{% endif %}{% if id.use %}
-     "use" : "{{ id.use }}"{% endif %}{% if id.type %},
-     "type" : {% include "v1api/fhir_profile/include/fhir_type.json.html" %}{% endif %}{% if id.system %},
-     "text" : "{{ id.system }}"{% endif %}{% if id.value %},
-     "value" : "{{ id.value }}"{% endif %}{% if id.period %},
-     "period": { {% for item, date in id.period.items %}
-                "{{ item }}" : "{{ date }}"{% if forloop.last %}{% else %},{% endif %}{% endfor %}
-         }{% endif %}{% if id.assigner %},
-     "assigner": "{{ id.assigner }}"{% endif %}
-     }{% if forloop.last %}{% else %},{% endif %}{% endfor %}
-    ],{% endif %}
-
+{% if id.type %}{
+    {% for label, content in id.type.items %}
+        "{{ label }}": {% if label == "coding" %}[{ {% for key, value in content.0.items %}"{{ key }}": "{{ value }}"{% if forloop.last %}{% else %},{% endif %}
+     {% endfor %} }]{% else %}"{{ content }}"{% endif %}{% if forloop.last %}{% else %},{% endif %}{% endfor %}
+}{% endif %}
 {% comment %}
 
   // from Element: extension

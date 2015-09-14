@@ -186,6 +186,7 @@ LOCAL_APPS = (
     'apps.npi_upload',
     'apps.getbb',
     'apps.eob_upload',
+    'apps.bluebutton',
 )
 
 INSTALLED_APPS = DEFAULT_APPS + THIRD_PARTY_APPS + LOCAL_APPS

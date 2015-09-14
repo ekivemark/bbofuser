@@ -474,19 +474,18 @@ def find_profile(request, resourceType, profile, search_spec):
     # ?identifier=http://www.cms.gov|1215930367
     # &_format=json
 
-
     # search_spec = {'namespace': "http://www.cms.gov",
     #                        'txn'  : context['txn'],
     #                        'field': "identifier",
     #                        'value': "NPI", # Field Name from Profile
     #                        }
-     # txn =  {'resourceType' :"Practitioner",
-     #        'display' :'Practitioner',
-     #        'mask'  : True,
-     #        'server': settings.FHIR_SERVER,
-     #        'locn'  : "/baseDstu2/Practitioner",
-     #        'template' : 'v1api/fhir_profile/practitioner',
-     #        'extn'  : 'json.html',}
+    # txn =  {'resourceType' :"Practitioner",
+    #        'display' :'Practitioner',
+    #        'mask'  : True,
+    #        'server': settings.FHIR_SERVER,
+    #        'locn'  : "/baseDstu2/Practitioner",
+    #        'template' : 'v1api/fhir_profile/practitioner',
+    #        'extn'  : 'json.html',}
 
     search_result = {}
 
@@ -542,6 +541,97 @@ def find_profile(request, resourceType, profile, search_spec):
     # if settings.DEBUG:
     #     print("Returning search_result", search_result)
     return search_result
+
+
+@login_required
+def find_profile(request, resourceType, profile, search_spec):
+    """
+    Search a profile for an item
+    :param request:
+    :param resourceType:
+    :param profile:
+    :param search_spec:
+    :return: dict with matched values
+    """
+
+    # We are constructing this url:
+    # http://localhost:8080/fhir-p/
+    # baseDstu2/Practitioner
+    # ?identifier=http://www.cms.gov|1215930367
+    # &_format=json
+
+    # search_spec = {'namespace': "http://www.cms.gov",
+    #                        'txn'  : context['txn'],
+    #                        'field': "identifier",
+    #                        'value': "NPI", # Field Name from Profile
+    #                        }
+    # txn =  {'resourceType' :"Practitioner",
+    #        'display' :'Practitioner',
+    #        'mask'  : True,
+    #        'server': settings.FHIR_SERVER,
+    #        'locn'  : "/baseDstu2/Practitioner",
+    #        'template' : 'v1api/fhir_profile/practitioner',
+    #        'extn'  : 'json.html',}
+
+    search_result = {}
+
+    search_q = "?"
+    if search_spec['field'] == "COMPLEX_MULTI_VARIABLE":
+        search_q = search_q + search_spec['value']
+    else:
+        search_q = search_q + search_spec['field'] + "="
+        if 'namespace' in search_spec:
+            search_q = search_q + search_spec['namespace'] + "|"
+            search_q = search_q + profile[search_spec['value']]
+
+    search_q = search_q + "&_format=json"
+
+    target_url = search_spec['txn']['server'] + search_spec['txn']['locn'] + search_q
+
+    headers = {'Content-Type': 'application/json+fhir; charset=UTF-8',
+               'Accept': 'text/plain'}
+
+    try:
+        r = requests.get(target_url)
+
+        search_result['status_code'] = r.status_code
+        if r.status_code == 200:
+            # if settings.DEBUG:
+            #    print("SEARCH result:  ", r.json())
+            # we found something so get the content
+            content = OrderedDict(r.json())
+            # if settings.DEBUG:
+
+                # print("SEARCH Content: ", content)
+                # print("total:",content['total'])
+
+            search_result['total'] = content['total']
+            if search_result['total'] > 0:
+                search_result['id'] = content['entry'][0]['resource']['id']
+                search_result['versionId'] = content['entry'][0]['resource']['meta']['versionId']
+                # if settings.DEBUG:
+                #     print("id:", search_result['id'])
+                search_result['duplicates'] = []
+                for item in content['entry']:
+                    #print("getting duplicates:", item['resource'])
+                    #print(item['resource']['id'])
+                    search_result['duplicates'].append({'id': item['resource']['id'],
+                                                        'lastUpdated': item['resource']['meta']['lastUpdated']})
+                # if settings.DEBUG:
+                #     print("duplicates List:", search_result['duplicates'])
+        if r.status_code == 404:
+            print("Nothing found:[",r.status_code,"]" )
+
+        messages.info(request, "found "+ str(search_result['total']) + " items.")
+
+    except requests.ConnectionError:
+        messages.error(request,"We had a problem reaching the fhir server")
+
+    if settings.DEBUG:
+        print("Returning search_result", search_result)
+
+    return search_result
+
 
 
 @staff_member_required

@@ -197,6 +197,7 @@ Profile elements:
             tel_list.append(contact_point(telecom_source))
             rank += 1
 
+
         if not src_dict['Provider_Business_Practice_Location_Address_Fax_Number'] == "":
             telecom_source['system'] = "fax"
             telecom_source['value']  = src_dict['Provider_Business_Practice_Location_Address_Fax_Number']

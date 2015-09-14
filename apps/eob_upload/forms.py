@@ -12,8 +12,8 @@ __author__ = 'Mark Scrimshire:@ekivemark'
 from django import forms
 
 class BlueButtonJsonForm(forms.Form):
-    bbjfile = forms.FileField(label="Select a JSON File",
-                              help_text="Convert BlueButton Text to JSON "
-                                        "first"
+    bbjfile = forms.FileField(label="Select your CMS BlueButton 2.0 Text File",
+                              help_text="You should download the text file from "
+                                        "MyMedicare.gov"
                               )
 
