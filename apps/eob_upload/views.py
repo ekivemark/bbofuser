@@ -271,6 +271,9 @@ def write_eob(request, patient_id, bbj_in):
                               headers=headers )
             if r.status_code == 201:
                 commit_data = r.headers['content-location']
+                if settings.DEBUG:
+                    print("Write returned:", r.status_code,
+                          "|", commit_data)
             elif r.status_code == 400:
                 if settings.DEBUG:
                     print(r.status_code," Problem with input")

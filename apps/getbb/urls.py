@@ -29,6 +29,7 @@ urlpatterns = patterns('',
                        url(r'^connect/$',
                            'apps.getbb.views.mym_login.connect',
                            name='connect'),
+
                        url(r'^disconnect/$',
                            'apps.getbb.views.mym_login.disconnect',
                            name='disconnect'),

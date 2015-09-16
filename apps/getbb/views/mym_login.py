@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 bbofuser: getbb
 FILE: mym_login
@@ -8,13 +9,24 @@ Experimental app to use BeautifulSoup to attempt to login to MyMedicare.gov
 """
 __author__ = 'Mark Scrimshire:@ekivemark'
 
+import argparse
+import mechanicalsoup
+
 import re
 import requests
+import string
 import urllib
+from urllib.parse import urlparse
+
+from selenium import webdriver
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import NoSuchElementException
 
 from bs4 import BeautifulSoup
 
-from robobrowser import RoboBrowser
+from robobrowser import (RoboBrowser,
+                         browser)
 
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -26,56 +38,18 @@ from apps.getbb.utils import *
 
 def disconnect(request):
 
-    return
+    # https://www.mymedicare.gov/signout.aspx
+    context = {}
+
+    return render_to_response('getbb/index.html',
+                              RequestContext(request, context, ))
 
 
 def connect(request):
     """
-    Testing Login to MyMedicare.gov
+    Login to MyMedicare.gov using RoboBrowser
     :param request:
     :return:
-
-    Name, Input, Value,
-    Search_TextBox, Search_TextBox
-    __EVENTARGUMENT, __EVENTARGUMENT
-    __EVENTTARGET, __EVENTTARGET, ctl00$ContentPlaceHolder1$ctl00$HomePage$SignOut
-    __EVENTVALIDATION, __EVENTVALIDATION, /wEWBgKEgaG9BALXoa6+DALH7qC6AQL76Z2kCwL3zdT2DALk94LQAndrVxjeqzdGXnwUEBM4LAz9UKa/$
-    __VIEWSTATE, __VIEWSTATE, wEPDwUENTM4MQ9kFgJmD2QWAgIBD2QWAgIDDxYCHgZhY3Rpb24FDS9kZWZhdWx0LmFzcHgWCgIBDxUB
-    __VIEWSTATEGENERATOR, __VIEWSTATEGENERATOR, CA0B0334
-    __VIEWSTATEGENERATOR, __VIEWSTATEGENERATOR, 11258E27
-
-    LAWEB_FORM_ACTION
-    ctl00$ContentPlaceHolder1$ctl00$HomePage$Agree, ctl00$ContentPlaceHolder1$ctl00$HomePage$Agree, False
-    ctl00$ContentPlaceHolder1$ctl00$HomePage$SignOut, * OrNew To MyMedicare.gov?
-    ctl00$ContentPlaceHolder1$ctl00$HomePage$confirmString, ctl00$ContentPlaceHolder1$ctl00$HomePage$confirmString
-    ctl00$ContentPlaceHolder1$ctl00$HomePage$isError, ctl00$ContentPlaceHolder1$ctl00$HomePage$isError, False
-    ctl00$ContentPlaceHolder1$ctl00$HomePage$lnkCreateAccount, New To MyMedicare.gov? * Blue Button
-
-    guid: 97290573-7965-11DF-93F2-0800200C9A66
-
-    Search_TextBox, Search Medicare.gov * type search term here
-    ctl00$ContentPlaceHolder1$ctl00$HomePage$SWEUserName, Username * -Password
-    ctl00$ContentPlaceHolder1$ctl00$HomePage$SWEPassword, Password * Trouble Signing In?
-    ctl00$ContentPlaceHolder1$ctl00$HomePage$SignIn, Password * Trouble Signing In?
-    ctl00$ContentPlaceHolder1$ctl00$HomePage$lnkCreateAccount, New To MyMedicare.gov? * Blue Button
-
-<input name="ctl00$ContentPlaceHolder1$ctl00$HomePage$SWEUserName" type="text"
-id="ctl00_ContentPlaceHolder1_ctl00_HomePage_SWEUserName" class=" sp_clicked"
-style="cursor: crosshair; ">
-
-<input name="ctl00$ContentPlaceHolder1$ctl00$HomePage$SWEPassword"
-type="password" id="ctl00_ContentPlaceHolder1_ctl00_HomePage_SWEPassword"
-class=" sp_clicked">
-
-<input type="button" name="ctl00$ContentPlaceHolder1$ctl00$HomePage$SignIn"
-value="Sign In"
-onclick="ConfirmationPopup(this);__doPostBack('ctl00$ContentPlaceHolder1$ctl00$HomePage$SignIn','')"
-id="ctl00_ContentPlaceHolder1_ctl00_HomePage_SignIn"
-title="Sign into MyMedicare.gov" class="MyMedSignInButton sp_clicked">
-
-//form[@id='formMyMedicare']//
-label[text()='By checking this box, you agree that you have read and understand the “Protecting Your Personal Health Information” section shown above and wish to continue.']
-
 
     """
 
@@ -85,88 +59,83 @@ label[text()='By checking this box, you agree that you have read and understand 
             print('Default Parser for BeautifulSoup:', 'lxml')
         PARSER = 'lxml'
 
+    BeautifulSoup("", PARSER)
+
+    # page = MyMedicareLoginScraper()
+    # if settings.DEBUG:
+    #     print("Page:", page)
 
     login_url = 'https://www.mymedicare.gov/default.aspx'
     username = 'MBPUSER201A'
     password = 'CMSPWD2USE'
 
-    # soup = BeautifulSoup(login_url, PARSER )
-
+    # Call the default page
+    # We will then want to get the Viewstate and eventvalidation entries
+    # we need to submit them with the form
     rb = RoboBrowser()
     rb.open(login_url)
+
     form = rb.get_form()
 
     if settings.DEBUG:
         print("Page:", rb)
-        print("Form:", form)
 
     pwd_fld = "ctl00$ContentPlaceHolder1$ctl00$HomePage$SWEPassword"
     pwd_usr = "ctl00$ContentPlaceHolder1$ctl00$HomePage$SWEUserName"
-    # ctl00$ContentPlaceHolder1$ctl00$HomePage$SWEUserName
-    # ctl00$ContentPlaceHolder1$ctl00$HomePage$SWEPassword
+    agrees = "ctl00$ContentPlaceHolder1$ctl00$HomePage$Agree"
+    sign_in = "ctl00$ContentPlaceHolder1$ctl00$HomePage$SignIn"
 
-#    <input type="button"
-#           name="ctl00$ContentPlaceHolder1$ctl00$HomePage$SignIn"
-#           value="Sign In"
-#           onclick="ConfirmationPopup(this);__doPostBack('ctl00$ContentPlaceHolder1$ctl00$HomePage$SignIn','')"
-#           id="ctl00_ContentPlaceHolder1_ctl00_HomePage_SignIn"
-#           title="Sign into MyMedicare.gov"
-#           class="MyMedSignInButton">
+    # if settings.DEBUG:
+    #     print("Form Fields: ", form.fields)
+    #     for fld in form.fields.items():
+    #         if "__VIEWSTATE" in fld:
+    #             print("key:", fld, "|",fld[1]._value[:120], "...Truncated." )
+    #         else:
+    #             print("key:", fld, "|", fld[1]._value)
 
+    EVENTTARGET = "ctl00$ContentPlaceHolder1$ctl00$HomePage$SignIn"
+    create_account = "ctl00$ContentPlaceHolder1$ctl00$HomePage$lnkCreateAccount"
 
-    form[pwd_usr].value = username
-    form[pwd_fld].value = password
+    form.fields[pwd_usr].value = username
+    form.fields[pwd_fld].value = password
+    form.fields[agrees].value = "True"
+    form.fields.pop(create_account)
 
+    VIEWSTATEGENERATOR = form.fields['__VIEWSTATEGENERATOR']._value
+    EVENTVALIDATION = form.fields['__EVENTVALIDATION']._value
+    VIEWSTATE = form.fields['__VIEWSTATE']._value
 
-    EVENTTARGET   = "ctl00$ContentPlaceHolder1$ctl00$HomePage$SignIn"
-    __EVENTARGUMENT = ""
-    __VIEWSTATE     = VIEWSTATE
+    if settings.DEBUG:
+        print("EventValidation:", EVENTVALIDATION )
+        print("ViewStateGenerator:", VIEWSTATEGENERATOR)
+
+    form.fields['__VIEWSTATEGENERATOR'].value = VIEWSTATEGENERATOR
+    form.fields['__VIEWSTATE'].value = VIEWSTATE
+    form.fields['__EVENTVALIDATION'].value = EVENTVALIDATION
+
+    form.serialize()
+
+    print("serialized form:", form)
 
     rb.submit_form(form)
 
-    if settings.DEBUG:
-        print("RB:", rb)
+    # if settings.DEBUG:
+    #     print("RB:", rb)
+    #     print("RB:", rb.__str__())
 
     browser = RoboBrowser(history=True)
-    # This gets all the ASPX stuff, __VIEWSTATE and friends
-    browser.open(login_url)
-
-    signin = browser.get_form(id='aspnetForm')
-
-    #soup = BeautifulSoup(signin, PARSER)
-    #print("Soup: ",soup.prettify())
+    browser.parser = PARSER
 
     if settings.DEBUG:
-        print("Browser:", browser)
-        print("State:", rb.RoboState)
+        print("Browser History:", browser.history,
+              "\nBrowser parser:", browser.parser,
+              "\nPage html:", rb.parsed)
 
-    formData = {
-                '__VIEWSTATE': VIEWSTATE,
-                '__EVENTTARGET':	EVENTTARGET,
-                #'__VIEWSTATEENCRYPTED' :'' ,
-                pwd_usr : username ,
-                pwd_fld : password,
-                'ctl00$ContentPlaceHolder1$ctl00$HomePage$SignIn' : "Sign In",
-                #'Button1': 'ctl00$ContentPlaceHolder1$ctl00$HomePage$SignIn.MyMedSigninButton',
-    }
+    context = {'site' : Site.objects.get_current(),}
 
-    # print(signin)
-    # signin["jsCheck"].value = ''
-    #signin["ddlEngine"].value = "www.mymedicare.gov:13008"
-    signin[pwd_usr].value = username
-    signin[pwd_fld].value = password
-    #signin["btnLogin.x"].value = "42"
-    #signin["btnLogin.y"].value = "9"
-    #signin["btnLogin"].value = "Login"
-    #browser.submit_form(formData)
-
-    context = {'site' : Site.objects.get_current(),
-              }
-
-    si = RoboBrowser()
     if settings.DEBUG:
         print("RB post sign-in:", rb)
-        print("Sign-in:",si)
 
     return render_to_response('getbb/index.html',
                               RequestContext(request, context, ))
+
