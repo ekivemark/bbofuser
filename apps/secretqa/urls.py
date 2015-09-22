@@ -31,8 +31,8 @@ urlpatterns = patterns('',
                            'apps.secretqa.views.pop_answer',
                            name='security_pop_answer'),
 
-                       # url(r'^device/edit/(?P<pk>[-\w]+)/$',
-                       #     'apps.device.views.device_edit',
+                       # url(r'^subacc/edit/(?P<pk>[-\w]+)/$',
+                       #     'apps.subacc.views.device_edit',
                        #     name='device_edit'),
 
                        #url(r'^delete(?P<pk>[-\w]+)/$',

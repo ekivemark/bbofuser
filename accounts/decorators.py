@@ -21,7 +21,7 @@ from django.template import RequestContext
 
 # USE THIS DECORATOR
 def session_master(func):
-    # Is the account using the master profile or a device
+    # Is the account using the master profile or a subacc
     # request.session['auth_master'] only set on master account
     def decorated(request, *args, **kwargs):
         if 'auth_master' in request.session:

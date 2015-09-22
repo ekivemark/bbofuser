@@ -1,9 +1,9 @@
 """
-bbofuser:device
+bbofuser:device aka Sub-account
 FILE: models.py
 Created: 8/3/15 4:50 PM
 
-Creating per device authentication
+Creating per device (aka Sub-account) authentication
 
 """
 __author__ = 'Mark Scrimshire:@ekivemark'
@@ -27,9 +27,10 @@ class Device(models.Model):
     Create Per User/Per Device Credentials
 
     """
-    device       = models.CharField(max_length=40, blank=False)
+    device       = models.CharField(max_length=40, blank=False,
+                                    verbose_name="Sub-Account Nick Name")
     user         = models.ForeignKey(settings.AUTH_USER_MODEL)
-    account      = models.CharField(max_length=80, blank=False)
+    account      = models.CharField(max_length=80, blank=False, verbose_name="User name")
     password     = models.CharField(max_length=40)
     valid_until  = models.DateTimeField(default=datetime.now()+timedelta(days=settings.DEFAULT_VALID_UNTIL))
     date_created = models.DateTimeField(auto_now_add=True)
@@ -43,7 +44,7 @@ class Device(models.Model):
         created = self.date_created is None
         if not self.pk or created is None:
             if settings.DEBUG:
-                print("Overriding Device save")
+                print("Overriding Sub-account save")
 
             # Assign an account and password with the save
             # DONE: Save as lower case Account and Password
@@ -64,12 +65,16 @@ class Device(models.Model):
         super(Device, self).save(*args, **kwargs)
 
     def __str__(self):
-        return "%s %s's device:%s" % (self.user.first_name,
+        return "%s %s's Sub-account:%s" % (self.user.first_name,
                               self.user.last_name,
                               self.device)
 
     def get_device(self):
-        # DONE: return the device name
+        # DONE: return the Sub-account name
+        return self.device
+
+    def get_subaccount(self):
+        # DONE: return the sub-account Name
         return self.device
 
     def get_email(self):
@@ -82,9 +87,9 @@ class Device(models.Model):
 
     def is_deleted(self):
         # DONE: Get deleted state
-        # Return the Deleted State (Devices are marked deleted and not
-        # removed to ensure accounts are unique and not re-used by another
-        # user
+        # Return the Deleted State (Devices/Sub-accounts are marked
+        # deleted and not removed to ensure accounts are unique
+        # and not re-used by another user
         return self.deleted
 
     def is_active(self):
@@ -127,13 +132,13 @@ class Device(models.Model):
                   'message': ""}
         if self.deleted:
             result['result'] = False
-            result['message'] = "Failed - DELETED DEVICE"
+            result['message'] = "Failed - DELETED Sub-Account"
             if settings.DEBUG:
                 print(result)
             return result
         if not self.active:
             result['result'] = False
-            result['message'] = "Failed - INACTIVE DEVICE"
+            result['message'] = "Failed - INACTIVE Sub-account"
             if settings.DEBUG:
                 print(result)
             return result

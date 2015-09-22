@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block pretitle %}Edit A Device{% endblock %}
+{% block pretitle %}Edit A Sub-account{% endblock %}
 {% block extra_head %}
 {% endblock %}
 {% block breadcrumbs %}
@@ -8,11 +8,11 @@
         <ul class="breadcrumb">
             <li><a href="{% url 'home' %}">Home</a></li>
             <li><a href="{% url 'accounts:manage_account' %}">My Dashboard</a></li>
-            <li class="active">Edit Device</li>
+            <li class="active">Edit Sub-account</li>
         </ul>
     </div>
 {% endblock %}
-{% block pagename %}Edit Device Account{% endblock %}
+{% block pagename %}Edit Sub-Account{% endblock %}
 {% block content %}
 
     <div class="container col-lg-8 well">
@@ -22,7 +22,7 @@
 
                         {{ form.as_table }}
                 <tr>
-                    <td style="font-weight:bold">Generated Key:</td>
+                    <td style="font-weight:bold">Generated Password key:</td>
                     <td style="font-style:italic;font-size:larger;">{{ device.password }}</td>
                 </tr>
             </table>

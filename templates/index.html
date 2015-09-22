@@ -29,7 +29,7 @@
                         <i class="fa fa-lock fa-lg"></i>  Manage Your Account</a>
                     {% else %}
                         {% if user.is_authenticated and not request.session.auth_master %}
-                    You are logged in via a device account:
+                    You are logged in via a sub-account:
                         <a href="{%  url 'accounts:account_access' %}">
                     [ {{ user.first_name }} {{ user.last_name }} {% if request.session.auth_device %}
                             via {{ request.session.auth_device }} {% endif %}]</a>
@@ -46,12 +46,13 @@
                             value="{% trans " Main Account Login " %}"/></a>
                         </div>
                         <div class="col-lg-4">
-                        <h4>Login with a device account</h4>
-                        <a href="{% url "device:device_login" %}?next=/">
-                        <i class="fa fa-unlock fa-2x" style="color:green"></i><input
+                        <h4>Login with a sub-account</h4>
+                        <a href="{% url "subaccount:subacc_login" %}?next=/">
+                        <i class="fa fa-unlock fa-2x" style="color:lightgreen"></i><input
                             type="button"
                             class="active btn btn-large btn-success"
-                            value="{% trans "Device Login " %}"/></a>
+                            style="color:lightgreen"
+                            value="{% trans "Sub-account Login " %}"/></a>
                         </div>
                         <div class="col-lg-4">
 

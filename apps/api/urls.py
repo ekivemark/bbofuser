@@ -17,7 +17,7 @@ from django.conf.urls import (patterns,
 from django.contrib import admin
 
 from apps.api.views import *
-from apps.device.views import device_authenticate
+from apps.subacc.views import subaccount_authenticate
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -26,7 +26,7 @@ urlpatterns = patterns('',
                            'apps.api.views.api_index',
                            name='home'),
                        url(r'^login$',
-                           'apps.device.views.device_authenticate',
+                           'apps.subacc.views.subaccount_authenticate',
                            name='login'),
                        url(r'^v1/',
                            include('apps.v1api.urls',

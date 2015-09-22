@@ -12,7 +12,7 @@
     </div>
 
 {%  endblock %}
-{% block pagename %}Give Permission to this account{% endblock %}
+{% block pagename %}Give Permission to this Sub-account{% endblock %}
 {% block content %}
 
        <div class="container col-lg-8 well">
@@ -21,7 +21,7 @@
             <h1>Permit Access to Your Information</h1>
             <div class="col-lg-12 well">
                 There are three steps to giving this permission to access
-                your information from this account:
+                your information from this Sub-account:
                 <ol>
                     <li>Answer one of your secret questions correctly</li>
                     <li>Read the permission statement shown below</li>
@@ -29,7 +29,8 @@
                 </ol>
                 <h4>Permission to access my health information</h4>
                 <span>
-                    I, the beneficiary authorize this device/account to get
+                    I, the beneficiary, as the owner of the master
+                    account, authorize this Sub-account to access
                     my data until {{ device.valid_until }}.
                 </span>
             </div>
@@ -39,7 +40,7 @@
                         {{ form.as_table }}
 
             </table>
-             <a href="{% url "device:device_login" %}"><input
+             <a href="{% url "subacc:device_login" %}"><input
                                 type="button" class="btn-danger"
                                 value="Cancel"/></a>
 

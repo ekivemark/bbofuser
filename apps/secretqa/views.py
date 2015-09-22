@@ -26,7 +26,7 @@ from django.template import RequestContext
 from apps.secretqa.models import QA
 from apps.secretqa.forms import (QA_EditForm,
                                 QA_View, QA_Form)
-from apps.device.utils import get_phrase
+from apps.subacc.utils import get_phrase
 from datetime import datetime, timedelta
 
 

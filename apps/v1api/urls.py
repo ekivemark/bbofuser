@@ -17,7 +17,7 @@ from django.conf.urls import (patterns,
                               url)
 from django.contrib import admin
 
-from apps.device.views import device_authenticate
+from apps.subacc.views import subaccount_authenticate
 from apps.v1api.views.home import *
 from apps.v1api.views.patient import (get_patient,
                                       get_eob,

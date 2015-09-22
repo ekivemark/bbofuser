@@ -9,7 +9,7 @@
         <ul class="breadcrumb">
             <li><a hef="{% url 'home' %}">Home</a></li>
             <li><a href="{% url 'accounts:manage_account' %}">My Dashboard</a></li>
-            <li class="active">My Devices</li>
+            <li class="active">My Sub-accounts</li>
 
         </ul>
     </div>
@@ -27,7 +27,7 @@
                    <div class="col-md-8">
 
                         <p>
-                         {% include 'accounts/include/device_profile.html' %}
+                         {% include 'accounts/include/subaccount_profile.html' %}
                         </p>
                     </div>
                 {% else %}

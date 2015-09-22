@@ -4,12 +4,12 @@
     <div class="container-fluid">
         <div class="row-fluid">
             <div class="col-lg-10">
-                 <h2>My Devices</h2>
+                 <h2>My Sub-accounts</h2>
             </div>
              <div class="col-lg-2 align-right">
-                <a href="/device/add"
+                <a href="/subaccount/add"
                    class="btn btn-success">
-                    <i class="fa fa-plus-square-o"></i> Add a Device</a>
+                    <i class="fa fa-plus-square-o"></i> Add a Sub-account</a>
             </div>
         </div>
 
@@ -23,9 +23,9 @@
                 <th>Active</th>
                 <th>Used</th>
                 <th>permitted</th>
-                <th>Device</th>
-                <th>Account</th>
-                <th>Key</th>
+                <th>Nick name</th>
+                <th>User name</th>
+                <th>Password key</th>
                 <th>Valid Until</th>
                 <th>Delete</th>
             </tr>
@@ -33,7 +33,7 @@
         {% for device in devices %}
             <tr>
                 <td style="text-align:center;">
-                    <a href="/device/edit/{{ device.id }}/"><i class="fa fa-pencil-square-o fa-lg"></i></a>
+                    <a href="/subaccount/edit/{{ device.id }}/"><i class="fa fa-pencil-square-o fa-lg"></i></a>
                 </td>
                 <td style="text-align:center;">
                     {% if device.active %}<i class="fa fa-check-square-o fa-lg" style="color:green"></i>
@@ -61,7 +61,7 @@
                     {{ device.valid_until }}
                 </td>
                 <td style="text-align:center;">
-                    <a href="/device/delete/{{ device.id }}/" style="color:red"><i class="fa fa-trash-o fa-fw fa-lg"></i></a>
+                    <a href="/subaccount/delete/{{ device.id }}/" style="color:red"><i class="fa fa-trash-o fa-fw fa-lg"></i></a>
                 </td>
 
             </tr>

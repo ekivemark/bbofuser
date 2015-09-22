@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block pretitle %}Delete Device{% endblock %}
+{% block pretitle %}Delete Sub-account{% endblock %}
 {% block extra_head %}
 
 {% endblock %}
@@ -9,11 +9,11 @@
         <ul class="breadcrumb">
             <li><a href="{% url 'home' %}">Home</a></li>
             <li><a href="{% url 'accounts:manage_account' %}">My Dashboard</a></li>
-            <li class="active">Delete Device</li>
+            <li class="active">Delete Sub-account</li>
         </ul>
     </div>
 {%  endblock %}
-{% block pagename %}Delete Device{% endblock %}
+{% block pagename %}Delete Sub-account{% endblock %}
 {% block content %}
 
     <div class="container col-lg-8 well">
@@ -22,8 +22,9 @@
 
         <div class="alert alert-dismissible alert-warning">
             <h4>{{ device.device }}</h4>
-            <p>Are you sure you want to delete your account, {{ device.account }}</p>
-            <p>on your device, {{ device.device }}?</p>
+            <p>Are you sure you want to delete this Sub-account: {{ device.account }}
+                / {{ device.device }}?
+            </p>
         </div>
 
              <a href="{% url "accounts:manage_account" %}"><input

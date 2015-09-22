@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Medicare Connector" %}{% endblock %}
+{% block breadcrumbs %}
+    <div class="container">
+        <ul class="breadcrumb">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'accounts:manage_account' %}">My Account</a></li>
+            <li class="active">Medicare Connector</li>
+        </ul>
+    </div>
+{% endblock %}
+{% block pagename %}Medicare Connector{% endblock %}
+{% block content %}
+    <form method="post" action="">
+        {% csrf_token %}
+        <p>User name on MyMedicare.gov:</p>
+
+        <p>{{ form.mmg_user }}</p>
+
+        <p>MyMedicare.gov Password:</p>
+
+        <p>{{ form.mmg_pwd }}</p>
+
+        <p>
+         By clicking <b>"Connect"</b> you are agreeing to link your MyMedicare.gov
+            account with this BlueButton 2.0 application. <br/>
+            This application will get your Medicare BlueButton file and convert the
+            claims information to the FHIR format. This is a format understood by
+            a growing number of health applications. You can then choose to create
+            sub-accounts that allow these devices, applications and services to
+            make use of your information to help you maintain better health.<br/>
+            &nbsp;<br/>
+            If you do not want to connect with MyMedicare.gov please select
+            the <b>Cancel</b> button.
+        </p>
+        <p>
+            <input type="submit" class="active btn btn-lg btn-success"
+                   name="login" value="{% trans 'Connect' %}"/>
+
+            <a href="{% url "accounts:manage_account" %}"><input
+                                type="button" class="btn-danger"
+                                value="Cancel"/></a>
+
+        </p>
+        <input type="hidden" name="next" value="{{ next }}"/>
+    </form>
+
+{% endblock %}

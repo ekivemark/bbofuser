@@ -135,6 +135,8 @@ class User(AbstractBaseUser):
                                   blank=True)
     last_name = models.CharField(max_length=50,
                                  blank=True)
+    medicare_connected = models.BooleanField(default=False)
+    medicare_verified = models.BooleanField(default=False)
     # Done: modify joined to date_joined in user model
     date_joined = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=False)
@@ -258,6 +260,13 @@ class Crosswalk(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
     guid = models.CharField(max_length=40)
     hicn = models.CharField(max_length=40, blank=True)
+    mmg_user = models.CharField(max_length=250, blank=True)
+    mmg_pwd = models.CharField(max_length=16, blank=True)
+    mmg_name = models.CharField(max_length=250, blank=True)
+    mmg_email = models.EmailField(max_length=250, blank=True, null=True)
+    mmg_account = models.TextField(blank=True)
+    mmg_bbdata = models.TextField(blank=True)
+    mmg_bbfhir = models.BooleanField(default=False)
     fhir = models.CharField(max_length=40, blank=True )
     fhir_url_id = models.CharField(max_length=80, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -267,6 +276,16 @@ class Crosswalk(models.Model):
     # eg. /baseDstu2/Patient/{id}
     # This will allow us to construct a URL to make a call directly to
     # a record, rather than requiring a search
+
+    # MyMedicare.gov Password Creation Guidelines
+    # Must be 8 to 16 characters long
+    # Must contain at least one letter
+    # Must contain at least one number
+    # May also contain one or more of the following special characters:
+    # @ ! $ % ^ * ( )
+    # Must be different from the previous six (6) passwords
+    # Cannot be the same as your Username
+    # Cannot contain your Medicare Number or SSN
 
     def save(self, *args, **kwargs):
         created = self.date_created is None

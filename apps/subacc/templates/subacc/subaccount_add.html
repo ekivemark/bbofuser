@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block pretitle %}Add A Device{% endblock %}
+{% block pretitle %}Add A Sub-Account{% endblock %}
 {% block extra_head %}
 
 {% endblock %}
@@ -9,11 +9,11 @@
         <ul class="breadcrumb">
             <li><a href="{% url 'home' %}">Home</a></li>
             <li><a href="{% url 'accounts:manage_account' %}">My Dashboard</a></li>
-            <li class="active">Add Device</li>
+            <li class="active">Add Sub-account</li>
         </ul>
     </div>
 {% endblock %}
-{% block pagename %}Add Device{% endblock %}
+{% block pagename %}Add Sub-account{% endblock %}
 {% block content %}
 
     <div class="container col-lg-8 well">

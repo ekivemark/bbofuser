@@ -12,8 +12,8 @@ from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from django.forms import (HiddenInput, Textarea)
 
-from apps.device.models import (Device, DeviceAccessLog)
-from apps.device.utils import LowerCaseCharField
+from apps.subacc.models import (Device, DeviceAccessLog)
+from apps.subacc.utils import LowerCaseCharField
 # Form Field that converts to lower case
 
 def unique_account(acc):
@@ -44,7 +44,7 @@ def Device_View(request, mymodel_id):
 
     model = get_object_or_404(Device, pk=mymodel_id)
     form = MyModelForm(instance=model)
-    return render(request, 'device/model.html', {'form': form})
+    return render(request, 'subacc/model.html', {'form': form})
 
 class Device_Form(forms.ModelForm):
     class Meta:
@@ -63,14 +63,18 @@ class Device_Form(forms.ModelForm):
 class Device_EditForm(forms.ModelForm):
     # DONE: Account must be unique across all users AND Devices
     # DONE: account and password should be lower case
-    device = forms.CharField(max_length=40, help_text="Enter a device name")
+    device = forms.CharField(max_length=40,
+                             label='Nick name',
+                             help_text="Enter a Sub-account name")
     account = LowerCaseCharField(max_length=80,
+                                 label='User name',
+                                 help_text='Used for device login',
                               widget=forms.Textarea(attrs={'rows': 1,
                               'cols': 80}))
     password = LowerCaseCharField(max_length=40, widget=HiddenInput())
     valid_until = forms.DateTimeField()
-    used = forms.BooleanField(required=False , help_text="Has device been used to connect to your account?")
-    permitted = forms.BooleanField(required=False, help_text="Has permission been given for this device to access your account?")
+    used = forms.BooleanField(required=False , help_text="Has Sub-account been used to connect to your account?")
+    permitted = forms.BooleanField(required=False, help_text="Has permission been given for this Sub-account to access your account?")
 
     class Meta:
         model = Device
@@ -93,10 +97,13 @@ class Device_EditForm(forms.ModelForm):
 
 class Device_AddForm(forms.ModelForm):
     # DONE: Account must be unique across all users AND Devices
-    device = forms.CharField(max_length=40, help_text="Enter a device name")
+    device = forms.CharField(max_length=40,
+                             label='Sub-account Nick name',
+                             help_text="Enter a Sub-account name")
     account = LowerCaseCharField(max_length=80,
                               widget=forms.Textarea(attrs={'rows': 1,
-                              'cols': 80}))
+                              'cols': 80}), label='Sub-account username',
+                                 help_text="Used for Sub-account Login")
     password = LowerCaseCharField(max_length=40, widget=HiddenInput())
     active = forms.BooleanField(initial=True)
     valid_until = forms.DateTimeField()
@@ -110,7 +117,7 @@ class Device_AddForm(forms.ModelForm):
                   'active',
                   )
     def clean(self):
-        # Check that account is unique in device table
+        # Check that account is unique in subacc table
         error_messages = []
         if not unique_account(self.cleaned_data['account']):
             error_messages.append("Account: Name is not available")
@@ -121,7 +128,7 @@ class Device_AddForm(forms.ModelForm):
         return self.cleaned_data
 
 
-# DONE: Create Device Authentication Form for Device_Login View
+# DONE: Create Device Authentication Form for Subaccount_Login View
 class Device_AuthenticationForm(forms.Form):
     """
     Device Login form

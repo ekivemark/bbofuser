@@ -30,14 +30,14 @@ from accounts.models import User
 from accounts.utils import (send_activity_message,
                             cell_email,
                             email_mask)
-from apps.device.models import (Device,
+from apps.subacc.models import (Device,
                                 DeviceAccessLog)
-from apps.device.forms import (Device_AuthenticationForm,
+from apps.subacc.forms import (Device_AuthenticationForm,
                                Device_EditForm,
                                Device_AddForm,
                                Device_View,
                                unique_account)
-from apps.device.utils import (get_phrase,
+from apps.subacc.utils import (get_phrase,
                                session_device,
                                via_device,
                                Master_Account,
@@ -45,36 +45,36 @@ from apps.device.utils import (get_phrase,
 
 from apps.secretqa.views import (Get_Question,
                                  Check_Answer)
-from apps.device.forms import Question_Form
+from apps.subacc.forms import Question_Form
 
 
 @session_master
 @login_required
-def device_index(request):
+def subacc_index(request):
     # Show Device Home Page
 
     DEBUG = settings.DEBUG_SETTINGS
 
     if DEBUG:
-        print(settings.APPLICATION_TITLE, "in apps.device.views.device_index")
+        print(settings.APPLICATION_TITLE, "in apps.subacc.views.subacc_index")
 
     context = {}
-    return render_to_response('device/index.html',
+    return render_to_response('subacc/index.html',
                               RequestContext(request, context, ))
 
 
 @session_master
 @login_required
-def device_add(request):
+def subacc_add(request):
 
     if settings.DEBUG:
-        print("In apps.device.views.device_add")
+        print("In apps.subacc.views.subacc_add")
 
     if request.POST:
         form = Device_AddForm(request.POST)
         if form.is_valid():
             if settings.DEBUG:
-                print("Form is valid. Adding Device")
+                print("Form is valid. Adding Sub-account")
 
             d = Device()
 
@@ -91,8 +91,8 @@ def device_add(request):
             return HttpResponseRedirect(reverse('accounts:manage_account'),
                                         RequestContext(request))
         else:
-            messages.error(request,"Did you use a device name?")
-            return render(request, 'device/device_add.html',
+            messages.error(request,"Did you use a Sub-account name?")
+            return render(request, 'subacc/subaccount_add.html',
                           {'form': form,
                            })
     else:
@@ -110,7 +110,7 @@ def device_add(request):
 
 
     return render(request,
-                  'device/device_add.html',
+                  'subacc/subaccount_add.html',
                   {'form': form,
                    'password': pwd, }
                   )
@@ -118,15 +118,15 @@ def device_add(request):
 
 @session_master
 @login_required
-def device_edit(request, pk):
+def subacc_edit(request, pk):
     if settings.DEBUG:
         print(request.user)
-        print("Entering Device Edit with:%s" % pk)
+        print("Entering Sub-account Edit with:%s" % pk)
 
     d = Device.objects.get(pk=pk)
 
     if settings.DEBUG:
-        print("Device", d)
+        print("Sub-Account", d)
 
     form = Device_EditForm(data=request.POST or None, instance=d)
 
@@ -137,7 +137,7 @@ def device_edit(request, pk):
                 if not unique_account(form.cleaned_data['account']):
 
                     messages.error(request,"Account Name changed and is NOT Unique")
-                    return render(request, 'device/device_edit.html',
+                    return render(request, 'subacc/subaccount_edit.html',
                           {'form': form, 'device': d.device, })
 
             if settings.DEBUG:
@@ -166,14 +166,14 @@ def device_edit(request, pk):
                 print("Form is invalid")
 
             messages.error(request, "There was an input problem.")
-            return render(request, 'device/device_edit.html',
+            return render(request, 'subacc/subaccount_edit.html',
                           {'form': form, 'device': d.device, })
 
     else:
         d = Device.objects.get(pk=pk)
 
         if settings.DEBUG:
-            print("in the get with Device:", d.device, )
+            print("in the get with Sub-account:", d.device, )
         form = Device_EditForm(initial={'device': d.device,
                                         'account': d.account,
                                         'password': d.password,
@@ -183,20 +183,20 @@ def device_edit(request, pk):
                                              })
         if settings.DEBUG:
             print("Not in the post in the get")
-        return render(request, 'device/device_edit.html',
+        return render(request, 'subacc/subaccount_edit.html',
                       {'form': form,
                        'device': d})
 
 @session_master
 @login_required
-def Device_Delete(request, pk):
+def Subacc_Delete(request, pk):
     """
     We will not delete. Instead we will flag as deleted.
     This will avoid user accounts being reused
     """
     if settings.DEBUG:
-        print("in apps.device.views.Device_Delete")
-        print("Device:", pk,)
+        print("in apps.subacc.views.Subacc_Delete")
+        print("SubAccount:", pk,)
 
     d = Device.objects.get(pk=pk)
 
@@ -215,30 +215,30 @@ def Device_Delete(request, pk):
                 print("Form is invalid")
 
             messages.error(request, "There was an input problem.")
-            return render(request, 'device/device_confirm_delete.html',
+            return render(request, 'subacc/subaccount_confirm_delete.html',
                           {'form': form, 'device': d.device, })
     else:
         d = Device.objects.get(pk=pk)
         if settings.DEBUG:
-            print("in the get with Device Deletion:", pk)
+            print("in the get with Sub-Account Deletion:", pk)
         form =Device_EditForm()
 
-    return render(request, 'device/device_confirm_delete.html',
+    return render(request, 'subacc/subaccount_confirm_delete.html',
                     {'form': form,
                      'device': d})
 
 
-def device_authenticate(account, password):
+def subaccount_authenticate(account, password):
     """
-    Check for Device Login
+    Check for Sub-Account Login
     """
     result = None
 
     try:
         D = Device.objects.get(account=account,
                            password=password,
-            # DONE: Ignore Deleted Devices
-            # DONE: We check for an active device later
+            # DONE: Ignore Deleted Sub-account
+            # DONE: We check for an active subacc later
                            active=True,
                            deleted=False)
         if settings.DEBUG:
@@ -249,7 +249,7 @@ def device_authenticate(account, password):
     except Device.DoesNotExist:
         if settings.DEBUG:
             print("account", account, " Password:", password)
-            print("device_authenticate: Device.DoesNotExist")
+            print("subaccount_authenticate: Device.DoesNotExist")
         result = None
 
     if settings.DEBUG:
@@ -257,7 +257,7 @@ def device_authenticate(account, password):
     return result
 
 
-# DONE: View for Device Permission from User
+# DONE: View for Sub-account Permission from User
 # DONE: Get Secret Question
 # DONE: test answer aqinst secret answer
 def ask_user_for_permission(request):
@@ -265,7 +265,7 @@ def ask_user_for_permission(request):
 
     :param request:
     :param user:
-    :param device:
+    :param subacc:
     :return:
     """
     if 'device_ask_permission' in request.session:
@@ -275,7 +275,7 @@ def ask_user_for_permission(request):
     ask_count += 1
 
     if 'device_permission' in request.session:
-        device_id = request.session['device_permission']['device']
+        device_id = request.session['device_permission']['subacc']
         user_email   = request.session['device_permission']['user']
         if settings.DEBUG:
             print("User:  ", user_email)
@@ -287,7 +287,7 @@ def ask_user_for_permission(request):
 
     else:
         if settings.DEBUG:
-            print("Not passed from Device Login correctly")
+            print("Not passed from Sub-account Login correctly")
         messages.error(request, "Unable to Check Permission")
         return HttpResponseRedirect(reverse("api:home"))
 
@@ -302,27 +302,30 @@ def ask_user_for_permission(request):
     if max_count > 0:
         # We need to check the number of attempts
         if ask_count > max_count:
-            # Set device as used
+            # Set subacc as used
             # set message
             # return to api:home
             device.set_used()
             # now we can clear down the count
             request.session['device_ask_permission'] = {}
 
-            messages.error(request, "Too many permission attempts. This device is locked. The account owner will need to reset this device account")
+            messages.error(request, "Too many permission attempts. "
+                                    "This Sub-Account is locked. "
+                                    "The account owner will need to reset "
+                                    "this Sub-account")
             return HttpResponseRedirect(reverse("api:home"))
 
     # Now to Ask for Permission
 
     if settings.DEBUG:
-        print("Entering apps.device.views.Ask_User_For_Permission")
+        print("Entering apps.subacc.views.Ask_User_For_Permission")
         print("request.user:", request.user)
         print("request.session:", request.session)
 
         print("user passed via session:", user )
-        print("device passed via session:", device)
+        print("subacc passed via session:", device)
 
-    # We need to work out the user and device
+    # We need to work out the user and subacc
     # should be able to use request.session
     # DONE: Create Ask User For Permission
     # DONE: Create Form and View to get permission
@@ -333,13 +336,13 @@ def ask_user_for_permission(request):
             if Check_Answer(user, form.cleaned_data['question'], form.cleaned_data['answer']):
                 # True is good. False is BAD
                 # Finish the login process
-                # Also have to set device.permitted to True
+                # Also have to set subacc.permitted to True
                 permitted_result = Device_Set_To_Permitted(device)
-                # DONE: Set device.used = True
+                # DONE: Set subacc.used = True
                 used_result = device.set_used()
                 if settings.DEBUG:
-                    print("device is now permitted?:", permitted_result)
-                    print("device in set to used:", used_result)
+                    print("subacc is now permitted?:", permitted_result)
+                    print("subacc in set to used:", used_result)
                 User_Model = get_user_model()
                 user = User_Model.objects.get(email=device.user)
                 user.backend = 'django.contrib.auth.backends.ModelBackend'
@@ -351,14 +354,14 @@ def ask_user_for_permission(request):
 
                 # DONE: Add Email Notification of Permission Given
                 if user.notify_activity in "ET":
-                    # msg = PERM_MSG0 + user.email + PERM_MSG1 + device.device + PERM_MSG2
+                    # msg = PERM_MSG0 + user.email + PERM_MSG1 + subacc.subacc + PERM_MSG2
                     subject = "Device Connected to " + settings.APPLICATION_TITLE
                     if user.notify_activity in "ET":
                         send_activity_message(request,
                                               user,
                                               subject,
                                               template="accounts/messages/device_permission_email",
-                                              context={'device':device.device,
+                                              context={'subacc':device.device,
                                                        'email_mask':email_mask(user.email)},
                                               )
               # Otherwise don't send a message
@@ -387,11 +390,11 @@ def ask_user_for_permission(request):
                 request.session['device_ask_permission'] = {'count': ask_count}
 
                 # DONE: Record Access in DeviceAccessLog
-                return HttpResponseRedirect(reverse('device:device_login'))
+                return HttpResponseRedirect(reverse('subacc:device_login'))
         else:
             messages.error(request,"I am sorry = there was a problem")
             render(request,
-                  'device/device_permission.html',
+                   'subacc/subaccount_permission.html',
                    {'form': form,
                     'question': form['question']})
     else:
@@ -405,19 +408,19 @@ def ask_user_for_permission(request):
     if settings.DEBUG:
         print("Question to ask:", question)
     return render(request,
-                  'device/device_permission.html',
+                  'subacc/subaccount_permission.html',
                    {'form': form,
                     'question': question,
-                    'device': device},
+                    'subacc': device},
                     )
 
 
 
-# DONE: Post Device Access Record
+# DONE: Post Sub-account Access Record
 def Post_Device_Access(request, device, action="ACCESS"):
     """
 
-    Add the record of a device access to the DeviceAccessLog
+    Add the record of a subacc access to the DeviceAccessLog
     update Device.Connected_From
 
     :param device:
@@ -463,7 +466,7 @@ def Post_Device_Access(request, device, action="ACCESS"):
     result = DAL.save()
 
     # DONE: Update Device used field.
-    # device.used = True
+    # subacc.used = True
     device.connected_from = DAL.source
     device.save()
 
@@ -471,7 +474,7 @@ def Post_Device_Access(request, device, action="ACCESS"):
 
 
 # DONE: Give Device Permission
-# def Give_Device_Permission(request, user, device,):
+# def Give_Device_Permission(request, user, subacc,):
 #     """
 #     Ask for Device Permission
 #     Ask a Security Question
@@ -480,14 +483,14 @@ def Post_Device_Access(request, device, action="ACCESS"):
 #
 #     If permission is denied then set Device.active to false
 #         Return False
-#     :param device:
+#     :param subacc:
 #     :return:
 #     """
 #     result = False
 #     if settings.DEBUG:
-#         print("Entering apps.device.views.Give_Device_Permission")
+#         print("Entering apps.subacc.views.Give_Device_Permission")
 #
-#     check = device.is_authorized()
+#     check = subacc.is_authorized()
 #     # is active, is not deleted, is permitted. is valid_until.
 #     if not 'result' in check:
 #         # No warnings sent bck from is_authorized
@@ -496,24 +499,24 @@ def Post_Device_Access(request, device, action="ACCESS"):
 #         return True
 #
 #     # There was an issue with is_authorized()
-#     if not device.used:
-#         if not device.permitted:
+#     if not subacc.used:
+#         if not subacc.permitted:
 #             # Device has not been used and we need to check permission
-#             # DONE: check permission if device is not used before
+#             # DONE: check permission if subacc is not used before
 #             # We need to Ask Permission and use a challenge question
 #             #permission_result = Ask_User_For_Permission(request,
 #             #                                            user,
-#             #                                            device)
+#             #                                            subacc)
 #
 #             # Call the ask_permission Screen
 #             if settings.DEBUG:
 #                 print("About to ask Permission")
-#             return HttpResponseRedirect(reverse("device:ask_permission"))
+#             return HttpResponseRedirect(reverse("subacc:ask_permission"))
 #
 #         else:
 #             if settings.DEBUG:
-#                 print("Device Used:", device.used,
-#                       " Permitted:", device.permitted)
+#                 print("Device Used:", subacc.used,
+#                       " Permitted:", subacc.permitted)
 #             # Device is permitted
 #             return True
 #
@@ -531,7 +534,7 @@ def Post_Device_Access(request, device, action="ACCESS"):
 #             return True
 #
 #
-def Device_Login(request, *args, **kwargs):
+def Subaccount_Login(request, *args, **kwargs):
     """
     Device Login
     :param request:
@@ -543,28 +546,28 @@ def Device_Login(request, *args, **kwargs):
     if request.method == 'POST':
         form = Device_AuthenticationForm(request.POST)
         if settings.DEBUG:
-            print("in apps.device.views.Device_Login POST")
+            print("in apps.subacc.views.Subaccount_Login POST")
         if form.is_valid():
             if settings.DEBUG:
-                print("Form is Valid: Authenticating Device")
+                print("Form is Valid: Authenticating Sub-account")
 
             # DONE: Remove trailing spaces
             account = form.cleaned_data['account'].strip()
             Dpassword = form.cleaned_data['password'].strip()
 
-            device = device_authenticate(account=account,
+            device = subaccount_authenticate(account=account,
                                          password=Dpassword,)
             # device_authenticate will check for active and not deleted
             if settings.DEBUG:
-                print("device:", device,)
+                print("subacc:", device,)
             permission_check = False
             if device is not None:
                 if device.is_active:
                     if settings.DEBUG:
-                        print("Active Device:", device.is_active())
+                        print("Active Sub-account:", device.is_active())
                         print("Request.user:", request.user)
-                        print("Device.user:", device.user)
-                        print("Device used:", device.is_used())
+                        print("Sub-account.user:", device.user)
+                        print("Sub-account used:", device.is_used())
                     # Now get the User Account
                     User_Model = get_user_model()
                     user = User_Model.objects.get(email=device.user)
@@ -572,12 +575,12 @@ def Device_Login(request, *args, **kwargs):
                     user.backend = 'django.contrib.auth.backends.ModelBackend'
                     auth_rslt = django_authenticate(username=user.email,
                                                     password=user.password)
-                    # DONE: Check for not device.used
+                    # DONE: Check for not subacc.used
 
                     if not device.used:
                         if not device.permitted:
                             # Device has not been used and we need to check permission
-                            # DONE: check permission if device is not used before
+                            # DONE: check permission if subacc is not used before
                             # We need to Ask Permission and use a challenge question
                             # Call the ask_permission Screen
                             if settings.DEBUG:
@@ -586,40 +589,40 @@ def Device_Login(request, *args, **kwargs):
                             args = {}
                             args['form']   = form
                             args['user']   = user.email
-                            args['device'] = device.id
+                            args['subacc'] = device.id
 
-                            request.session['device_permission'] = {'device':device.id,
+                            request.session['device_permission'] = {'subacc':device.id,
                                                                     'user':device.user.email}
-                            return HttpResponseRedirect(reverse("device:ask_permission"), args)
+                            return HttpResponseRedirect(reverse("subacc:ask_permission"), args)
 
-                        else: # device.permitted
+                        else: # subacc.permitted
 
                             permission_check = True
                             if settings.DEBUG:
-                                print("Device Used:", device.used,
+                                print("Sub-account Used:", device.used,
                                       " Permitted:", device.permitted)
                                 # Device is permitted
                     else: # Device has been used
                         if not device.permitted:
                             if settings.DEBUG:
-                                print("Device Used and Device_Permitted NOT Set")
+                                print("Sub-account Used and Device_Permitted NOT Set")
                                 # Failed authorization checks
                                 # So check if permitted
                             permission_check = False
-                            messages.error(request, "You are not permitted access with this account")
+                            messages.error(request, "You are not permitted access with this Sub-account")
                             Post_Device_Access(request, device, action="NOTPERMITD")
                             # DONE: Record Access in DeviceAccessLog
 
                             return HttpResponseRedirect(reverse("api:home"))
                         else:
                             if settings.DEBUG:
-                                print("Device Used:", device.used,
+                                print("Sub-account Used:", device.used,
                                       " Permitted:", device.permitted)
                                 # Authorized Check is empty - so there were no problems
                             permission_check = True
                 else:
                     permission_check = False
-                    messages.error(request,"Inactive device/account.")
+                    messages.error(request,"Inactive Sub-account.")
                     Post_Device_Access(request, device, action="INACTIVE")
                     # DONE: Record Access in DeviceAccessLog
                     return HttpResponseRedirect(reverse('api:home'))
@@ -644,22 +647,22 @@ def Device_Login(request, *args, **kwargs):
                         print("Sessions:", request.session )
 
                     return HttpResponseRedirect(reverse('api:home'))
-                else: # device.active = False
-                    messages.error(request, "This is an inactive device account.")
+                else: # subacc.active = False
+                    messages.error(request, "This is an inactive Sub-account.")
                     return HttpResponseRedirect(reverse('api:home'))
             else: # Problem with account or password match
-                messages.error(request, "Invalid device account or password.")
-                return render_to_response('device/device_login.html',
+                messages.error(request, "Invalid Sub-account or password.")
+                return render_to_response('subacc/subaccount_login.html',
                                           {'form': Device_AuthenticationForm()},
                                           RequestContext(request))
         else: # Problem with the form
-            return render_to_response('device/device_login.html',
+            return render_to_response('subacc/subaccount_login.html',
                                       {'form': form},
                                       RequestContext(request))
     else: # GET and not a POST - so setup form
         if settings.DEBUG:
-            print("in Device_Login. Setting up Form")
+            print("in Subaccount_Login. Setting up Form")
         form = Device_AuthenticationForm()
 
-    return render_to_response('device/device_login.html', {'form': form},
+    return render_to_response('subacc/subaccount_login.html', {'form': form},
                               RequestContext(request))

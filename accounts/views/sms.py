@@ -30,7 +30,7 @@ from accounts.views.ldap import validate_ldap_user
 from accounts.models import (User,
                              ValidSMSCode)
 
-from apps.device.utils import (session_device,
+from apps.subacc.utils import (session_device,
                                Master_Account)
 
 
@@ -190,7 +190,7 @@ def sms_login(request, *args, **kwargs):
                     django_login(request, user)
 
                     # DONE: Set a session variable to identify as
-                    # master account and not a device
+                    # master account and not a subacc
 
                     session_device(request,
                                    "True",

@@ -48,7 +48,7 @@ class LowerCaseCharField(forms.CharField):
 
 def session_device(request, var, Session="auth_device"):
     """
-    Set a Session variable if logging in via a device
+    Set a Session variable if logging in via a subacc
     This will be linked to a decorator to control access to
     sections of the site that will require the master account to be used
     :param request:

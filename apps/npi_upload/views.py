@@ -45,7 +45,7 @@ def npi_index(request):
 
 
     if settings.DEBUG:
-        print(settings.APPLICATION_TITLE, "in apps.device.views.device_index")
+        print(settings.APPLICATION_TITLE, "in apps.subacc.views.device_index")
 
     context = {'site' : Site.objects.get_current(),
               }

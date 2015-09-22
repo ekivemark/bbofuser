@@ -23,12 +23,13 @@ from accounts.decorators import (session_master,
 from accounts.forms.application import (ApplicationCheckForm)
 from accounts.forms.authenticate import AuthenticationForm
 from accounts.forms.register import RegistrationForm
-from accounts.models import Application
+from accounts.models import (Application,
+                             Crosswalk)
 from accounts.utils import (cell_email,
                             send_activity_message)
 
-from apps.device.models import Device
-from apps.device.utils import Master_Account
+from apps.subacc.models import Device
+from apps.subacc.utils import Master_Account
 
 from apps.secretqa.models import QA
 
@@ -79,14 +80,14 @@ def logout(request):
     """
     Log out view
     """
-    # DONE: Change redirection based on whether device or user
+    # DONE: Change redirection based on whether subacc or user
     if 'auth_device' in request.session:
-        mode = "device"
+        mode = "subacc"
     else:
         mode = "user"
 
     django_logout(request)
-    if mode == "device":
+    if mode == "subacc":
         return redirect(reverse_lazy('api:home'))
     return redirect(reverse_lazy('home'))
 
@@ -172,6 +173,17 @@ def manage_account(request):
                                           deleted=False))
     # DONE: Get Device Used indicator
     # Used Field is included in Device. It is set during login
+    try:
+        xwalk = Crosswalk.objects.get(user=request.user)
+        mmg_xwalk = {}
+        mmg_xwalk['mmg_user'] = xwalk.mmg_user
+        mmg_xwalk['mmg_name'] = xwalk.mmg_name
+        mmg_xwalk['mmg_email'] = xwalk.mmg_email
+        mmg_xwalk['mmg_account'] = xwalk.mmg_account
+        mmg_xwalk['mmg_bbdata'] = xwalk.mmg_bbdata
+        mmg_xwalk['mmg_bbfhir'] = xwalk.mmg_bbfhir
+    except Crosswalk.DoesNotExist:
+        mmg_xwalk = {}
 
     try:
         secretqa = QA.objects.get(user=request.user)
@@ -188,6 +200,7 @@ def manage_account(request):
     security_list = secretqa
     context = {"user": user,
                "mfa_address": mfa_address,
+               "mmg_xwalk": mmg_xwalk,
                "devices": dev_list,
                'security_mode': security_mode,
                "security": security_list}

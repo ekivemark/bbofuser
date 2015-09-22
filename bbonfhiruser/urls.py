@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse_lazy
 
 from accounts.forms.other import RegistrationFormUserTOSAndEmail
 from apps.secretqa.views import *
-from apps.device.views import *
+from apps.subacc.views import *
 from apps.api.views import *
 
 from django.contrib import admin
@@ -25,8 +25,8 @@ urlpatterns = patterns('',
                            include('accounts.urls', namespace='accounts')),
                        url(r'^upload/', include('apps.uploader.urls',
                                                 namespace='upload')),
-                       url(r'^device/',
-                           include('apps.device.urls', namespace='device')),
+                       url(r'^subaccount/',
+                           include('apps.subacc.urls', namespace='subaccount')),
                        url(r'^security/',
                            include('apps.secretqa.urls', namespace='security')),
                        url(r'^api/',
@@ -42,6 +42,9 @@ urlpatterns = patterns('',
                            RegistrationView.as_view(
                                form_class=RegistrationFormUserTOSAndEmail),
                            name='register'),
+                       url(r'^logout$',
+                           'accounts.views.logout',
+                           name='logout'),
                        url(r'^registration/', include(
                            'registration.backends.default.urls', )),
                        url(r'^password/reset/$', auth_views.password_reset,

@@ -179,7 +179,7 @@ LOCAL_APPS = (
     # Add custom apps here
     'accounts',
     'apps.uploader',
-    'apps.device',
+    'apps.subacc',
     'apps.secretqa',
     'apps.api',
     'apps.v1api',
@@ -466,7 +466,7 @@ if DEBUG_SETTINGS:
 DEFAULT_VALID_DAYS = 365
 
 # DONE: Define DEVICE_ACCESS_LOG_DAYS (365)_
-# Days to retain Device Access Log entries for a device
+# Days to retain Device Access Log entries for a subacc
 DEVICE_ACCESS_LOG_DAYS = int(PARSE_INI.get('global',
                                            'device_access_log_days'))
 # DEVICE_ACCESS_LOG_DAYS = 365

@@ -5,9 +5,10 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
 # Register your models here.
-from apps.device.models import Device, DeviceAccessLog
+from apps.subacc.models import Device, DeviceAccessLog
 
 # Device
+
 
 class DeviceAdmin(admin.ModelAdmin):
     """
