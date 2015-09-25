@@ -10,6 +10,9 @@ This provides partial compatibility with full JSON/XML format
 __author__ = 'Mark Scrimshire:@ekivemark'
 
 from datetime import datetime, date, timedelta
+from collections import OrderedDict
+
+import re
 
 import json
 import collections
@@ -1814,3 +1817,42 @@ def write_source(kvs, dt):
 
     return dt
 
+
+def string_to_ordereddict(txt):
+    #######################################
+    # String_To_OrderedDict
+    # Convert String to OrderedDict
+    # Example String
+    #    txt = "OrderedDict([('width', '600'), ('height', '100'), ('left', '1250'), ('top', '980'), ('starttime', '4000'), ('stoptime', '8000'), ('startani', 'random'), ('zindex', '995'), ('type', 'text'), ('title', '#WXR#@TU@@Izmir@@brief_txt@'), ('backgroundcolor', 'N'), ('borderstyle', 'solid'), ('bordercolor', 'N'), ('fontsize', '35'), ('fontfamily', 'Ubuntu Mono'), ('textalign', 'right'), ('color', '#c99a16')])"
+    #######################################
+
+    tempDict = OrderedDict()
+
+    od_start = "OrderedDict(["
+    od_end = '])'
+
+    first_index = txt.find(od_start)
+    last_index = txt.rfind(od_end)
+
+    new_txt = txt[first_index+len(od_start):last_index]
+    # print("new_txt:", new_txt)
+    # print("First 3:", new_txt[1:-1])
+
+
+    pattern = r"(\(\'\S+\'\,\ \'\S+\'\))"
+    all_variables = re.findall(pattern, new_txt)
+
+    # print("All_var:", all_variables)
+    for str_variable in all_variables:
+        # print("str_variable", str_variable)
+        data = str_variable.split("', '")
+        key = data[0].replace("('", "")
+        value = data[1].replace("')", "")
+        # print("key : %s" % (key))
+        # print("value : %s" % (value))
+        tempDict[key] = value
+
+    # print(tempDict)
+    # print(tempDict['title'])
+
+    return tempDict

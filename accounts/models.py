@@ -16,7 +16,9 @@ Models for bbonfhir Users
 
 
 """
+import collections
 import random
+
 from datetime import datetime, timedelta
 from uuid import uuid4
 
@@ -29,6 +31,7 @@ from django.contrib.auth.models import (User,
 from django.contrib.auth.signals import user_logged_out
 from django.utils import timezone
 from django.contrib.auth.models import AbstractBaseUser
+from jsonfield import JSONField
 from phonenumber_field.modelfields import PhoneNumberField
 
 from accounts.utils import CARRIER_SELECTION, cell_email, send_sms_pin
@@ -266,6 +269,8 @@ class Crosswalk(models.Model):
     mmg_email = models.EmailField(max_length=250, blank=True, null=True)
     mmg_account = models.TextField(blank=True)
     mmg_bbdata = models.TextField(blank=True)
+    mmg_bbjson = JSONField(load_kwargs={'object_pairs_hook': collections.OrderedDict},
+                           blank=True)
     mmg_bbfhir = models.BooleanField(default=False)
     fhir = models.CharField(max_length=40, blank=True )
     fhir_url_id = models.CharField(max_length=80, blank=True)

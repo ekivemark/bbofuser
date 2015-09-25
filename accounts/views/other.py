@@ -6,7 +6,11 @@ __author__ = 'Mark Scrimshire:@ekivemark'
 
 # DONE Activate Account
 # DONE: accounts/profile Landing Page.
+import ast
+import json
 
+from collections import OrderedDict
+from django.core import serializers
 from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, redirect
@@ -27,6 +31,8 @@ from accounts.models import (Application,
                              Crosswalk)
 from accounts.utils import (cell_email,
                             send_activity_message)
+
+from apps.bluebutton.cms_parser_utilities import string_to_ordereddict
 
 from apps.subacc.models import Device
 from apps.subacc.utils import Master_Account
@@ -182,6 +188,21 @@ def manage_account(request):
         mmg_xwalk['mmg_account'] = xwalk.mmg_account
         mmg_xwalk['mmg_bbdata'] = xwalk.mmg_bbdata
         mmg_xwalk['mmg_bbfhir'] = xwalk.mmg_bbfhir
+
+        temp = xwalk.mmg_bbjson
+        if settings.DEBUG:
+            print("Temp:", temp)
+        #temp2 = json.loads(eval(temp))
+        #temp = json.loads(json.dumps(xwalk.mmg_bbjson),object_pairs_hook=OrderedDict)
+        #temp = json.dumps(serializers.serialize(xwalk.mmg_bbjson))
+
+        #print("Temp2:", temp2)
+        #print("========")
+        #for key, value in temp2.items():
+        #    print("Key:", key, ":", temp[key])
+
+        mmg_xwalk['mmg_bbjson'] = temp
+        # print("patient:", temp['patient'])
     except Crosswalk.DoesNotExist:
         mmg_xwalk = {}
 
@@ -281,3 +302,5 @@ def connect_application(request):
 @login_required
 class Application_Detail(DetailView):
     model = Application
+
+

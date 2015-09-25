@@ -14,9 +14,10 @@ import json
 import re
 import os, sys
 
+from collections import OrderedDict
+
 from apps.bluebutton.cms_parser_utilities import *
 from apps.bluebutton.cms_custom import *
-
 
 # DBUG = False
 
@@ -163,6 +164,160 @@ def cms_file_read(inPath):
             ln_cntr += 1
 
     f.close()
+
+    # print(i+1, "records")
+    # print(ln_cntr, "written.")
+    # print(blank_ln, "skipped")
+
+    # print(f_lines)
+    # print("")
+
+    return f_lines
+
+
+def cms_text_read(inText):
+    # Read textfield and save in OrderedDict
+    # Identify Headings and set them as level 0
+    # Everything else assign as Level 1
+
+    # Add in claimNumber value to line_dict to simplify detail
+    # downstream processing of lines
+
+    DBUG = False
+
+    ln_cntr = 0
+    blank_ln = 0
+    f_lines = []
+    set_level = 0
+
+    line_type = "BODY"
+    header_line = False
+    set_header = "HEADER"
+    current_segment = ""
+    claim_number = ""
+
+    kvs = {}
+
+    line_dict = {"key": 0,
+                 "level": 0,
+                 "line": "",
+                 "type": "",
+                 "claimNumber": "",
+                 "category": ""}
+
+    if DBUG:
+        print("In apps.bluebutton.cms_parser.cms_text_read")
+
+    i = 0
+    for l in inText.split('\n'):
+        # reset the dictionary
+        line_dict = {}
+
+        # Read each line in file
+        l = l.rstrip()
+        # remove white space from end of line
+
+        # if (i % 10) == 0:
+        # print ".",
+        # Show progress every 10 steps
+
+        if len(l) < 1:
+            # skip blank lines
+            blank_ln += 1
+            continue
+
+        if line_type == "BODY" and (divider in l):
+            header_line = True
+            get_title = True
+            line_type = "HEADER"
+            blank_ln += 1
+            continue
+        elif line_type == "HEADER" and header_line and get_title:
+            # Get the title line
+            # print "we found title:",l
+            # print i, "[About to set Seg:", l, "]"
+            # Save the current_segment before we overwrite it
+            if not (divider in l):
+                if len(l.strip()) > 0:
+                    # print "title length:", len(l.strip())
+
+                    # Remove : from Title - for Claims LineNumber:
+                    titleline = l.split(":")
+                    tl = titleline[0].rstrip()
+                    set_header = line_type
+                    current_segment = tl
+                    get_title = False
+                    if "CLAIM LINES FOR CLAIM NUMBER" in l.upper():
+                        # we have to account for Part D Claims
+                        kvs = assign_simple_key(l, kvs)
+                        claim_number = kvs["v"]
+                        set_level = 1
+                    else:
+                        set_level = 0
+            else:
+                # we didn't find a title
+                # So set a default
+                # Only claim summary title segments are blank
+                # save current_segment
+                previous_segment = current_segment
+                current_segment = "claim Header"
+                # print "set title to", current_segment
+                # print i,"We never got a title line...",
+                # current_segment
+                set_level = 1
+                header_line = False
+                if current_segment == "claim Header":
+                    set_header = "HEADER"
+                else:
+                    set_header = "HEADER"
+                line_type = "BODY"
+
+            line_dict = {"key": ln_cntr,
+                         "level": set_level,
+                         "line": current_segment,
+                         "type": set_header,
+                         "claimNumber": claim_number}
+
+        elif line_type == "HEADER" and not get_title:
+            # we got a second divider
+            if divider in l:
+                set_header = "BODY"
+                line_type = "BODY"
+                header_line = False
+
+                blank_ln += 1
+                continue
+
+        else:
+            line_type = "BODY"
+            set_header = line_type
+            if "CLAIM NUMBER" in l.upper():
+                kvs = assign_simple_key(l, kvs)
+                claim_number = kvs["v"]
+            if "CLAIM TYPE: PART D" in l.upper():
+                # We need to re-write the previous f_lines entry
+                prev_line = f_lines[ln_cntr - 1]
+                if DBUG:
+                    do_DBUG("prev_line:", prev_line)
+                if prev_line[ln_cntr - 1][
+                    "line"].upper() == "CLAIM LINES FOR CLAIM NUMBER":
+                    prev_line[ln_cntr - 1]["line"] = "Part D Claims"
+                    f_lines[ln_cntr - 1] = prev_line
+
+                    if DBUG:
+                        do_DBUG("re-wrote f_lines:",
+                                f_lines[ln_cntr - 1])
+            line_dict = {"key": ln_cntr,
+                         "level": set_level + 1,
+                         "line": l,
+                         "type": set_header,
+                         "claimNumber": claim_number}
+
+        f_lines.append({ln_cntr: line_dict})
+
+        ln_cntr += 1
+        i += 1
+
 
     # print(i+1, "records")
     # print(ln_cntr, "written.")

@@ -165,12 +165,13 @@ THIRD_PARTY_APPS = (
     'bootstrapform',
     # this installs django-registration-redux
     'registration',
+    'rest_framework',
+    'oauth2',
     'oauth2_provider',
     'corsheaders',
     'django_python3_ldap',
     'debug_toolbar',
     'ldap3',
-    'rest_framework',
     'requests',
 
 )

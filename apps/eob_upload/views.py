@@ -26,6 +26,7 @@ from django.template import RequestContext
 from accounts.models import Crosswalk
 
 from apps.bluebutton.cms_parser import (cms_file_read,
+                                        cms_text_read,
                                         parse_lines)
 from apps.eob_upload.forms import BlueButtonJsonForm
 from apps.npi_upload.views import find_profile
@@ -91,6 +92,221 @@ def load_eob(request, patient_id):
                               )
 
 
+def json_to_eob(request, patient_id):
+    """
+
+    :param request:
+    :param patient_id:
+
+    :return:
+    """
+
+    if settings.DEBUG:
+        print("Patient_Id =", patient_id)
+
+    u = User.objects.get(email=request.user.email)
+    xwalk = Crosswalk.objects.get(user=u)
+
+
+    json_stuff = parse_lines(demodict)
+
+    if settings.DEBUG:
+        print("Converted BlueButton File:\n",
+              json_stuff,
+              "\n===================================")
+
+    #jfn = open(settings.MEDIA_ROOT+bbj_in, 'r')
+    #json_stuff = json.load(jfn)
+    # print("stuff:", json_stuff)
+    #jfn.close()
+
+    # Check the Crosswalk for a FHIR Id for this user
+
+    # If no Crosswalk entry let's check to see if we have a match on
+    # name, dob and addressLine1
+
+    # Now we need to see if there is a patient record
+    patient_count = match_patient(request, json_stuff)
+
+    if settings.DEBUG:
+        print("Patient Count: ", patient_count,
+              "\n Request.user:", request.user)
+
+    if patient_count > 1:
+        messages.error(request,"Unable to match a patient record. We"
+                               "have multiple patient records matching."
+                               " We found ", patient_count, " records.")
+        return HttpResponseRedirect(reverse("eob_upload:home"))
+    elif patient_count == 0:
+        # We need to create a patient resource record
+        # If there is no fhir_url_id in the crosswalk for request.user
+        try:
+            x_walk = Crosswalk.objects.get(user=request.user)
+            guid = x_walk.guid
+            patient_id = x_walk.get_fhir_url_id()
+        except Crosswalk.DoesNotExist:
+            # No Crosswalk so create a patient
+
+            result = create_patient(request, bb_dict=json_stuff)
+
+            # create_patient should have created a crosswalk entry
+            x_walk = Crosswalk.objects.get(user=request.user)
+            guid = x_walk.guid
+            patient_id = x_walk.get_fhir_url_id()
+    else: # patient_count == 1:
+        #
+        x_walk = Crosswalk.objects.get(user=request.user)
+        guid = x_walk.guid
+        patient_id = x_walk.get_fhir_url_id()
+
+    if settings.DEBUG:
+        print("=====================",
+              "\nWorking with Patient Id:",
+              patient_id,
+              "\nGUID:", guid,
+              "\n===========")
+
+    claims = json_stuff['claims']
+
+    for claim in claims:
+        # Deal with the Claim Header
+        extension = []
+        extension.append(extn_item("Patient", patient_id, "valueString"))
+        extension.append(extn_item("identifier", guid, "valueString"))
+        for key, value in claim.items():
+
+            # if settings.DEBUG:
+            #     print("Key:", key)
+            #     print("Value:", value)
+
+            if key == "claimNumber":
+                add_it = extn_item(key, value, "valueString",)
+                claim_number = value
+                extension.append(add_it)
+            elif key == "claimType":
+                add_it = extn_item(key, value, "valueString")
+                extension.append(add_it)
+            elif key == "provider":
+                add_it = extn_item(key, value, "valueString")
+                extension.append(add_it)
+            elif key == "providerBillingAddress":
+                add_it = extn_item(key, value, "valueString")
+                extension.append(add_it)
+            elif key == "date":
+                period = {}
+                if value['serviceStartDate']:
+                    period['start'] = value['serviceStartDate']
+                if value['serviceEndDate']:
+                    period['end'] = value['serviceEndDate']
+                add_it = extn_item(key, period, "valuePeriod")
+                extension.append(add_it)
+                # Set created to the Service End Date.
+                # This should be easier to track duplicate
+                # EOB entries
+                created = value['serviceEndDate']
+
+            elif key == "diagnosisCode1":
+                add_it = extn_item(key, value, "valueString")
+                extension.append(add_it)
+            elif key == "diagnosisCode2":
+                add_it = extn_item(key, value, "valueString")
+                extension.append(add_it)
+            elif key == "source":
+                add_it = extn_item(key, value, "valueString")
+                extension.append(add_it)
+            elif key == "charges":
+                for ckey, charge in value.items():
+                    add_it = extn_item(ckey,charge, "valueString")
+                    extension.append(add_it)
+            elif key == "details":
+                # Deal with the Claim Lines
+                add_it = claim_detail(details=value)
+                add_it = extn_item(key,add_it,"valueString")
+                extension.append(add_it)
+
+        eob_extn = [{"url" : "https://dev.bbonfhir.com/fhir/StructureDefinition/cms-eob",
+                 "extension": extension}]
+
+        #if settings.DEBUG:
+        #    print("==================================",
+        #          "extension:", eob_extn,
+        #          "\n==================================")
+
+        # Now we need to write an EOB Resource to the server.
+        eob = OrderedDict()
+        eob['resourceType'] = "ExplanationOfBenefit"
+
+        id_source = {}
+        id_list = []
+        id_source['system'] = "https://mymedicare.gov/claims"
+        id_source['use'] = "official"
+        id_source['value'] = claim_number
+        id_list.append(unique_id(id_source))
+
+        id_source['system'] = "https://mymedicare.gov/claims/beneficiary"
+        id_source['use'] = "official"
+        id_source['value'] = "Patient/"+str(patient_id)
+        id_list.append(unique_id(id_source))
+
+        eob['identifier']   = id_list
+        eob['outcome']      = "complete"
+        eob['extension']    = eob_extn
+
+
+        #if settings.DEBUG:
+        #    print("EOB:", eob)
+
+        txn = {'resourceType': "ExplanationOfBenefit",
+               'server': settings.FHIR_SERVER,
+               'locn': "/baseDstu2/ExplanationOfBenefit"}
+
+        target_url = txn['server'] + txn['locn']
+
+        # Can we write the EOB now....
+        headers = {'Content-Type': 'application/json+fhir; charset=UTF-8',
+                   'Accept': 'text/plain'}
+
+        try:
+            r = requests.post(target_url + "?_format=json",
+                              data=json.dumps(eob),
+                              headers=headers )
+            if r.status_code == 201:
+                commit_data = r.headers['content-location']
+                if settings.DEBUG:
+                    print("Write returned:", r.status_code,
+                          "|", commit_data)
+            elif r.status_code == 400:
+                if settings.DEBUG:
+                    print(r.status_code," Problem with input")
+                    print(rec_counter,":","Mode:",
+                          claim_number,"[",
+                          r.status_code,
+                          "] NPI:",
+                          row_under['NPI'],
+                          r.__dict__)
+        except requests.ConnectionError:
+            messages.error(request,"Problem posting:" + claim_number)
+
+        if settings.DEBUG:
+            print("Result from post", r.status_code, "|",
+                  r.content, "|",
+                  r.text, "|",
+                  "Headers", r.headers)
+
+    form = {}
+
+    return render_to_response('eob_upload/eob.html',
+                              {'documents': claims,
+                               'patient_id': patient_id,
+                               'eob': json.dumps(eob,
+                                                 indent=4,
+                                                 ),
+                               'form': form},
+                              context_instance=RequestContext(request)
+                              )
+
+
+
 def write_eob(request, patient_id, bbj_in):
     """
 
@@ -118,8 +334,6 @@ def write_eob(request, patient_id, bbj_in):
     #jfn.close()
 
     # Check the Crosswalk for a FHIR Id for this user
-
-
 
     # If no Crosswalk entry let's check to see if we have a match on
     # name, dob and addressLine1

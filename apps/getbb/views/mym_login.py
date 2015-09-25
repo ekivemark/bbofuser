@@ -7,6 +7,7 @@ Created: 8/25/15 2:48 PM
 Experimental app to use BeautifulSoup to attempt to login to MyMedicare.gov
 
 """
+from django.core import serializers
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 
@@ -37,6 +38,8 @@ from accounts.forms import Medicare_Connect
 from accounts.models import (User,
                              Crosswalk)
 
+from apps.bluebutton.cms_parser import (cms_text_read,
+                                        parse_lines)
 from apps.getbb.utils import *
 
 
@@ -109,9 +112,23 @@ def connect_first(request):
                     xwalk.mmg_name = mmg['mmg_name']
                     xwalk.mmg_account = mmg['mmg_account']
                     if mmg_bb['status'] == "OK":
+                        # We need to save the BlueButton Text
                         # print("We are okay to update mmg_bbdata",
                         #       "\n with ", mmg_bb['mmg_bbdata'][:250])
                         xwalk.mmg_bbdata = mmg_bb['mmg_bbdata']
+                        result = bb_to_json(request)
+                        # if settings.DEBUG:
+                            # print("BB Conversion:", result['result'])
+                        if result['result']:
+                            xwalk.mmg_bbjson = result['mmg_bbjson']
+                            # print("returned json:", result['mmg_bbjson'])
+                            for key, value in result['mmg_bbjson'].items():
+                                # print("Key:", key)
+                                if key == "patient":
+                                    for k, v in value.items():
+                                        # print("K:", k, "| v:", v)
+                                        if k == "email":
+                                            xwalk.mmg_email = v
 
                     # if mmg_mail['status'] == "OK":
                     #     xwalk.mmg_email = mmg_mail['mmg_email']
@@ -309,6 +326,7 @@ def connect(request, mmg):
     return mmg_back
 
 
+@login_required
 def get_bluebutton(request, mmg):
     """
 
@@ -357,7 +375,6 @@ def get_bluebutton(request, mmg):
         print("RB in Get BlueButton:", rb.url)
         print("================"
               "rb:", rb.parsed)
-
 
     form = rb.get_form()
 
@@ -435,6 +452,9 @@ def get_bluebutton(request, mmg):
 
     bb_file_link = rb.find("a", {"id": "TXTHyperLink"})
     bb_link = bb_file_link.get('href')
+    # Now we have the link to the text file
+    # We need to add the Medicare site prefix
+    # So we can call RobBrowser.
     bb_link = "https://www.mymedicare.gov/" + bb_link
     if settings.DEBUG:
         print("BlueButton Link:", bb_file_link,
@@ -445,6 +465,7 @@ def get_bluebutton(request, mmg):
     # id="TXTHyperLink"
     # title="Download TXT"><b>Download TXT</b></a>
 
+    # Get the BlueButton Text file content
     rb.open(bb_link)
 
     if settings.DEBUG:
@@ -452,6 +473,8 @@ def get_bluebutton(request, mmg):
 
     browser = RoboBrowser(history=True)
     # browser.parser = PARSER
+
+    # strip out just the text from inside the html/body/p tag
     mmg_back['mmg_bbdata'] = rb.find('p').getText()
 
     if settings.DEBUG:
@@ -466,6 +489,43 @@ def get_bluebutton(request, mmg):
     return mmg_back
 
 
+@login_required
+def bb_to_json(request):
+    """
+    Get the User's Crosswalk record
+    Get the mmg_bbdata textfield
+    Convert to json
+    Update mmg_bbjson
+
+    :param request:
+    :return:
+    """
+    result = {}
+    result['result'] = False
+
+    u = User.objects.get(email=request.user.email)
+    xwalk = Crosswalk.objects.get(user=u)
+
+    if xwalk.mmg_bbdata:
+        # We have something to process
+        bb_dict = cms_text_read(xwalk.mmg_bbdata)
+
+        print("bb_dict:", bb_dict)
+
+        json_stuff = parse_lines(bb_dict)
+
+        print("json:", json_stuff)
+
+        result['mmg_bbjson'] = json_stuff
+        messages.info(request,"BlueButton converted to json")
+        result['result'] = True
+    else:
+        messages.error(request,"Nothing to process ["+xwalk.mmg_bbdata[:80]+"]")
+
+    return result
+
+
+@login_required
 def get_medicare_email(request, mmg):
     """
 
