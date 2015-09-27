@@ -29,6 +29,8 @@ urlpatterns = patterns('',
                            include('apps.subacc.urls', namespace='subaccount')),
                        url(r'^security/',
                            include('apps.secretqa.urls', namespace='security')),
+                       # API Entry point
+                       # v1api is referenced inside apps.api.urls as v1
                        url(r'^api/',
                            include('apps.api.urls', namespace='api')),
                        url(r'^npi_up/', include('apps.npi_upload.urls',
@@ -66,8 +68,12 @@ urlpatterns = patterns('',
                        url(r'^o/', include('oauth2_provider.urls',
                                            namespace='oauth2_provider')),
 
+                       # OAuth2 Provider Library
+                       url(r'^o/', include('oauth2_provider.urls',
+                                           namespace='oauth2_provider')),
                        url(r'^admin/', include(admin.site.urls)),
-                       # Uncomment the admin/doc line below to enable admin documentation:
+                       # Uncomment the admin/doc line below to enable admin
+                       # documentation:
                        url(r'^admin/doc/',
                            include('django.contrib.admindocs.urls')),
                        )

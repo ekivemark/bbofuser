@@ -22,21 +22,30 @@ from apps.v1api.views.home import *
 from apps.v1api.views.patient import (get_patient,
                                       get_eob,
                                       get_eob_view)
+from apps.v1api.views.ogets import ApiEndpoint
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
-                       # Examples:
+                       # Examples: These are used by sub-accounts
+                       # or master accounts
                        url(r'^$', 'apps.v1api.views.home.api_index',
                            name='home'),
                        url(r'^patient$',
                            'apps.v1api.views.patient.get_patient',
                            name='patient'),
-                        url(r'^eob/',
+                       url(r'^eob/',
                            'apps.v1api.views.patient.get_eob',
                            name='eob'),
-                        url(r'^eobview/(?P<eob_id>[-\w]+)$',
+                       url(r'^eobview/(?P<eob_id>[-\w]+)$',
                            'apps.v1api.views.patient.get_eob_view',
                            name='eobview'),
+                       # OAuth entry points are here
+                       # These will only be used by OAuth authorized apps
+                       # These are the resource servers
+                       url(r'^o/hello', ApiEndpoint.as_view()),
+                       # Add more oauth endpoints here
+                       url(r'^o/patient', ApiEndpoint.as_view()),
 
                        url(r'^admin/', include(admin.site.urls)),
 

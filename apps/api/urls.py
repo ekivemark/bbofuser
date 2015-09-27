@@ -28,6 +28,9 @@ urlpatterns = patterns('',
                        url(r'^login$',
                            'apps.subacc.views.subaccount_authenticate',
                            name='login'),
+                       # v1 api entry point
+                       # Oauth entry point is found inside v1api
+                       # apps.v1api.urls
                        url(r'^v1/',
                            include('apps.v1api.urls',
                                    namespace='v1')),
