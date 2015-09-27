@@ -40,6 +40,7 @@ from accounts.models import (User,
 
 from apps.bluebutton.cms_parser import (cms_text_read,
                                         parse_lines)
+from apps.eob_upload.views import json_to_eob
 from apps.getbb.utils import *
 
 
@@ -97,13 +98,12 @@ def connect_first(request):
                 # if settings.DEBUG:
                 #     print("mmg returned from connect:", mmg)
 
-                # mmg_mail = get_medicare_email(request, mmg)
                 mmg_bb = get_bluebutton(request, mmg)
                 mmg_mail = {}
                 if settings.DEBUG:
-                    print("BlueButton returned:", mmg_bb['mmg_bbdata'])
+                    print("BlueButton returned:", mmg_bb)
 
-                if mmg['status'] == "OK":
+                if mmg_bb['status'] == "OK":
                     u.medicare_connected = True
                     u.medicare_verified = True
                     u.save()
@@ -114,11 +114,12 @@ def connect_first(request):
                     if mmg_bb['status'] == "OK":
                         # We need to save the BlueButton Text
                         # print("We are okay to update mmg_bbdata",
-                        #       "\n with ", mmg_bb['mmg_bbdata'][:250])
+                        #      "\n with ", mmg_bb['mmg_bbdata'][:250])
                         xwalk.mmg_bbdata = mmg_bb['mmg_bbdata']
+                        xwalk.save()
                         result = bb_to_json(request)
-                        # if settings.DEBUG:
-                            # print("BB Conversion:", result['result'])
+                        if settings.DEBUG:
+                            print("BB Conversion:", result)
                         if result['result']:
                             xwalk.mmg_bbjson = result['mmg_bbjson']
                             # print("returned json:", result['mmg_bbjson'])
@@ -129,6 +130,11 @@ def connect_first(request):
                                         # print("K:", k, "| v:", v)
                                         if k == "email":
                                             xwalk.mmg_email = v
+                        if not xwalk.mmg_bbfhir:
+                            if result['mmg_bbjson']:
+                                outcome = json_to_eob(request)
+                                if outcome['result'] == "OK":
+                                    xwalk.mmg_bbfhir = True
 
                     # if mmg_mail['status'] == "OK":
                     #     xwalk.mmg_email = mmg_mail['mmg_email']
@@ -501,7 +507,7 @@ def bb_to_json(request):
     :return:
     """
     result = {}
-    result['result'] = False
+    result['result'] = "FAIL"
 
     u = User.objects.get(email=request.user.email)
     xwalk = Crosswalk.objects.get(user=u)
@@ -518,7 +524,7 @@ def bb_to_json(request):
 
         result['mmg_bbjson'] = json_stuff
         messages.info(request,"BlueButton converted to json")
-        result['result'] = True
+        result['result'] = "OK"
     else:
         messages.error(request,"Nothing to process ["+xwalk.mmg_bbdata[:80]+"]")
 

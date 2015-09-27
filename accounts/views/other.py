@@ -190,8 +190,8 @@ def manage_account(request):
         mmg_xwalk['mmg_bbfhir'] = xwalk.mmg_bbfhir
 
         temp = xwalk.mmg_bbjson
-        if settings.DEBUG:
-            print("Temp:", temp)
+        # if settings.DEBUG:
+            # print("Temp:", temp)
         #temp2 = json.loads(eval(temp))
         #temp = json.loads(json.dumps(xwalk.mmg_bbjson),object_pairs_hook=OrderedDict)
         #temp = json.dumps(serializers.serialize(xwalk.mmg_bbjson))
