@@ -48,7 +48,7 @@ from apps.v1api.utils import (get_format,
 # TODO: Extract site domain from querying url in Connected_From
 
 
-@login_required
+# @login_required
 def get_patient(request, *args, **kwargs):
     """
     Display Patient Profile
