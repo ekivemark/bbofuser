@@ -70,7 +70,7 @@ def connect_first(request):
     try:
         xwalk = Crosswalk.objects.get(user=request.user)
     except Crosswalk.DoesNotExist:
-        xwalk = Crosswalk
+        xwalk = Crosswalk()
         xwalk.user = request.user
         xwalk.save()
 

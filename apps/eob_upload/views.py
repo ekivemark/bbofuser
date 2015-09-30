@@ -955,7 +955,7 @@ def create_patient(request, bb_dict):
     try:
         x_walk = Crosswalk.objects.get(user=request.user)
     except Crosswalk.DoesNotExist:
-        x_walk = Crosswalk
+        x_walk = Crosswalk()
         x_walk.user = request.user
         x_walk.save()
 
