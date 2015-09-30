@@ -175,6 +175,12 @@ THIRD_PARTY_APPS = (
     'requests',
 
 )
+###############
+# IMPORTANT: If running on Apache you need to
+# update /etc/apache2/sites-available/default-ssl.conf
+# with WSGIPassAuthorization On.
+# Insert before WSGIScriptAlias
+###############
 
 LOCAL_APPS = (
     # Add custom apps here

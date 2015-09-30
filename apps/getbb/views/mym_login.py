@@ -67,7 +67,16 @@ def connect_first(request):
     """
 
     u = User.objects.get(email=request.user.email)
-    xwalk = Crosswalk.objects.get(user=u)
+    try:
+        xwalk = Crosswalk.objects.get(user=request.user)
+    except Crosswalk.DoesNotExist:
+        xwalk = Crosswalk
+        xwalk.user = request.user
+        xwalk.save()
+
+    xwalk = Crosswalk.objects.get(user=request.user)
+
+    # xwalk = Crosswalk.objects.get(user=u)
 
     form = Medicare_Connect()
     if settings.DEBUG:
