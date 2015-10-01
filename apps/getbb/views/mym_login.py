@@ -129,10 +129,12 @@ def connect_first(request):
                         result = bb_to_json(request)
                         if settings.DEBUG:
                             print("BB Conversion:", result)
-                        if result['result']:
-                            xwalk.mmg_bbjson = result['mmg_bbjson']
-                            # print("returned json:", result['mmg_bbjson'])
-                            for key, value in result['mmg_bbjson'].items():
+                        if result['result'] == "OK":
+                            # xwalk.mmg_bbjson = result['mmg_bbjson']
+                            xwalk = Crosswalk.objects.get(user=request.user)
+                            print("returned json from xwalk:", xwalk.mmg_bbjson)
+                            
+                            for key, value in xwalk.mmg_bbjson.items():
                                 # print("Key:", key)
                                 if key == "patient":
                                     for k, v in value.items():
@@ -140,7 +142,7 @@ def connect_first(request):
                                         if k == "email":
                                             xwalk.mmg_email = v
                         if not xwalk.mmg_bbfhir:
-                            if result['mmg_bbjson']:
+                            if result['result'] == "OK":
                                 outcome = json_to_eob(request)
                                 if outcome['result'] == "OK":
                                     xwalk.mmg_bbfhir = True
@@ -530,9 +532,14 @@ def bb_to_json(request):
         json_stuff = parse_lines(bb_dict)
 
         print("json:", json_stuff)
+        print("Json Length:", len(json_stuff))
 
-        result['mmg_bbjson'] = json_stuff
-        messages.info(request,"BlueButton converted to json")
+        xwalk.mmg_bbjson = json_stuff
+        xwalk.save()
+
+        # result['mmg_bbjson'] = json_stuff
+        result['description'] = "BlueButton converted to json and saved"
+        messages.info(request, result['description'])
         result['result'] = "OK"
     else:
         messages.error(request,"Nothing to process ["+xwalk.mmg_bbdata[:80]+"]")
