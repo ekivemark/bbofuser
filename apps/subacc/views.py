@@ -390,7 +390,7 @@ def ask_user_for_permission(request):
                 request.session['device_ask_permission'] = {'count': ask_count}
 
                 # DONE: Record Access in DeviceAccessLog
-                return HttpResponseRedirect(reverse('subacc:device_login'))
+                return HttpResponseRedirect(reverse('subaccount:device_login'))
         else:
             messages.error(request,"I am sorry = there was a problem")
             render(request,
@@ -593,7 +593,7 @@ def Subaccount_Login(request, *args, **kwargs):
 
                             request.session['device_permission'] = {'subacc':device.id,
                                                                     'user':device.user.email}
-                            return HttpResponseRedirect(reverse("subacc:ask_permission"), args)
+                            return HttpResponseRedirect(reverse("subaccount:ask_permission"), args)
 
                         else: # subacc.permitted
 

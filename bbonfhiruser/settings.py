@@ -558,7 +558,7 @@ BS_PARSER = 'lxml'
 
 FHIR_SERVER = PARSE_INI.get('global', 'fhir_server')
 if FHIR_SERVER == '':
-    FHIR_SERVER = 'http://fhir.bbonfhir.com:8080/fhir-p'
+    FHIR_SERVER = 'http://fhir.bbonfhir.com/fhir-p'
     # FHIR_SERVER = 'http://localhost:8080/fhir-p'
 
 if DB_PLATFORM == 'sqlite3':

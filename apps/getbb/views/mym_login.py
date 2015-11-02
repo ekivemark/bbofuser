@@ -133,7 +133,7 @@ def connect_first(request):
                             # xwalk.mmg_bbjson = result['mmg_bbjson']
                             xwalk = Crosswalk.objects.get(user=request.user)
                             print("returned json from xwalk:", xwalk.mmg_bbjson)
-                            
+
                             for key, value in xwalk.mmg_bbjson.items():
                                 # print("Key:", key)
                                 if key == "patient":
@@ -208,6 +208,7 @@ def connect(request, mmg):
     # We will then want to get the Viewstate and eventvalidation entries
     # we need to submit them with the form
     rb = RoboBrowser()
+    mmg_back['robobrowser'] = rb
 
     # Set the default parser (lxml)
     # This avoids BeautifulSoup reporting an issue in the console/log

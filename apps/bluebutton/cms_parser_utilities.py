@@ -1130,8 +1130,11 @@ def get_line_dict(ln, i):
     found_line = ln[i]
     extract_line = found_line[i]
 
+    if extract_line == {}:
+        return extract_line
+
     # fix for missing claim header line(s)
-    if "Claim Number:" in extract_line["line"]:
+    if "claim number:" in extract_line["line"].lower():
         # we need to check the previous line which
         # should be "claimHeader". If it isn't we have a missing
         # header so change this line content type to "HEADER"
@@ -1142,7 +1145,11 @@ def get_line_dict(ln, i):
             do_DBUG("ln["+ str(prev_i)+"]:",
                     ln[prev_i],
                     prev_line)
-        if prev_line["line"].upper() == "CLAIM HEADER" or \
+        if prev_line == {}:
+            if DBUG:
+                do_DBUG("Previous Line was empty", prev_i)
+            pass
+        elif prev_line["line"].upper() == "CLAIM HEADER" or \
                 "SOURCE:" in prev_line["line"].upper():
             if DBUG:
                 do_DBUG("We found claim Number with previous claimHeader")

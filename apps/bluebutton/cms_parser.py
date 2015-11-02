@@ -372,8 +372,15 @@ def parse_lines(ln_list):
     # while i <= 44: #(len(ln_list)-1):
     while i <= (len(ln_list) - 1):
         # process each line in the list until end of list
-
+        # We need to deal with an empty dict
         ln = get_line_dict(ln_list, i)
+        if ln == {}:
+            if DBUG:
+                do_DBUG("Empty Ln", "Line(i):", i,
+                        "ln:", ln)
+            i += 1
+            # increment counter and go back to top of while loop
+            continue
 
         wrk_lvl = ln["level"]
 

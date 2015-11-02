@@ -1103,22 +1103,22 @@ def create_patient(request, bb_dict):
               r.text, "|",
               "Headers", r.headers)
 
+        if r.status_code == 201:
+            url_result = r.headers['content-location']
+            if settings.DEBUG:
+                print("url_content_location", url_result)
+            result = get_fhir_url(url_result, "Patient")
+
+            if settings.DEBUG:
+                print("result:", result, "|", result[1], "|")
+
+            x_walk.fhir_url_id = result[1]
+            x_walk.save()
+        # Get Id from successful write
+        # Update Patient Crosswalk
+
     except requests.ConnectionError:
         messages.error(request,"Problem posting:" + guid)
-
-    if r.status_code == 201:
-        url_result = r.headers['content-location']
-        if settings.DEBUG:
-            print("url_content_location", url_result)
-        result = get_fhir_url(url_result, "Patient")
-
-        if settings.DEBUG:
-            print("result:", result, "|", result[1], "|")
-
-        x_walk.fhir_url_id = result[1]
-        x_walk.save()
-    # Get Id from successful write
-    # Update Patient Crosswalk
 
     return
 
