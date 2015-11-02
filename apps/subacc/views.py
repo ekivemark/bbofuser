@@ -511,7 +511,7 @@ def Post_Device_Access(request, device, action="ACCESS"):
 #             # Call the ask_permission Screen
 #             if settings.DEBUG:
 #                 print("About to ask Permission")
-#             return HttpResponseRedirect(reverse("subacc:ask_permission"))
+#             return HttpResponseRedirect(reverse("subaccount:ask_permission"))
 #
 #         else:
 #             if settings.DEBUG:
