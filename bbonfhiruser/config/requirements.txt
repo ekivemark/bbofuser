@@ -47,7 +47,7 @@ pycparser==2.14
 pycrypto==2.6.1
 pyjwkest==1.0.5
 pylint==1.4.4
-pyOpenSSL==0.15.1
+pyopenssl>=17.5.0
 python-stdnum==1.1
 python3-ldap==0.9.8.4
 requests==2.20.0
