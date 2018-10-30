@@ -50,7 +50,7 @@ pylint==1.4.4
 pyOpenSSL==0.15.1
 python-stdnum==1.1
 python3-ldap==0.9.8.4
-requests==2.7.0
+requests==2.20.0
 robobrowser==0.5.3
 selenium==2.47.3
 shortuuid==0.4.2
