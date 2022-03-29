@@ -40,7 +40,7 @@ MechanicalSoup==0.3.1
 oauth2==1.9.0.post1
 oauthlib==0.7.2
 oic==0.7.8b0
-paramiko==1.15.2
+paramiko==2.10.1
 phonenumbers==7.0.7
 pyasn1==0.1.8
 pycparser==2.14
